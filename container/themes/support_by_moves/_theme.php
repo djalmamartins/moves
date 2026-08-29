@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <?= $head ?>
     <link rel="icon" href="<?= site_favicon_url() ?>">
+    <link rel="stylesheet" href="<?= url('/organic/organic.min.css') ?>">
+    <link rel="stylesheet" href="<?= url('/organic/compat-v1.css') ?>">
     <link rel="stylesheet" href="<?= url('/container/themes/support_by_moves/assets/support.css?v=' . filemtime(__DIR__ . '/assets/support.css')) ?>">
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 </head>
@@ -33,6 +35,8 @@
         <span>© <?= date('Y') ?> <?= htmlspecialchars(CONF_SITE_NAME) ?></span>
     </nav>
 </footer>
+<script type="module" src="<?= url('/organic/organic.min.js') ?>"></script>
+<script src="<?= url('/organic/compat-v1.js') ?>"></script>
 <?= $this->section('scripts') ?>
 </body>
 </html>

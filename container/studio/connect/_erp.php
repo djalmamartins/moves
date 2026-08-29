@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <script src="<?= url("/organic/scripts/tracker.js"); ?>"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <?= $head; ?>
@@ -47,6 +46,8 @@
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <script src="<?= themeErp("/assets/scripts.js"); ?>"></script>
+<script type="module" src="<?= url('/organic/organic.min.js') ?>"></script>
+<script src="<?= url('/organic/compat-v1.js') ?>"></script>
 
 <?= $this->section("scripts"); ?>
 

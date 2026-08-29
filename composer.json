@@ -24,6 +24,7 @@
       "source/Boot/Settings.php",
       "source/Boot/Minify/Web.php",
       "source/Boot/Minify/App.php",
+      "source/Boot/Minify/Erp.php",
       "source/Boot/Minify/Studio.php"
     ]
   },

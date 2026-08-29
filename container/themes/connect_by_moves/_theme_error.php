@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <script src="<?= url("/organic/scripts/tracker.js"); ?>"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <?= $head; ?>
@@ -34,6 +33,8 @@
 <!--MODALS-->
 <?= $this->insert("views/modals", $this->data); ?>
 <script src="<?= theme("/assets/scripts.js"); ?>"></script>
+<script type="module" src="<?= url('/organic/organic.min.js') ?>"></script>
+<script src="<?= url('/organic/compat-v1.js') ?>"></script>
 <?= $this->section("scripts"); ?>
 </body>
 </html>

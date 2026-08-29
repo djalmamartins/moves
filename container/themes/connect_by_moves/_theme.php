@@ -42,6 +42,8 @@
 <script src="<?= theme("/assets/js/counters.js"); ?>"></script>
 <script src="<?= theme("/assets/js/testimonials.js"); ?>"></script>
 <script src="<?= theme("/assets/js/motion.js"); ?>"></script>
+<script type="module" src="<?= url('/organic/organic.min.js') ?>"></script>
+<script src="<?= url('/organic/compat-v1.js') ?>"></script>
 <?= $this->section("scripts"); ?>
 </body>
 </html>

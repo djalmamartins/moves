@@ -20,11 +20,10 @@ if (is_local_host()
      * CSS
      */
     $minCSS = new CSS();
-    $minCSS->add(__DIR__ . "/../../organic/styles/toolpit.css");
-    $minCSS->add(__DIR__ . "/../../organic/owl/owl.carousel.min.css");
-    $minCSS->add(__DIR__ . "/../../organic/owl/owl.theme.default.min.css");
-    $minCSS->add(__DIR__ . "/../../organic/styles/styles.css");
-    $minCSS->add(__DIR__ . "/../../organic/styles/organic.css");
+    $minCSS->add(__DIR__ . "/../../container/shared/assets/vendor/owl/owl.carousel.min.css");
+    $minCSS->add(__DIR__ . "/../../container/shared/assets/vendor/owl/owl.theme.default.min.css");
+    $minCSS->add(__DIR__ . "/../../organic/organic.min.css");
+    $minCSS->add(__DIR__ . "/../../organic/compat-v1.css");
 
     //theme CSS
     $cssDir = scandir(__DIR__ . "/../../container/studio/" . CONF_VIEW_ERP . "/assets/css");
@@ -37,19 +36,20 @@ if (is_local_host()
 
     //Minify CSS
     $minCSS->minify($erpStyleTarget);
+    chmod($erpStyleTarget, 0664);
 
     /**
      * JS
      */
     $minJS = new JS();
-    $minJS->add(__DIR__ . "/../../organic/scripts/jquery.min.js");
-    $minJS->add(__DIR__ . "/../../organic/owl/owl.carousel.js");
-    $minJS->add(__DIR__ . "/../../organic/scripts/jquery.form.js");
-    $minJS->add(__DIR__ . "/../../organic/scripts/jquery-ui.js");
-    $minJS->add(__DIR__ . "/../../organic/scripts/jquery.mask.js");
-    $minJS->add(__DIR__ . "/../../organic/scripts/highcharts.js");
-    $minJS->add(__DIR__ . "/../../organic/scripts/tracker.js");
-    $minJS->add(__DIR__ . "/../../organic/scripts/validation.js");
+    $minJS->add(__DIR__ . "/../../container/shared/assets/vendor/scripts/jquery.min.js");
+    $minJS->add(__DIR__ . "/../../container/shared/assets/vendor/owl/owl.carousel.js");
+    $minJS->add(__DIR__ . "/../../container/shared/assets/vendor/scripts/jquery.form.js");
+    $minJS->add(__DIR__ . "/../../container/shared/assets/vendor/scripts/jquery-ui.js");
+    $minJS->add(__DIR__ . "/../../container/shared/assets/vendor/scripts/jquery.mask.js");
+    $minJS->add(__DIR__ . "/../../container/shared/assets/vendor/scripts/highcharts.js");
+    $minJS->add(__DIR__ . "/../../container/shared/assets/vendor/scripts/tracker.js");
+    $minJS->add(__DIR__ . "/../../container/shared/assets/vendor/scripts/validation.js");
 
     //theme CSS
     $jsDir = scandir(__DIR__ . "/../../container/studio/" . CONF_VIEW_ERP . "/assets/js");
@@ -62,4 +62,5 @@ if (is_local_host()
 
     //Minify JS
     $minJS->minify($erpScriptTarget);
+    chmod($erpScriptTarget, 0664);
 }
