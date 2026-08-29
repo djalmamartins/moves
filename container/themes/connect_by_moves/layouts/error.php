@@ -38,8 +38,8 @@
 
 <!--MODALS-->
 <?= $this->insert("pages/modals", $this->data); ?>
-<script src="<?= url('/organic/organic.global.min.js') ?>"></script>
-<script src="<?= url('/organic/compat-v1.js') ?>"></script>
+<script src="<?= url('/organic/organic.global.min.js') . '?v=' . filemtime(dirname(__DIR__, 4) . '/organic/organic.global.min.js') ?>"></script>
+<script src="<?= url('/organic/compat-v1.js') . '?v=' . filemtime(dirname(__DIR__, 4) . '/organic/compat-v1.js') ?>"></script>
 <script src="<?= theme("/assets/scripts.js"); ?>"></script>
 <?= $this->section("scripts"); ?>
 </body>

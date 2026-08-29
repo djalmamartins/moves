@@ -259,7 +259,7 @@ var OrganicBundle = (() => {
     return el;
   }
   function scan(root2 = document) {
-    const selector = '[data-org-icon], [class^="icon-"], [class*=" icon-"], [class*="org-icon-"]';
+    const selector = '[data-org-icon], i[class^="icon-"], i[class*=" icon-"], span[class^="icon-"], span[class*=" icon-"], i[class*="org-icon-"], span[class*="org-icon-"]';
     root2.querySelectorAll?.(selector).forEach(render);
     if (root2.nodeType === 1 && root2.matches?.(selector)) render(root2);
   }

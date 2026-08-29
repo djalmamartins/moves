@@ -28,6 +28,7 @@ button.main_header_nav_mobile,button.main_header_nav_mobile_close{padding:0;bord
 .cards--testimonials article{flex:0 0 calc((100% - 40px)/3);margin:0}
 .cards--testimonials article{box-shadow:0 3px 10px rgb(16 35 29 / .05)}
 .cards--testimonials article:hover{box-shadow:0 8px 18px rgb(16 35 29 / .10)}
+@media (max-width:1400px){.main_header_logo{width:200px}.main_header_nav_links{gap:2px}.main_header_nav_links .link{padding-inline:9px;font-size:13px}.main_header_nav_links .link:nth-last-child(2){margin-left:4px;padding-inline:14px}.main_header_nav_links .link:last-child{margin-left:2px;padding-inline:12px}}
 .testimonial-card__header{display:flex;align-items:center;gap:14px}
 .testimonial-card__photo{width:58px;height:58px;flex:0 0 58px;display:block;object-fit:cover;border:2px solid var(--web-primary);border-radius:50%}
 .testimonial-card__header .stars{margin-bottom:5px}

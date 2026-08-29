@@ -245,7 +245,7 @@ function render(el) {
   return el;
 }
 function scan(root=document) {
-  const selector='[data-org-icon], [class^="icon-"], [class*=" icon-"], [class*="org-icon-"]';
+  const selector='[data-org-icon], i[class^="icon-"], i[class*=" icon-"], span[class^="icon-"], span[class*=" icon-"], i[class*="org-icon-"], span[class*="org-icon-"]';
   root.querySelectorAll?.(selector).forEach(render);
   if (root.nodeType===1 && root.matches?.(selector)) render(root);
 }
