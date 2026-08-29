@@ -20,6 +20,7 @@
 /storage/images/cache/
 /storage/logs/*
 !/storage/logs/.htaccess
+/storage/output/
 /storage/sessions/
 /storage/temp/
 /storage/tmp/
