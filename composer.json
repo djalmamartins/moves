@@ -1,6 +1,7 @@
 {
   "name": "djalmamartins/moves-os",
-  "description": "MovesOS",
+  "description": "Moves platform for Studio, Web, ERP and resident applications",
+  "license": "proprietary",
   "minimum-stability": "stable",
   "authors": [
     {
