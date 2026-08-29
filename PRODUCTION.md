@@ -13,22 +13,42 @@
 Configure fora do repositório:
 
 ```text
-MOVESOS_DB_HOST=localhost
-MOVESOS_DB_USER=usuario_do_banco
-MOVESOS_DB_PASS=senha_forte
-MOVESOS_DB_NAME=banco_movesos
-MOVESOS_ENV=production
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://seu-dominio.example
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=banco_movesos
+DB_USER=usuario_do_banco
+DB_PASS=senha_forte
 ```
 
-As credenciais antigas precisam ser revogadas, pois já estiveram gravadas no código.
+Os nomes `MOVESOS_*` continuam aceitos somente por compatibilidade. Novas instalações
+devem usar as variáveis canônicas acima. Nunca envie o arquivo `.env` ao Git.
+
+Para habilitar o Banco Inter, gere um novo aplicativo/segredo no Internet Banking,
+revogue a credencial que anteriormente esteve no código e configure também
+`INTER_CLIENT_ID`, `INTER_CLIENT_SECRET`, `INTER_CERT_PATH` e `INTER_KEY_PATH`.
+Certificado e chave devem ficar fora do diretório público e legíveis apenas pelo
+usuário do PHP.
 
 ## Tarefas agendadas
 
 Execute a cada minuto, ajustando o caminho absoluto do projeto:
 
 ```text
-* * * * * MOVESOS_ENV=production /usr/bin/php /caminho/do/projeto/service/process-mail-queue.php >> /caminho/privado/movesos-mail.log 2>&1
+* * * * * APP_ENV=production /usr/bin/php /caminho/do/projeto/service/process-mail-queue.php >> /caminho/privado/movesos-mail.log 2>&1
 ```
+
+## Procedimento de implantação
+
+1. Salvar backup do banco, de `storage/` e do `.env` atual.
+2. Publicar o commit aprovado pelo CI em um novo diretório de release.
+3. Executar `composer install --no-dev --prefer-dist --optimize-autoloader`.
+4. Restaurar o `.env` externo e apontar `storage/` persistente para a release.
+5. Executar as migrations aplicáveis e conferir suas cópias de segurança.
+6. Trocar o link/diretório ativo de forma atômica e reiniciar o PHP quando necessário.
+7. Executar os testes rápidos abaixo; em caso de falha, voltar à release anterior.
 
 ## Antes de liberar tráfego
 
