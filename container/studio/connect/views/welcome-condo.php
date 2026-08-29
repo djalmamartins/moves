@@ -1,0 +1,23 @@
+<div class="container">
+    <div class="main-welcome">
+        <div class="main-welcome-condo">
+            <div>
+                <h1>Selecione o Condomínio</h1>
+                <p>
+                    <a class="link link--arrowed" href="<?= url("/erp/register/condo"); ?>">
+                        Cadastrar novo condomíno
+                        <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28"
+                             viewBox="0 0 32 32">
+                            <g fill="none" stroke="var(--erp-primary)" stroke-width="1.5" stroke-linejoin="round"
+                               stroke-miterlimit="10">
+                                <circle class="arrow-icon--circle" cx="16" cy="16" r="15.12"></circle>
+                                <path class="arrow-icon--arrow"
+                                      d="M16.14 9.93L22.21 16l-6.07 6.07M8.23 16h13.98"></path>
+                            </g>
+                        </svg>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

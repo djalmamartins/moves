@@ -1,0 +1,33 @@
+# Local environment and editor metadata
+.env
+.env.*
+!.env.example
+.DS_Store
+.vscode/
+
+# Installed dependencies and test/build caches
+/vendor/
+/node_modules/
+.phpunit.cache/
+.phpunit.result.cache
+
+# Runtime data. Keep only explicit access-control placeholders.
+/storage/backups/
+/storage/cache/
+/storage/cert/*
+!/storage/cert/.htaccess
+/storage/files/
+/storage/images/cache/
+/storage/logs/*
+!/storage/logs/.htaccess
+/storage/sessions/
+/storage/temp/
+/storage/tmp/
+/storage/uploads/
+/output/
+/tmp/*
+!/tmp/.gitkeep
+
+# Local archives and operating-system artifacts
+/*.zip
+/organic/icons/*.zip

@@ -1,0 +1,27 @@
+/* ---- TYPOGRAPHY ---- */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700;800&display=swap');
+@font-face {
+    font-family: GothamMedium;
+    src: url(fonts/GothamMedium.otf);
+}
+
+@font-face {
+    font-family: "OrgGotham";
+    src: url(fonts/GothamBookRegular.otf) format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "OrgGotham";
+    src: url(fonts/GothamMedium.otf) format("opentype");
+    font-weight: 500 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: GothamBook;
+    src: url(fonts/GothamBookRegular.otf);
+}
