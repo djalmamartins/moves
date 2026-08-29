@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+if (defined('MOVESOS_TEST_BOOTSTRAPPED')) {
+    return;
+}
+define('MOVESOS_TEST_BOOTSTRAPPED', true);
+
 require __DIR__ . '/prepare-environment.php';
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
