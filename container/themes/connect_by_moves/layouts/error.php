@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <?= $head; ?>
     <link rel="icon" type="image/png" href="<?= theme("/assets/images/favicon.png"); ?>"/>
-    <link rel="stylesheet" href="<?= theme("/assets/style.css"); ?>"/>
-    <link rel="stylesheet" href="<?= theme("/assets/responsive.css"); ?>"/>
-    <link rel="stylesheet" href="<?= theme("/assets/pages.css"); ?>"/>
-    <link rel="stylesheet" href="<?= theme("/assets/motion.css"); ?>"/>
+    <link rel="stylesheet" href="<?= theme('/assets/style.css') . '?v=' . filemtime(__DIR__ . '/../assets/style.css') ?>"/>
+    <link rel="stylesheet" href="<?= theme('/assets/responsive.css') . '?v=' . filemtime(__DIR__ . '/../assets/responsive.css') ?>"/>
+    <link rel="stylesheet" href="<?= theme('/assets/pages.css') . '?v=' . filemtime(__DIR__ . '/../assets/pages.css') ?>"/>
+    <link rel="stylesheet" href="<?= theme('/assets/motion.css') . '?v=' . filemtime(__DIR__ . '/../assets/motion.css') ?>"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
 <body class="organic-error-layout">
