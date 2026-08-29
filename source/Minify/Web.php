@@ -11,9 +11,6 @@ if (is_local_host()) {
      * CSS
      */
     $minCSS = new CSS();
-    $minCSS->add(__DIR__ . "/../../organic/organic.min.css");
-    $minCSS->add(__DIR__ . "/../../organic/compat-v1.css");
-
     //theme CSS
     $cssDir = scandir(__DIR__ . "/../../container/themes/" . CONF_VIEW_THEME . "/assets/css");
     foreach ($cssDir as $css) {

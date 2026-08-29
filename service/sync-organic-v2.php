@@ -62,6 +62,7 @@ $copyTree = static function (string $from, string $to) use (&$copyTree): void {
 
 try {
     $copyTree($sourceRoot . '/assets', $targetRoot . '/assets');
+    $copyTree($sourceRoot . '/dist/fonts', $targetRoot . '/fonts');
     $copyTree($sourceRoot . '/src/js', $targetRoot . '/modules');
     $copyTree($sourceRoot . '/dist/organic-editor', $targetRoot . '/editor');
 } catch (Throwable $error) {

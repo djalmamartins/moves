@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <?= $head; ?>
     <link rel="icon" href="<?= site_favicon_url(); ?>"/>
+    <link rel="stylesheet" href="<?= url('/organic/organic.min.css') . '?v=' . filemtime(dirname(__DIR__, 4) . '/organic/organic.min.css') ?>"/>
+    <link rel="stylesheet" href="<?= url('/organic/compat-v1.css') . '?v=' . filemtime(dirname(__DIR__, 4) . '/organic/compat-v1.css') ?>"/>
     <link rel="stylesheet" href="<?= theme('/assets/style.css') . '?v=' . filemtime(__DIR__ . '/../assets/style.css') ?>"/>
     <link rel="stylesheet" href="<?= theme('/assets/responsive.css') . '?v=' . filemtime(__DIR__ . '/../assets/responsive.css') ?>"/>
     <link rel="stylesheet" href="<?= theme('/assets/pages.css') . '?v=' . filemtime(__DIR__ . '/../assets/pages.css') ?>"/>
