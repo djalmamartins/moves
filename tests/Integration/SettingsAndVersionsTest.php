@@ -22,14 +22,29 @@ final class SettingsAndVersionsTest extends TestCase
     public function testRequiredThemeEntrypointsExist(): void
     {
         $root = dirname(__DIR__, 2);
-        self::assertFileExists($root . '/container/themes/connect_by_moves/default.php');
-        self::assertFileExists($root . '/container/themes/support_by_moves/default.php');
-        self::assertFileExists($root . '/container/studio/app_connect/default.php');
-        self::assertFileExists($root . '/container/studio/connect/default.php');
-        self::assertFileExists($root . '/container/studio/moves_studio/default.php');
-        self::assertFileExists($root . '/container/studio/moves_studio/layouts/error.php');
-        self::assertDirectoryExists($root . '/container/studio/moves_studio/components');
-        self::assertDirectoryExists($root . '/container/themes/connect_by_moves/pages');
+        self::assertFileExists($root . '/container/web/default/default.php');
+        self::assertFileExists($root . '/container/web/support/default.php');
+        self::assertFileExists($root . '/container/apps/residents/default/default.php');
+        self::assertFileExists($root . '/container/apps/erp/default/default.php');
+        self::assertFileExists($root . '/container/apps/studio/default/default.php');
+        self::assertFileExists($root . '/container/apps/studio/default/layouts/error.php');
+        self::assertDirectoryExists($root . '/container/apps/studio/default/components');
+        self::assertDirectoryExists($root . '/container/web/default/pages');
+    }
+
+    public function testCanonicalArchitectureHasNoLegacyParallelTrees(): void
+    {
+        $root = dirname(__DIR__, 2);
+
+        foreach (['container/themes', 'container/studio', 'container/send', 'database', 'source/Public', 'source/Minify'] as $legacy) {
+            self::assertDirectoryDoesNotExist($root . '/' . $legacy);
+        }
+
+        self::assertSame($root . '/container/web/default', moves_container_path('web', 'connect_by_moves'));
+        self::assertSame($root . '/container/apps/studio/default', moves_container_path('studio', 'moves_studio'));
+        self::assertSame($root . '/container/apps/erp/default', moves_container_path('erp', 'connect'));
+        self::assertSame($root . '/container/apps/residents/default', moves_container_path('residents', 'app_connect'));
+        self::assertSame($root . '/container/mail/default', moves_container_path('mail', 'mail'));
     }
 
     public function testVersionsAreIndependentByProduct(): void

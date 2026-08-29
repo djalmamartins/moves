@@ -38,10 +38,9 @@ Studio. O Router atual é preservado.
 
 ## Minify
 
-Os pontos oficiais são `source/Boot/Minify/Web.php`, `App.php` e `Studio.php`.
-Web e App mantêm os adaptadores em `source/Minify/`, que usam os componentes
-MovesCode e referenciam os assets Organic. Esses assets permanecem separados
-do núcleo da aplicação.
+Os pontos oficiais ficam em `source/Services/Minify/`: `Web.php`, `App.php`, `Erp.php` e `Studio.php`.
+Os serviços usam os componentes MovesCode e referenciam os assets Organic,
+que permanecem separados do núcleo da aplicação.
 
 ## Testes
 

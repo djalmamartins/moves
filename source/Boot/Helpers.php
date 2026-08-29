@@ -368,9 +368,41 @@ function searchOwner($units_id, $owner): ?string
  * @param string $theme
  * @return string
  */
+function moves_container_theme(string $area, string $theme): string
+{
+    $aliases = [
+        'web' => ['connect_by_moves' => 'default', 'support_by_moves' => 'support'],
+        'studio' => ['moves_studio' => 'default'],
+        'erp' => ['connect' => 'default'],
+        'residents' => ['app_connect' => 'default'],
+        'mail' => ['mail' => 'default'],
+    ];
+
+    return $aliases[$area][$theme] ?? $theme;
+}
+
+function moves_container_path(string $area, string $theme): string
+{
+    $section = in_array($area, ['studio', 'erp', 'residents'], true)
+        ? "apps/{$area}"
+        : $area;
+
+    return dirname(__DIR__, 2) . "/container/{$section}/" . moves_container_theme($area, $theme);
+}
+
+function moves_container_url(string $area, string $theme, ?string $path = null): string
+{
+    $section = in_array($area, ['studio', 'erp', 'residents'], true)
+        ? "apps/{$area}"
+        : $area;
+    $theme = moves_container_theme($area, $theme);
+
+    return url("container/{$section}/{$theme}" . ($path ? "/" . ltrim($path, "/") : ""));
+}
+
 function theme(?string $path = null, string $theme = CONF_VIEW_THEME): string
 {
-    return url("container/themes/{$theme}" . ($path ? "/" . ltrim($path, "/") : ""));
+    return moves_container_url('web', $theme, $path);
 }
 
 /**
@@ -380,7 +412,7 @@ function theme(?string $path = null, string $theme = CONF_VIEW_THEME): string
  */
 function themeApp(?string $path = null, string $theme = CONF_VIEW_APP): string
 {
-    return url("container/studio/{$theme}" . ($path ? "/" . ltrim($path, "/") : ""));
+    return moves_container_url('residents', $theme, $path);
 }
 
 /**
@@ -390,7 +422,7 @@ function themeApp(?string $path = null, string $theme = CONF_VIEW_APP): string
  */
 function themeErp(?string $path = null, string $theme = CONF_VIEW_ERP): string
 {
-    return url("container/studio/{$theme}" . ($path ? "/" . ltrim($path, "/") : ""));
+    return moves_container_url('erp', $theme, $path);
 }
 
 
@@ -401,7 +433,7 @@ function themeErp(?string $path = null, string $theme = CONF_VIEW_ERP): string
  */
 function themeMail(?string $path = null, string $theme = CONF_VIEW_MAIL): string
 {
-    return url("container/send/{$theme}" . ($path ? "/" . ltrim($path, "/") : ""));
+    return moves_container_url('mail', $theme, $path);
 }
 
 /**
@@ -409,9 +441,9 @@ function themeMail(?string $path = null, string $theme = CONF_VIEW_MAIL): string
  * @param string $theme
  * @return string
  */
-function themeStudio(?string $path = null, string $theme = CONF_VIEW_ERP): string
+function themeStudio(?string $path = null, string $theme = 'moves_studio'): string
 {
-    return url("container/studio/{$theme}" . ($path ? "/" . ltrim($path, "/") : ""));
+    return moves_container_url('studio', $theme, $path);
 }
 /**
  * @param string $image

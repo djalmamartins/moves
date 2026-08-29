@@ -6,7 +6,7 @@ namespace MovesOSTests\Integration;
 
 use MovesOSTests\TestCase;
 use ReflectionClass;
-use Source\Public\Studio\Studio;
+use Source\Controllers\Studio\Studio;
 use Source\Models\User;
 
 final class ServiceDeskTest extends TestCase

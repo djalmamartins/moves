@@ -82,10 +82,10 @@ $pdo->exec("ALTER TABLE settings
     ADD COLUMN IF NOT EXISTS site_logo_svg VARCHAR(255) NULL AFTER site_photo,
     ADD COLUMN IF NOT EXISTS site_icon VARCHAR(255) NULL AFTER site_logo_svg,
     ADD COLUMN IF NOT EXISTS site_favicon VARCHAR(255) NULL AFTER site_icon,
-    ADD COLUMN IF NOT EXISTS view_support VARCHAR(255) NULL DEFAULT 'support_by_moves' AFTER view_theme,
+    ADD COLUMN IF NOT EXISTS view_support VARCHAR(255) NULL DEFAULT 'support' AFTER view_theme,
     ADD COLUMN IF NOT EXISTS access_site TINYINT(1) NOT NULL DEFAULT 1 AFTER access_app,
     ADD COLUMN IF NOT EXISTS access_support TINYINT(1) NOT NULL DEFAULT 1 AFTER access_site");
 $pdo->exec("INSERT INTO settings
     (id,mode,site_name,site_title,site_desc,site_lang,site_domain_ssl,view_theme,view_support,view_app,view_erp,view_admin,view_mail,view_upkeep,mail_name,mail_address,mail_lang,mail_html,mail_auth,mail_charset,pay_mode,pay_back,timezone_set,access_studio,access_erp,access_app)
-    VALUES (1,1,'MovesOS Test','MovesOS Test','Ambiente automatizado','pt_BR','https://localhost','connect_by_moves','support_by_moves','app_connect','connect','moves_studio','mail','moves_upkeep','MovesOS Test','test@localhost','pt_BR','1','0','UTF-8','test','/','America/Sao_Paulo',1,1,1)
+    VALUES (1,1,'MovesOS Test','MovesOS Test','Ambiente automatizado','pt_BR','https://localhost','default','support','default','default','default','default','default','MovesOS Test','test@localhost','pt_BR','1','0','UTF-8','test','/','America/Sao_Paulo',1,1,1)
     ON DUPLICATE KEY UPDATE site_name=VALUES(site_name),timezone_set=VALUES(timezone_set),access_studio=1,access_erp=1,access_app=1,access_site=1,access_support=1");

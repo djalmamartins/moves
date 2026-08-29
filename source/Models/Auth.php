@@ -188,7 +188,7 @@ class Auth extends Model
             $user->save();
         }
 
-        $view = new View(__DIR__ . "/../../container/send/" . CONF_VIEW_MAIL);
+        $view = new View(moves_container_path('mail', CONF_VIEW_MAIL));
         $message = $view->render("forget", [
             "first_name" => $user->first_name,
             "forget_link" => url("/forget/{$user->forget}:{$user->email}")

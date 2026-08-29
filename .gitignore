@@ -4,6 +4,7 @@
 !.env.example
 .DS_Store
 .vscode/
+.idea/
 
 # Installed dependencies and test/build caches
 /vendor/
@@ -17,7 +18,7 @@
 /storage/cert/*
 !/storage/cert/.htaccess
 /storage/files/
-/storage/images/cache/
+/storage/images/
 /storage/logs/*
 !/storage/logs/.htaccess
 /storage/output/
@@ -25,9 +26,6 @@
 /storage/temp/
 /storage/tmp/
 /storage/uploads/
-/output/
-/tmp/*
-!/tmp/.gitkeep
 
 # Local archives and operating-system artifacts
 /*.zip

@@ -23,10 +23,10 @@
       "source/Boot/Helpers.php",
       "source/Boot/Connection.php",
       "source/Boot/Settings.php",
-      "source/Boot/Minify/Web.php",
-      "source/Boot/Minify/App.php",
-      "source/Boot/Minify/Erp.php",
-      "source/Boot/Minify/Studio.php"
+      "source/Services/Minify/Web.php",
+      "source/Services/Minify/App.php",
+      "source/Services/Minify/Erp.php",
+      "source/Services/Minify/Studio.php"
     ]
   },
   "autoload-dev": {

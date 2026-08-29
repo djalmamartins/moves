@@ -19,13 +19,12 @@ uploads, logs, backups ou outros dados gerados em `storage/`.
 ## Estrutura
 
 ```text
-api/          integrações e interfaces
-container/    layouts, páginas, componentes e assets
+api/          ponto reservado para interfaces públicas
+container/    apps, Web, Mail e recursos visuais compartilhados
 organic/      distribuição oficial do Organic V2 usada pelo Moves
-service/      workers, manutenção e automações CLI
+service/      commands, jobs e workers operacionais
 source/       aplicação PHP
-storage/      dados e arquivos gerados no ambiente
-database/     schema e migrations versionáveis
+storage/      dados gerados e suporte de banco em storage/database
 tests/        testes unitários e de integração
 ```
 
@@ -38,7 +37,7 @@ terceiros compartilhadas ficam em `container/shared/assets/vendor/`.
 cd ../organic-v2
 npm ci && npm test && npm run build
 cd ../erp
-php service/sync-organic-v2.php ../organic-v2
+php service/commands/sync-organic-v2.php ../organic-v2
 ```
 
 Consulte [arquitetura](docs/architecture.md),

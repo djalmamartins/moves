@@ -13,7 +13,7 @@ npm test
 npm run build
 
 cd ../erp
-php service/sync-organic-v2.php ../organic-v2
+php service/commands/sync-organic-v2.php ../organic-v2
 ```
 
 Os adaptadores `compat-v1.css` e `compat-v1.js` são temporários e devem ser

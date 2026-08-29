@@ -37,7 +37,7 @@ usuário do PHP.
 Execute a cada minuto, ajustando o caminho absoluto do projeto:
 
 ```text
-* * * * * APP_ENV=production /usr/bin/php /caminho/do/projeto/service/process-mail-queue.php >> /caminho/privado/movesos-mail.log 2>&1
+* * * * * APP_ENV=production /usr/bin/php /caminho/do/projeto/service/workers/process-mail-queue.php >> /caminho/privado/movesos-mail.log 2>&1
 ```
 
 ## Procedimento de implantação

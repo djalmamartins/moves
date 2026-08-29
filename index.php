@@ -23,9 +23,9 @@ $route = new Router(url(), ":");
 $moduleRole = Access::role(Auth::user());
 $developerBypass = ($moduleRole->slug ?? null) === "developer";
 if (CONF_ACCESS_SITE || $developerBypass) {
-    require __DIR__ . "/container/themes/" . CONF_VIEW_THEMES . "/default.php";
+    require moves_container_path('web', CONF_VIEW_THEMES) . "/default.php";
 }
-$supportRoutes = __DIR__ . "/container/themes/" . CONF_VIEW_SUPPORT . "/default.php";
+$supportRoutes = moves_container_path('web', CONF_VIEW_SUPPORT) . "/default.php";
 if ((CONF_ACCESS_SUPPORT || $developerBypass) && is_file($supportRoutes)) {
     require $supportRoutes;
 }
@@ -33,12 +33,12 @@ if ((CONF_ACCESS_SUPPORT || $developerBypass) && is_file($supportRoutes)) {
 /**
  * STUDIO ROUTES
  */
-require __DIR__ . "/container/studio/moves_studio/default.php";
+require moves_container_path('studio', 'default') . "/default.php";
 
 /**
  * APP
  */
-$appRoutes = __DIR__ . "/container/studio/" . CONF_VIEW_APP . "/default.php";
+$appRoutes = moves_container_path('residents', CONF_VIEW_APP) . "/default.php";
 if (is_file($appRoutes)) {
     require $appRoutes;
 }
@@ -46,7 +46,7 @@ if (is_file($appRoutes)) {
 /**
  * ERP ROUTES
  */
-$erpRoutes = __DIR__ . "/container/studio/" . CONF_VIEW_ERP . "/default.php";
+$erpRoutes = moves_container_path('erp', CONF_VIEW_ERP) . "/default.php";
 if (is_file($erpRoutes)) {
     require $erpRoutes;
 }
