@@ -29,7 +29,7 @@ class Condo extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condo/base", [
+        echo $this->view->render("components/condo/base", [
             "app" => "condo/home",
             "head" => $head,
             "user" => $this->user,
@@ -53,7 +53,7 @@ class Condo extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condo/home", [
+        echo $this->view->render("components/condo/home", [
             "app" => "condo/home",
             "head" => $head,
             "user" => $this->user,
@@ -79,7 +79,7 @@ class Condo extends Erp
 
         $edit = ($data["edit"] ?? null);
 
-        echo $this->view->render("widgets/condo/profile", [
+        echo $this->view->render("components/condo/profile", [
             "app" => "condo/profile",
             "head" => $head,
             "user" => $this->user,
@@ -106,7 +106,7 @@ class Condo extends Erp
 
         $edit = ($data["edit"] ?? null);
 
-        echo $this->view->render("widgets/condo/address", [
+        echo $this->view->render("components/condo/address", [
             "app" => "condo/address",
             "head" => $head,
             "user" => $this->user,
@@ -138,7 +138,7 @@ class Condo extends Erp
             $units = null;
         }
 
-        echo $this->view->render("widgets/condo/units", [
+        echo $this->view->render("components/condo/units", [
             "app" => "condo/units",
             "head" => $head,
             "user" => $this->user,
@@ -172,7 +172,7 @@ class Condo extends Erp
         }
 
 
-        echo $this->view->render("widgets/condo/owner", [
+        echo $this->view->render("components/condo/owner", [
             "app" => "condo/units",
             "head" => $head,
             "user" => $this->user,

@@ -1,4 +1,4 @@
-<?php $this->layout("_theme", ["title" => "Recupere sua senha"]); ?>
+<?php $this->layout("layouts/theme", ["title" => "Recupere sua senha"]); ?>
 
 <table role="presentation" cellspacing="0" cellpadding="0" width="100%" align="center" style="background: url('image/backgroudEmail.svg') #FFFFFF center top;
         border-top: 1px solid #C5A131;max-width:600px">

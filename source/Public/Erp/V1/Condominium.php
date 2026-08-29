@@ -69,7 +69,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/home", [
+        echo $this->view->render("components/condominium/home", [
             "app" => "condominium/home",
             "head" => $head,
             "user" => $this->user,
@@ -119,7 +119,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/profile", [
+        echo $this->view->render("components/condominium/profile", [
             "app" => "condominium/profile/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,
@@ -178,7 +178,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/create", [
+        echo $this->view->render("components/condominium/create", [
             "app" => $link,
             "head" => $head,
             "user" => $this->user,
@@ -549,7 +549,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/address", [
+        echo $this->view->render("components/condominium/address", [
             "app" => "condominium/address/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,
@@ -606,7 +606,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/address_edit", [
+        echo $this->view->render("components/condominium/address_edit", [
             "app" => "condominium/address/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,
@@ -684,7 +684,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/units", [
+        echo $this->view->render("components/condominium/units", [
             "app" => "condominium/units/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,
@@ -752,7 +752,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/create_units", [
+        echo $this->view->render("components/condominium/create_units", [
             "app" => $link,
             "head" => $head,
             "user" => $this->user,
@@ -829,7 +829,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/accountable", [
+        echo $this->view->render("components/condominium/accountable", [
             "app" => "condominium/accountable/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,
@@ -908,7 +908,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/banks", [
+        echo $this->view->render("components/condominium/banks", [
             "app" => "condominium/banks/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,
@@ -987,7 +987,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/documents", [
+        echo $this->view->render("components/condominium/documents", [
             "app" => "condominium/documents/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,
@@ -1066,7 +1066,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/occurrences", [
+        echo $this->view->render("components/condominium/occurrences", [
             "app" => "condominium/occurrences/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,
@@ -1145,7 +1145,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/apportionment", [
+        echo $this->view->render("components/condominium/apportionment", [
             "app" => "condominium/apportionment/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,
@@ -1224,7 +1224,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/maintenance", [
+        echo $this->view->render("components/condominium/maintenance", [
             "app" => "condominium/maintenance/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,
@@ -1276,7 +1276,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/Condominium/invoices", [
+        echo $this->view->render("components/Condominium/invoices", [
             "app" => "Condominium/invoices/{$condominium->id}",
             "head" => $head,
             "user" => $this->user,
@@ -1324,7 +1324,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/Condominium/historic", [
+        echo $this->view->render("components/Condominium/historic", [
             "app" => "Condominium/historic/{$condominium->id}",
             "head" => $head,
             "user" => $this->user,

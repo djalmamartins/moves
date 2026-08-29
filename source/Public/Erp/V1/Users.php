@@ -73,7 +73,7 @@ class Users extends Erp
             false
         );
 
-        echo $this->view->render("widgets/users/home", [
+        echo $this->view->render("components/users/home", [
             "app" => "users/home",
             "head" => $head,
             "search" => $search,
@@ -388,7 +388,7 @@ class Users extends Erp
             false
         );
 
-        echo $this->view->render("widgets/users/profile", [
+        echo $this->view->render("components/users/profile", [
             "app" => "users/profile/{$userEdit->id}",
             "head" => $head,
             "user" => $this->user,
@@ -505,7 +505,7 @@ class Users extends Erp
             false
         );
 
-        echo $this->view->render("widgets/corporations/address", [
+        echo $this->view->render("components/corporations/address", [
             "app" => "users/address/{$corporationsEdit->id}",
             "head" => $head,
             "user" => $this->user,

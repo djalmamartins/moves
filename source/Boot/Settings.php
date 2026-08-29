@@ -75,7 +75,7 @@ define("CONF_SOCIAL_LINKEDIN_PAGE", "{$setup->social_linkedin_page}");
  * VIEW
  */
 define("CONF_MODE", "{$setup->mode}");
-define("CONF_VIEW_PATH", __DIR__ . "/../../shared/views");
+define("CONF_VIEW_PATH", __DIR__ . "/../../shared/pages");
 define("CONF_VIEW_EXT", "php");
 define("CONF_VIEW_THEMES", "{$setup->view_theme}");
 define("CONF_VIEW_SUPPORT", "{$setup->view_support}");

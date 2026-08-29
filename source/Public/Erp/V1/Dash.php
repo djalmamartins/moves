@@ -67,7 +67,7 @@ class Dash extends Erp
             theme("/assets/images/image.jpg", CONF_VIEW_ERP),
             false
         );
-        echo $this->view->render("widgets/dash/home", [
+        echo $this->view->render("components/dash/home", [
             "app" => "dash",
             "head" => $head,
             "user" => $this->user,

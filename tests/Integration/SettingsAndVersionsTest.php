@@ -27,7 +27,9 @@ final class SettingsAndVersionsTest extends TestCase
         self::assertFileExists($root . '/container/studio/app_connect/default.php');
         self::assertFileExists($root . '/container/studio/connect/default.php');
         self::assertFileExists($root . '/container/studio/moves_studio/default.php');
-        self::assertFileExists($root . '/container/studio/moves_studio/_theme_error.php');
+        self::assertFileExists($root . '/container/studio/moves_studio/layouts/error.php');
+        self::assertDirectoryExists($root . '/container/studio/moves_studio/components');
+        self::assertDirectoryExists($root . '/container/themes/connect_by_moves/pages');
     }
 
     public function testVersionsAreIndependentByProduct(): void

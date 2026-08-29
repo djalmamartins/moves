@@ -48,7 +48,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/home", [
+        echo $this->view->render("pages/home", [
             "head" => $head,
             "briefs" => (new AppBrief())
                 ->find("status = :status", "status=published")
@@ -73,7 +73,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/sales", [
+        echo $this->view->render("pages/sales", [
             "head" => $head,
             "briefs" => (new AppBrief())
                 ->find("status = :status", "status=published")
@@ -241,7 +241,7 @@ class Web extends Controller
         $pager = new Pager(url("/artigos/p/"));
         $pager->pager($articles->count(), 9, ($data['page'] ?? 1));
 
-        echo $this->view->render("views/articles", [
+        echo $this->view->render("pages/articles", [
             "head" => $head,
             "articles" => $articles->order("post_at DESC")->limit($pager->limit())->offset($pager->offset())->fetch(true),
             "paginator" => $pager->render()
@@ -273,7 +273,7 @@ class Web extends Controller
             ($category->cover ? image($category->cover, 1200, 628) : theme("/assets/images/share.jpg"))
         );
 
-        echo $this->view->render("views/articles", [
+        echo $this->view->render("pages/articles", [
             "head" => $head,
             "title" => "Artigos em <strong>{$category->title}</strong>",
             "desc" => $category->description,
@@ -319,7 +319,7 @@ class Web extends Controller
         );
 
         if (!$articlesSearch->count()) {
-            echo $this->view->render("views/articles", [
+            echo $this->view->render("pages/articles", [
                 "head" => $head,
                 "title" => "Pesquisa por: <strong>{$search}</strong>",
                 "search" => $search,
@@ -331,7 +331,7 @@ class Web extends Controller
         $pager->pager($articlesSearch->count(), 9, $page);
 
 
-        echo $this->view->render("views/articles", [
+        echo $this->view->render("pages/articles", [
             "head" => $head,
             "title" => "Pesquisa por: <strong>{$search}</strong>",
             "search" => $search,
@@ -382,7 +382,7 @@ class Web extends Controller
             ($post->cover ? image($post->cover, 1200, 628) : theme("/assets/images/share.jpg"))
         );
 
-        echo $this->view->render("views/articles-post", [
+        echo $this->view->render("pages/articles-post", [
             "head" => $head,
             "post" => $post,
             "category" => $category,
@@ -441,7 +441,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/legal", ["head" => $head, "page" => $page]);
+        echo $this->view->render("pages/legal", ["head" => $head, "page" => $page]);
     }
 
     public function auth(?array $data):void{
@@ -458,7 +458,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/login/auth", [
+        echo $this->view->render("pages/login/auth", [
             "head" => $head,
         ]);
     }
@@ -521,7 +521,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/login/login", [
+        echo $this->view->render("pages/login/login", [
             "head" => $head,
             "cookie" => filter_input(INPUT_COOKIE, "authEmail")
         ]);
@@ -576,7 +576,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/login/forget", [
+        echo $this->view->render("pages/login/forget", [
             "head" => $head
         ]);
     }
@@ -626,7 +626,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/login/reset", [
+        echo $this->view->render("pages/login/reset", [
             "head" => $head,
             "code" => $data["code"]
         ]);
@@ -684,7 +684,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/login/confirmation", [
+        echo $this->view->render("pages/login/confirmation", [
             "head" => $head,
             "code" => $data["code"]
         ]);
@@ -737,7 +737,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/login/terms", [
+        echo $this->view->render("pages/login/terms", [
             "head" => $head
         ]);
     }
@@ -847,7 +847,7 @@ class Web extends Controller
             false
         );
 
-        echo $this->view->render("views/error", [
+        echo $this->view->render("pages/error", [
             "head" => $head,
             "error" => $error
         ]);

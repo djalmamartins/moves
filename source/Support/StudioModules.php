@@ -13,7 +13,7 @@ final class StudioModules
 
     private function __construct(?string $basePath = null)
     {
-        $this->basePath = $basePath ?: dirname(__DIR__, 2) . '/container/studio/moves_studio/widgets';
+        $this->basePath = $basePath ?: dirname(__DIR__, 2) . '/container/studio/moves_studio/components';
     }
 
     public static function instance(): self

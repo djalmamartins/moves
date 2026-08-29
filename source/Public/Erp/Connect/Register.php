@@ -30,7 +30,7 @@ class Register extends Erp
             false
         );
 
-        echo $this->view->render("widgets/register/home", [
+        echo $this->view->render("components/register/home", [
             "app" => "register/home",
             "head" => $head,
             "user" => $this->user,
@@ -56,7 +56,7 @@ class Register extends Erp
             false
         );
 
-        echo $this->view->render("widgets/register/condo", [
+        echo $this->view->render("components/register/condo", [
             "app" => "register/condo",
             "head" => $head,
             "user" => $this->user,
@@ -93,7 +93,7 @@ class Register extends Erp
             $urlapp = "register/users/{$userEdit->id}";
         }
 
-        echo $this->view->render("widgets/register/users", [
+        echo $this->view->render("components/register/users", [
             "app" => $urlapp ,
             "head" => $head,
             "user" => $this->user,
@@ -133,7 +133,7 @@ class Register extends Erp
             $urlapp = "register/users-pj/{$userEdit->id}";
         }
 
-        echo $this->view->render("widgets/register/users-pj", [
+        echo $this->view->render("components/register/users-pj", [
             "app" => $urlapp,
             "head" => $head,
             "user" => $this->user,

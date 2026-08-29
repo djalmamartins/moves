@@ -36,7 +36,7 @@ class Web extends Controller
             url(),
             theme("/assets/images/share.jpg")
         );
-        echo $this->view->render("views/home", [
+        echo $this->view->render("pages/home", [
             "head" => $head,
         ]);
     }
@@ -51,7 +51,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/home", [
+        echo $this->view->render("pages/home", [
             "head" => $head,
 
         ]);
@@ -114,7 +114,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/login/login", [
+        echo $this->view->render("pages/login/login", [
             "head" => $head,
             "cookie" => filter_input(INPUT_COOKIE, "authEmail")
         ]);
@@ -169,7 +169,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/login/forget", [
+        echo $this->view->render("pages/login/forget", [
             "head" => $head
         ]);
     }
@@ -219,7 +219,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/login/reset", [
+        echo $this->view->render("pages/login/reset", [
             "head" => $head,
             "code" => $data["code"]
         ]);
@@ -276,7 +276,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/login/confirmation", [
+        echo $this->view->render("pages/login/confirmation", [
             "head" => $head,
             "code" => $data["code"]
         ]);
@@ -329,7 +329,7 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        echo $this->view->render("views/login/terms", [
+        echo $this->view->render("pages/login/terms", [
             "head" => $head
         ]);
     }
@@ -431,7 +431,7 @@ class Web extends Controller
             false
         );
 
-        echo $this->view->render("views/error", [
+        echo $this->view->render("pages/error", [
             "head" => $head,
             "error" => $error
         ]);

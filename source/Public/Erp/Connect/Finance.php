@@ -131,7 +131,7 @@ class Finance extends Erp
             $wallet->wallet = $wallet->income - $wallet->expense;
         }
 
-        echo $this->view->render("widgets/finance/home", [
+        echo $this->view->render("components/finance/home", [
             "app" => "finance/home",
             "head" => $head,
             "chart" => $chartData,
@@ -164,7 +164,7 @@ class Finance extends Erp
             false
         );
 
-        echo $this->view->render("widgets/finance/invoices", [
+        echo $this->view->render("components/finance/invoices", [
             "app" => "finance/income",
             "head" => $head,
             "search" => null,
@@ -189,7 +189,7 @@ class Finance extends Erp
 //            false
 //        );
 //
-//        echo $this->view->render("widgets/users/home", [
+//        echo $this->view->render("components/users/home", [
 //            "app" => "users/home",
 //            "head" => $head,
 //            "search" => $search,

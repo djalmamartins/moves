@@ -30,7 +30,7 @@ class Dash extends Controller
             theme("/assets/images/image.jpg", CONF_VIEW_APP),
             false
         );
-        echo $this->view->render("widgets/dash/home", [
+        echo $this->view->render("components/dash/home", [
             "app" => "dash",
             "head" => $head,
             "user" => $this->user,

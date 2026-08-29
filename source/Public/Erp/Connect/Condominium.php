@@ -36,7 +36,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/home", [
+        echo $this->view->render("components/condominium/home", [
             "app" => "condominium/home",
             "head" => $head,
             "user" => $this->user,
@@ -93,7 +93,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/profile", [
+        echo $this->view->render("components/condominium/profile", [
             "app" => "condominium/home",
             "head" => $head,
             "user" => $this->user,
@@ -125,7 +125,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/address", [
+        echo $this->view->render("components/condominium/address", [
             "app" => "condominium/address/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,
@@ -164,7 +164,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/address_edit", [
+        echo $this->view->render("components/condominium/address_edit", [
             "app" => "condominium/address/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,
@@ -225,7 +225,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/units", [
+        echo $this->view->render("components/condominium/units", [
             "app" => "condominium/units/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,
@@ -292,7 +292,7 @@ class Condominium extends Erp
             false
         );
 
-        echo $this->view->render("widgets/condominium/accountable", [
+        echo $this->view->render("components/condominium/accountable", [
             "app" => "condominium/accountable/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,

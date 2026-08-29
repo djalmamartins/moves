@@ -73,7 +73,7 @@ class Corporations extends Erp
             false
         );
 
-        echo $this->view->render("widgets/corporations/home", [
+        echo $this->view->render("components/corporations/home", [
             "app" => "corporations/home",
             "head" => $head,
             "user" => $this->user,
@@ -123,7 +123,7 @@ class Corporations extends Erp
             false
         );
 
-        echo $this->view->render("widgets/corporations/profile", [
+        echo $this->view->render("components/corporations/profile", [
             "app" => "corporations/profile/{$corporations->id}",
             "head" => $head,
             "user" => $this->user,
@@ -179,7 +179,7 @@ class Corporations extends Erp
             false
         );
 
-        echo $this->view->render("widgets/corporations/create", [
+        echo $this->view->render("components/corporations/create", [
             "app" => $link,
             "head" => $head,
             "user" => $this->user,
@@ -401,7 +401,7 @@ class Corporations extends Erp
             false
         );
 
-        echo $this->view->render("widgets/corporations/address", [
+        echo $this->view->render("components/corporations/address", [
             "app" => "corporations/address/{$corporations->id}",
             "head" => $head,
             "user" => $this->user,
@@ -455,7 +455,7 @@ class Corporations extends Erp
             false
         );
 
-        echo $this->view->render("widgets/corporations/address_edit", [
+        echo $this->view->render("components/corporations/address_edit", [
             "app" => "corporations/address/{$corporations->id}",
             "head" => $head,
             "user" => $this->user,
@@ -503,7 +503,7 @@ class Corporations extends Erp
             false
         );
 
-        echo $this->view->render("widgets/corporations/invoices", [
+        echo $this->view->render("components/corporations/invoices", [
             "app" => "corporations/invoices/{$corporations->id}",
             "head" => $head,
             "user" => $this->user,
@@ -551,7 +551,7 @@ class Corporations extends Erp
             false
         );
 
-        echo $this->view->render("widgets/corporations/historic", [
+        echo $this->view->render("components/corporations/historic", [
             "app" => "corporations/historic/{$corporations->id}",
             "head" => $head,
             "user" => $this->user,

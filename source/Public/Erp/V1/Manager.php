@@ -73,7 +73,7 @@ class Manager extends Erp
             false
         );
 
-        echo $this->view->render("widgets/manager/home", [
+        echo $this->view->render("components/manager/home", [
             "app" => "manager/home/{$condominiums->id}",
             "head" => $head,
             "user" => $this->user,

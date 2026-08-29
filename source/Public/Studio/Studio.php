@@ -85,7 +85,7 @@ class Studio extends Controller
             return;
         }
 
-        echo $this->view->render("widgets/login/login", [
+        echo $this->view->render("components/login/login", [
             "head" => $this->seo->render(
                 "MovesOS - " . CONF_SITE_NAME,
                 CONF_SITE_DESC,
@@ -105,7 +105,7 @@ class Studio extends Controller
     public function dash(): void
     {
         $user = $this->guard("dashboard.view");
-        echo $this->view->render("widgets/dash/home", $this->viewData("Dashboard", "dash", $user, [
+        echo $this->view->render("components/dash/home", $this->viewData("Dashboard", "dash", $user, [
             "pagesCount" => (new Page())->find()->count(),
             "postsCount" => (new Post())->find()->count(),
             "publishedCount" => (new Post())->find("status = :s", "s=post")->count(),
@@ -125,7 +125,7 @@ class Studio extends Controller
         $like = "%{$term}%";
         $encodedLike = urlencode($like);
 
-        echo $this->view->render("widgets/search/home", $this->viewData("Busca", "search", $user, [
+        echo $this->view->render("components/search/home", $this->viewData("Busca", "search", $user, [
             "term" => $term,
             "pages" => $term !== "" && $user->can("pages.manage") ? ((new Page())->find("title LIKE :q1 OR uri LIKE :q2", "q1={$encodedLike}&q2={$encodedLike}")->order("title")->limit(8)->fetch(true) ?: []) : [],
             "posts" => $term !== "" && $user->can("articles.manage") ? ((new Post())->find("title LIKE :q1 OR subtitle LIKE :q2", "q1={$encodedLike}&q2={$encodedLike}")->order("id DESC")->limit(8)->fetch(true) ?: []) : [],
@@ -156,7 +156,7 @@ class Studio extends Controller
         $pager->pager($query->count(), 12, (int)($data['page'] ?? 1));
         $pdo = Connect::getInstance();
         $stats = $pdo->query("SELECT COUNT(*) total, SUM(status='new') new_count, SUM(status IN ('contacted','qualified','proposal_sent')) progress_count, SUM(status='won') won_count FROM proposals")->fetch();
-        echo $this->view->render('widgets/proposals/home', $this->viewData('Propostas', 'proposals', $user, [
+        echo $this->view->render('components/proposals/home', $this->viewData('Propostas', 'proposals', $user, [
             'proposals' => $query->order('created_at DESC')->limit($pager->limit())->offset($pager->offset())->fetch(true) ?: [],
             'paginator' => $pager->render(), 'stats' => $stats, 'search' => $search, 'status' => $status,
         ]));
@@ -208,7 +208,7 @@ class Studio extends Controller
         }
         $team = Connect::getInstance()->query("SELECT DISTINCT u.id,u.first_name,u.last_name FROM users u JOIN access_user_roles ur ON ur.user_id=u.id JOIN access_roles r ON r.id=ur.role_id WHERE r.slug IN ('developer','super_admin','client_admin','manager') AND u.status<>'trash' ORDER BY u.first_name")->fetchAll() ?: [];
         $responses = (new ProposalResponse())->find('proposal_id=:proposal', 'proposal='.$proposal->id)->order('id DESC')->fetch(true) ?: [];
-        echo $this->view->render('widgets/proposals/detail', $this->viewData('Proposta ' . $proposal->protocol, 'proposals', $user, ['proposal' => $proposal, 'team' => $team, 'responses' => $responses]));
+        echo $this->view->render('components/proposals/detail', $this->viewData('Proposta ' . $proposal->protocol, 'proposals', $user, ['proposal' => $proposal, 'team' => $team, 'responses' => $responses]));
     }
 
     public function proposalPdf(array $data): void
@@ -236,7 +236,7 @@ class Studio extends Controller
         $pager = new Pager(url("/studio/blog/home/p/") . "page" . ($search ? "?search=" . urlencode($search) : ""));
         $pager->pager($find->count(), 20, (int)($data["page"] ?? 1));
 
-        echo $this->view->render("widgets/blog/home", $this->viewData("Artigos", "blog", $user, [
+        echo $this->view->render("components/blog/home", $this->viewData("Artigos", "blog", $user, [
             "posts" => $find->order("id DESC")->limit($pager->limit())->offset($pager->offset())->fetch(true) ?: [],
             "search" => $search,
             "paginator" => $pager->render()
@@ -375,7 +375,7 @@ class Studio extends Controller
             return;
         }
 
-        echo $this->view->render("widgets/blog/post", $this->viewData($post ? "Editar artigo" : "Novo artigo", "blog", $user, [
+        echo $this->view->render("components/blog/post", $this->viewData($post ? "Editar artigo" : "Novo artigo", "blog", $user, [
             "post" => $post,
             "categories" => (new Category())->find()->order("title")->fetch(true) ?: [],
             "authors" => (new User())->find("level >= :l", "l=5")->order("first_name")->fetch(true) ?: [$user]
@@ -555,7 +555,7 @@ class Studio extends Controller
             "queue" => (int)$pdo->query("SELECT COUNT(*) FROM mail_queue")->fetchColumn(),
             "audit" => $canAudit ? (int)$pdo->query("SELECT COUNT(*) FROM system_audit_logs")->fetchColumn() : 0
         ];
-        echo $this->view->render("widgets/notifications/home", $this->viewData("Notificações", "notifications", $user, [
+        echo $this->view->render("components/notifications/home", $this->viewData("Notificações", "notifications", $user, [
             "messages" => $messages,
             "auditLogs" => $auditLogs,
             "canAudit" => $canAudit,
@@ -660,7 +660,7 @@ class Studio extends Controller
     public function categories(): void
     {
         $user = $this->guard("articles.manage");
-        echo $this->view->render("widgets/blog/categories", $this->viewData("Categorias", "blog", $user, [
+        echo $this->view->render("components/blog/categories", $this->viewData("Categorias", "blog", $user, [
             "categories" => (new Category())->find()->order("title")->fetch(true) ?: []
         ]));
     }
@@ -698,13 +698,13 @@ class Studio extends Controller
             return;
         }
 
-        echo $this->view->render("widgets/blog/category", $this->viewData($category ? "Editar categoria" : "Nova categoria", "blog", $user, ["category" => $category]));
+        echo $this->view->render("components/blog/category", $this->viewData($category ? "Editar categoria" : "Nova categoria", "blog", $user, ["category" => $category]));
     }
 
     public function pages(): void
     {
         $user = $this->guard("pages.manage");
-        echo $this->view->render("widgets/pages/home", $this->viewData("Páginas", "pages", $user, [
+        echo $this->view->render("components/pages/home", $this->viewData("Páginas", "pages", $user, [
             "pages" => (new Page())->find()->order("id DESC")->fetch(true) ?: []
         ]));
     }
@@ -749,7 +749,7 @@ class Studio extends Controller
             echo json_encode(["redirect" => url("/studio/page/{$page->id}")]);
             return;
         }
-        echo $this->view->render("widgets/pages/form", $this->viewData($page ? "Editar página" : "Nova página", "pages", $user, ["page" => $page]));
+        echo $this->view->render("components/pages/form", $this->viewData($page ? "Editar página" : "Nova página", "pages", $user, ["page" => $page]));
     }
 
     public function media(?array $data): void
@@ -893,7 +893,7 @@ class Studio extends Controller
             unset($visibleFile["stored_path"]);
         }
         unset($visibleFile);
-        echo $this->view->render("widgets/media/home", $this->viewData("Biblioteca de mídia", "media", $user, [
+        echo $this->view->render("components/media/home", $this->viewData("Biblioteca de mídia", "media", $user, [
             "files" => $visibleFiles, "total" => $total,
             "page" => $pager->page(), "pages" => $pager->pages(), "paginator" => $pager->render("studio-pagination", false),
             "search" => $search, "type" => $type, "orientation" => $orientation, "usageFilter" => $usageFilter, "sort" => $sort,
@@ -1015,7 +1015,7 @@ class Studio extends Controller
         $activityMap = [];
         $sessionRows = $pdo->query("SELECT users_id,MAX(COALESCE(updated_at,created_at)) last_access,COUNT(*) sessions FROM app_session GROUP BY users_id")->fetchAll();
         foreach ($sessionRows as $sessionRow) { $activityMap[(int)$sessionRow->users_id] = $sessionRow; }
-        echo $this->view->render("widgets/users/studio", $this->viewData("Usuários", "users", $user, [
+        echo $this->view->render("components/users/studio", $this->viewData("Usuários", "users", $user, [
             "users" => $listedUsers,
             "stats" => $stats,
             "activityMap" => $activityMap,
@@ -1142,7 +1142,7 @@ class Studio extends Controller
         }
         $defaultRole = null;
         if (!$targetUser) { foreach ($roles as $availableRole) { if ($availableRole->slug === "user") { $defaultRole = $availableRole; break; } } }
-        echo $this->view->render("widgets/users/form", $this->viewData($targetUser ? "Acessos do usuário" : "Novo usuário", "users", $user, ["targetUser" => $targetUser, "address" => $targetUser ? $targetUser->address("main") : null, "roles" => $roles, "permissions" => $permissions, "overrides" => $overrides, "selectedRole" => $targetUser ? AccessControl::role($targetUser) : $defaultRole]));
+        echo $this->view->render("components/users/form", $this->viewData($targetUser ? "Acessos do usuário" : "Novo usuário", "users", $user, ["targetUser" => $targetUser, "address" => $targetUser ? $targetUser->address("main") : null, "roles" => $roles, "permissions" => $permissions, "overrides" => $overrides, "selectedRole" => $targetUser ? AccessControl::role($targetUser) : $defaultRole]));
     }
 
     public function testimonials(?array $data): void
@@ -1177,7 +1177,7 @@ class Studio extends Controller
             echo json_encode(["redirect" => url("/studio/testimonials/{$testimonial->id}")]);
             return;
         }
-        echo $this->view->render("widgets/testimonials/home", $this->viewData("Depoimentos", "testimonials", $user, [
+        echo $this->view->render("components/testimonials/home", $this->viewData("Depoimentos", "testimonials", $user, [
             "testimonial" => $testimonial,
             "testimonials" => (new AppBrief())->find()->order("id DESC")->fetch(true) ?: []
         ]));
@@ -1220,7 +1220,7 @@ class Studio extends Controller
             echo json_encode(["reload" => true]);
             return;
         }
-        echo $this->view->render("widgets/faqs/studio", $this->viewData("Perguntas frequentes", "faqs", $user, [
+        echo $this->view->render("components/faqs/studio", $this->viewData("Perguntas frequentes", "faqs", $user, [
             "tab" => $tab,
             "channels" => (new Channel())->find()->order("channel")->fetch(true) ?: [],
             "questions" => (new Question())->find()->order("channel_id, order_by, id")->fetch(true) ?: [],
@@ -1231,7 +1231,7 @@ class Studio extends Controller
     public function support(): void
     {
         $user = $this->guard("support.manage");
-        echo $this->view->render("widgets/support/home", $this->viewData("Central de Ajuda", "support", $user, [
+        echo $this->view->render("components/support/home", $this->viewData("Central de Ajuda", "support", $user, [
             "categories" => (new SupportCategory())->find()->order("position, title")->fetch(true) ?: [],
             "articles" => (new SupportArticle())->find()->order("id DESC")->fetch(true) ?: []
         ]));
@@ -1269,7 +1269,7 @@ class Studio extends Controller
         $to = date("Y-m-d H:i:s", strtotime($from . " +1 month"));
         $events = $pdo->prepare("SELECT e.*, CONCAT(u.first_name,' ',u.last_name) assigned_name FROM studio_calendar_events e LEFT JOIN users u ON u.id=e.assigned_to WHERE e.starts_at >= :from AND e.starts_at < :to ORDER BY e.starts_at");
         $events->execute(["from" => $from, "to" => $to]);
-        echo $this->view->render("widgets/agenda/home", $this->viewData("Agenda", "agenda", $user, ["month" => $month, "events" => $events->fetchAll() ?: [], "users" => (new User())->find()->order("first_name,last_name")->fetch(true) ?: []]));
+        echo $this->view->render("components/agenda/home", $this->viewData("Agenda", "agenda", $user, ["month" => $month, "events" => $events->fetchAll() ?: [], "users" => (new User())->find()->order("first_name,last_name")->fetch(true) ?: []]));
     }
 
     public function tickets(?array $data): void
@@ -1330,7 +1330,7 @@ class Studio extends Controller
             $selected->execute(["id" => $ticketId]); $selectedTicket = $selected->fetch() ?: null;
             if ($selectedTicket) { $history = $pdo->prepare("SELECT m.*,CONCAT(u.first_name,' ',u.last_name) user_name FROM studio_support_ticket_messages m JOIN users u ON u.id=m.user_id WHERE m.ticket_id=:ticket ORDER BY m.created_at"); $history->execute(["ticket" => $ticketId]); $messages = $history->fetchAll() ?: []; }
         }
-        echo $this->view->render("widgets/tickets/home", $this->viewData("Chamados", "tickets", $user, ["tickets" => $stmt->fetchAll() ?: [], "users" => (new User())->find()->order("first_name,last_name")->fetch(true) ?: [], "status" => $status, "search" => $search, "counts" => $statusCounts, "selectedTicket" => $selectedTicket, "messages" => $messages, "settings" => Settings::dados()]));
+        echo $this->view->render("components/tickets/home", $this->viewData("Chamados", "tickets", $user, ["tickets" => $stmt->fetchAll() ?: [], "users" => (new User())->find()->order("first_name,last_name")->fetch(true) ?: [], "status" => $status, "search" => $search, "counts" => $statusCounts, "selectedTicket" => $selectedTicket, "messages" => $messages, "settings" => Settings::dados()]));
     }
 
     private function ticketSlaHours(string $priority): int
@@ -1437,7 +1437,7 @@ class Studio extends Controller
             if (!$category->save()) { echo json_encode(["message" => $category->message()->render()]); return; }
             echo json_encode(["redirect" => url("/studio/support")]); return;
         }
-        echo $this->view->render("widgets/support/category", $this->viewData($category ? "Editar categoria" : "Nova categoria", "support", $user, ["category" => $category]));
+        echo $this->view->render("components/support/category", $this->viewData($category ? "Editar categoria" : "Nova categoria", "support", $user, ["category" => $category]));
     }
 
     public function supportArticle(?array $data): void
@@ -1477,7 +1477,7 @@ class Studio extends Controller
             if (!$article->save()) { echo json_encode(["message" => $article->message()->render()]); return; }
             echo json_encode(["redirect" => url("/studio/support/article/{$article->id}")]); return;
         }
-        echo $this->view->render("widgets/support/article", $this->viewData($article ? "Editar matéria" : "Nova matéria", "support", $user, [
+        echo $this->view->render("components/support/article", $this->viewData($article ? "Editar matéria" : "Nova matéria", "support", $user, [
             "article" => $article, "categories" => (new SupportCategory())->find("status = :status", "status=active")->order("position, title")->fetch(true) ?: []
         ]));
     }
@@ -1495,7 +1495,7 @@ class Studio extends Controller
     public function slides(): void
     {
         $user = $this->guard("slides.manage");
-        echo $this->view->render("widgets/slides/home", $this->viewData("Banners e destaques", "slides", $user, [
+        echo $this->view->render("components/slides/home", $this->viewData("Banners e destaques", "slides", $user, [
             "slides" => (new AppSlides())->find()->order("id DESC")->fetch(true) ?: []
         ]));
     }
@@ -1536,13 +1536,13 @@ class Studio extends Controller
             echo json_encode(["redirect" => url("/studio/slide/{$slide->id}")]);
             return;
         }
-        echo $this->view->render("widgets/slides/form", $this->viewData($slide ? "Editar destaque" : "Novo destaque", "slides", $user, ["slide" => $slide]));
+        echo $this->view->render("components/slides/form", $this->viewData($slide ? "Editar destaque" : "Novo destaque", "slides", $user, ["slide" => $slide]));
     }
 
     public function reports(): void
     {
         $user = $this->guard("reports.view");
-        echo $this->view->render("widgets/reports/home", $this->viewData("Relatórios", "reports", $user, [
+        echo $this->view->render("components/reports/home", $this->viewData("Relatórios", "reports", $user, [
             "access" => (new Access())->find()->order("created_at DESC")->limit(30)->fetch(true) ?: [],
             "online" => (new Online())->findByActive() ?: []
         ]));
@@ -1586,7 +1586,7 @@ class Studio extends Controller
         $versions = $stmt->fetchAll() ?: [];
         $currentVersions = [];
         foreach ($pdo->query("SELECT product,version FROM movesos_versions WHERE status='current'")->fetchAll() as $current) { $currentVersions[$current->product] = $current->version; }
-        echo $this->view->render("widgets/versions/home", $this->viewData("Versões", "versions", $user, ["versions" => $versions, "product" => $product, "currentVersions" => $currentVersions]));
+        echo $this->view->render("components/versions/home", $this->viewData("Versões", "versions", $user, ["versions" => $versions, "product" => $product, "currentVersions" => $currentVersions]));
     }
 
     public function systemLogs(?array $data): void
@@ -1635,7 +1635,7 @@ class Studio extends Controller
         $channels = $pdo->query("SELECT DISTINCT channel FROM app_log WHERE channel<>'' ORDER BY channel")->fetchAll();
         $queryString = http_build_query(array_filter(['level' => $level, 'status' => $status, 'channel' => $channel, 'q' => $search, 'period' => $period !== '30' ? $period : '', 'date_from' => !empty($_GET['date_from']) ? $dateFrom : '', 'date_to' => !empty($_GET['date_to']) ? $dateTo : '', 'sort' => $sort !== 'newest' ? $sort : '', 'per_page' => $perPage !== 30 ? $perPage : ''], static fn($value) => $value !== ''));
 
-        echo $this->view->render('widgets/logs/home', $this->viewData('Log', 'system-logs', $user, [
+        echo $this->view->render('components/logs/home', $this->viewData('Log', 'system-logs', $user, [
             'logs' => $query->fetchAll(), 'summary' => $summary, 'channels' => $channels,
             'filters' => compact('level','status','channel','search','period','dateFrom','dateTo','sort','perPage'), 'page' => $page, 'pages' => $pages,
             'total' => $total, 'queryString' => $queryString
@@ -1741,7 +1741,7 @@ class Studio extends Controller
         $pdo = Connect::getInstance();
         $themeDirectories = $this->templateDirectories(dirname(__DIR__, 3) . "/container/themes");
         $supportThemes = array_values(array_filter($themeDirectories, fn($name) => str_contains($name, "support")));
-        echo $this->view->render("widgets/settings/home", $this->viewData("Configurações", "settings", $user, [
+        echo $this->view->render("components/settings/home", $this->viewData("Configurações", "settings", $user, [
             "settings" => $settings,
             "versions" => $pdo->query("SELECT v.*,CONCAT(u.first_name,' ',u.last_name) author_name FROM movesos_versions v LEFT JOIN users u ON u.id=v.created_by ORDER BY v.id DESC LIMIT 20")->fetchAll(),
             "siteThemes" => array_values(array_diff($themeDirectories, $supportThemes)),
@@ -1763,7 +1763,7 @@ class Studio extends Controller
             404 => ["title" => "Página não encontrada", "message" => "O endereço pode estar incorreto ou o conteúdo foi removido."],
             500 => ["title" => "Falha interna do sistema", "message" => "O incidente foi registrado. Tente novamente em alguns instantes."]
         ][$code];
-        echo $this->view->render("widgets/error/error", ["code" => $code, "errorTitle" => $content["title"], "errorMessage" => $content["message"]]);
+        echo $this->view->render("components/error/error", ["code" => $code, "errorTitle" => $content["title"], "errorMessage" => $content["message"]]);
     }
 
     private function guard(?string $permission = "studio.access"): User

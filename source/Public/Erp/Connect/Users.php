@@ -64,7 +64,7 @@ class Users extends Erp
             false
         );
 
-        echo $this->view->render("widgets/users/home", [
+        echo $this->view->render("components/users/home", [
             "app" => "users/home",
             "head" => $head,
             "search" => $search,
@@ -114,7 +114,7 @@ class Users extends Erp
             $urlapp = "users/profile/{$userEdit->id}";
         }
 
-        echo $this->view->render("widgets/users/profile", [
+        echo $this->view->render("components/users/profile", [
             "app" => $urlapp ,
             "head" => $head,
             "user" => $this->user,
@@ -155,7 +155,7 @@ class Users extends Erp
             $urlapp = "users/profile/profile_pj/{$userEdit->id}";
         }
 
-        echo $this->view->render("widgets/users/profile_pj", [
+        echo $this->view->render("components/users/profile_pj", [
             "app" => $urlapp,
             "head" => $head,
             "user" => $this->user,
@@ -190,7 +190,7 @@ class Users extends Erp
             false
         );
 
-        echo $this->view->render("widgets/users/address", [
+        echo $this->view->render("components/users/address", [
             "app" => "users/address/{$userEdit->id}",
             "head" => $head,
             "user" => $this->user,
@@ -225,7 +225,7 @@ class Users extends Erp
             false
         );
 
-        echo $this->view->render("widgets/users/address_edit", [
+        echo $this->view->render("components/users/address_edit", [
             "app" => "users/address",
             "head" => $head,
             "user" => $this->user,
@@ -260,7 +260,7 @@ class Users extends Erp
             false
         );
 
-        echo $this->view->render("widgets/users/invoices", [
+        echo $this->view->render("components/users/invoices", [
             "app" => "users/invoices/{$userEdit->id}",
             "head" => $head,
             "user" => $this->user,
@@ -294,7 +294,7 @@ class Users extends Erp
             false
         );
 
-        echo $this->view->render("widgets/users/invoices", [
+        echo $this->view->render("components/users/invoices", [
             "app" => "users/invoices/{$userEdit->id}",
             "head" => $head,
             "user" => $this->user,

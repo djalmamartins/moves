@@ -1,4 +1,4 @@
-<?php $this->layout("_theme", ["title" => "Confirme e ative sua conta"]); ?>
+<?php $this->layout("layouts/theme", ["title" => "Confirme e ative sua conta"]); ?>
 
 
 <table role="presentation" cellspacing="0" cellpadding="0" width="100%" align="center" style="background: url('image/backgroudEmail.svg') #FFFFFF center top;
