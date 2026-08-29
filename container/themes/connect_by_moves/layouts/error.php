@@ -6,9 +6,13 @@
     <?= $head; ?>
     <link rel="icon" type="image/png" href="<?= theme("/assets/images/favicon.png"); ?>"/>
     <link rel="stylesheet" href="<?= theme("/assets/style.css"); ?>"/>
+    <link rel="stylesheet" href="<?= theme("/assets/responsive.css"); ?>"/>
+    <link rel="stylesheet" href="<?= theme("/assets/pages.css"); ?>"/>
+    <link rel="stylesheet" href="<?= theme("/assets/motion.css"); ?>"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
-<body>
+<body class="organic-error-layout">
+<a class="org-skip-link" href="#main-content">Ir para o conteúdo</a>
 <!--LOAD-->
 <?= $this->insert("pages/load", $this->data); ?>
 
@@ -16,7 +20,7 @@
 
 
 <!--MAIN-->
-<main>
+<main id="main-content" tabindex="-1">
     <?= $this->section("content"); ?>
 </main>
 
@@ -32,9 +36,9 @@
 
 <!--MODALS-->
 <?= $this->insert("pages/modals", $this->data); ?>
-<script src="<?= theme("/assets/scripts.js"); ?>"></script>
-<script type="module" src="<?= url('/organic/organic.min.js') ?>"></script>
+<script src="<?= url('/organic/organic.global.min.js') ?>"></script>
 <script src="<?= url('/organic/compat-v1.js') ?>"></script>
+<script src="<?= theme("/assets/scripts.js"); ?>"></script>
 <?= $this->section("scripts"); ?>
 </body>
 </html>

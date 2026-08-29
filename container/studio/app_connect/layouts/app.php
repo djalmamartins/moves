@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="<?= themeApp("/assets/style.css"); ?>"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
-<body>
+<body class="organic-app-layout">
+<a class="org-skip-link" href="#main-content">Ir para o conteúdo</a>
 <!--LOAD-->
 <?= $this->insert("pages/load", $this->data); ?>
 
@@ -16,7 +17,7 @@
 <?= $this->insert("pages/header", $this->data); ?>
 
 <!--MAIN-->
-<main>
+<main id="main-content" tabindex="-1">
     <div class="main">
         <?= $this->section("content"); ?>
     </div>
@@ -34,9 +35,9 @@
 
 <!--MODALS-->
 <?= $this->insert("pages/modals", $this->data); ?>
-<script src="<?= themeApp("/assets/scripts.js"); ?>"></script>
-<script type="module" src="<?= url('/organic/organic.min.js') ?>"></script>
+<script src="<?= url('/organic/organic.global.min.js') ?>"></script>
 <script src="<?= url('/organic/compat-v1.js') ?>"></script>
+<script src="<?= themeApp("/assets/scripts.js"); ?>"></script>
 <?= $this->section("scripts"); ?>
 
 </body>

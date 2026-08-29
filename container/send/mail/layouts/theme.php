@@ -99,7 +99,7 @@
                                 alt="<?= CONF_SITE_NAME; ?>" width="40" height="40"></a></li>
                 <li style="display: inline-block;"><a href="<?= CONF_SOCIAL_INSTAGRAM_PAGE; ?>"><img
                                 src="<?= themeMail("image/linkedin.svg"); ?>"
-                                alt="<?= CONF_SITE_NAME; ?>" width="40" height="40"></li>
+                                alt="<?= CONF_SITE_NAME; ?>" width="40" height="40"></a></li>
             </ul>
         </td>
     </tr>
@@ -110,8 +110,8 @@
     <tr>
         <td style="color:#444;font-family:'Amazon Ember','Helvetica Neue',Roboto,Arial,sans-serif;font-size:0.7em;line-height:140%;padding:25px 35px">
             <p>Você está recebendo este e-mail pois utiliza algum serviço nosso.<br>
-                Caso não queira mais receber você pode <a href="">cancelar sua inscrição</a> a qualquer
-                momento.
+                Para alterar suas preferências de comunicação, entre em contato pelo
+                <a href="mailto:<?= CONF_MAIL_SUPPORT; ?>"><?= CONF_MAIL_SUPPORT; ?></a>.
             </p>
             <p><?= CONF_SITE_NAME; ?>, <?= CONF_SITE_ADDR_STREET; ?>
                 , <?= CONF_SITE_ADDR_NUMBER; ?> <?= CONF_SITE_ADDR_COMPLEMENT; ?>,

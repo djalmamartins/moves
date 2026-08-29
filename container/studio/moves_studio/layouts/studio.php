@@ -4,12 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <?= $head ?>
-    <link rel="stylesheet" href="<?= themeStudio('/assets/css/admin.css', 'moves_studio') ?>">
     <link rel="stylesheet" href="<?= url('/organic/organic.min.css') ?>">
     <link rel="stylesheet" href="<?= url('/organic/compat-v1.css') ?>">
+    <link rel="stylesheet" href="<?= themeStudio('/assets/css/admin.css', 'moves_studio') ?>">
     <link rel="icon" href="<?= themeStudio('/assets/images/favicon.png', 'moves_studio') ?>">
 </head>
 <body class="studio-body studio-v2">
+<a class="org-skip-link" href="#main-content">Ir para o conteúdo</a>
 <div class="ajax_load studio-preloader" role="status" aria-live="polite"><div class="studio-preloader-card"><span class="studio-preloader-mark"><i></i><i></i><i></i></span><strong>MOVES<small>OS</small></strong><p class="ajax_load_box_title">Preparando seu painel</p><span class="studio-preloader-line"><i></i></span></div></div>
 <div class="ajax_response"><?= flash() ?></div>
 <div class="studio-shell">
@@ -44,7 +45,7 @@
         <div class="studio-sidebar-footer"><a href="<?= url('/') ?>" target="_blank"><ion-icon name="open-outline"></ion-icon><span>Visualizar site</span></a><a href="<?= url('/studio/sair') ?>"><ion-icon name="log-out-outline"></ion-icon><span>Sair</span></a></div>
     </aside>
     <button class="studio-sidebar-backdrop" type="button" aria-label="Fechar menu"></button>
-    <main class="studio-main">
+    <main class="studio-main" id="main-content" tabindex="-1">
         <header class="studio-topbar studio-topbar-v2">
             <button class="studio-menu" type="button" aria-label="Abrir menu"><ion-icon name="apps-outline"></ion-icon></button>
             <form class="studio-global-search" action="<?= url('/studio/buscar') ?>" method="get"><ion-icon name="search-outline"></ion-icon><input name="q" value="<?= htmlspecialchars((string)($_GET['q'] ?? '')) ?>" placeholder="Buscar páginas, artigos, categorias ou usuários..." autocomplete="off"></form>
@@ -89,7 +90,7 @@
 <script src="<?= url('/container/shared/assets/vendor/scripts/jquery.form.js') ?>"></script>
 <script src="<?= url('/container/shared/assets/vendor/scripts/jquery-ui.js') ?>"></script>
 <script src="<?= url('/container/shared/assets/vendor/scripts/tinymce/tinymce.min.js') ?>"></script>
-<script type="module" src="<?= url('/organic/organic.min.js') ?>"></script>
+<script src="<?= url('/organic/organic.global.min.js') ?>"></script>
 <script src="<?= url('/organic/compat-v1.js') ?>"></script>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>

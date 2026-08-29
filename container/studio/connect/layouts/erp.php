@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="<?= themeErp("/assets/style.css"); ?>"/>
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
-<body>
+<body class="organic-erp-layout">
+<a class="org-skip-link" href="#main-content">Ir para o conteúdo</a>
 <!--LOAD-->
 <?= $this->insert("pages/load", $this->data); ?>
 
@@ -24,7 +24,7 @@
         <?= $this->insert("pages/header", $this->data); ?>
 
         <!--MAIN-->
-        <main>
+        <main id="main-content" tabindex="-1">
             <div class="main">
                 <?= $this->section("content"); ?>
             </div>
@@ -45,9 +45,9 @@
 <?= $this->insert("pages/modals", $this->data); ?>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-<script src="<?= themeErp("/assets/scripts.js"); ?>"></script>
-<script type="module" src="<?= url('/organic/organic.min.js') ?>"></script>
+<script src="<?= url('/organic/organic.global.min.js') ?>"></script>
 <script src="<?= url('/organic/compat-v1.js') ?>"></script>
+<script src="<?= themeErp("/assets/scripts.js"); ?>"></script>
 
 <?= $this->section("scripts"); ?>
 

@@ -11,6 +11,7 @@
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 </head>
 <body class="support-site">
+<a class="org-skip-link" href="#main-content">Ir para o conteúdo</a>
 <header class="support-header">
     <a href="<?= url('/suporte') ?>"><img src="<?= site_logo_url() ?>" alt="<?= htmlspecialchars(CONF_SITE_NAME) ?>"></a>
     <a class="support-system-link" href="<?= url('/login') ?>">Acessar o sistema</a>
@@ -26,7 +27,7 @@
         </form>
     </div>
 </section>
-<main><?= $this->section('content') ?></main>
+<main id="main-content" tabindex="-1"><?= $this->section('content') ?></main>
 <footer class="support-footer">
     <div><img src="<?= site_logo_url() ?>" alt="<?= htmlspecialchars(CONF_SITE_NAME) ?>"><p>Suporte e Central de Conhecimento</p></div>
     <nav>
@@ -35,7 +36,7 @@
         <span>© <?= date('Y') ?> <?= htmlspecialchars(CONF_SITE_NAME) ?></span>
     </nav>
 </footer>
-<script type="module" src="<?= url('/organic/organic.min.js') ?>"></script>
+<script src="<?= url('/organic/organic.global.min.js') ?>"></script>
 <script src="<?= url('/organic/compat-v1.js') ?>"></script>
 <?= $this->section('scripts') ?>
 </body>
