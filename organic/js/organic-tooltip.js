@@ -1,1 +1,0 @@
-(() => { const O=window.Organic=window.Organic||{}; O.Tooltip={init(element){element.classList.add('organic-tooltip');if(!element.getAttribute('aria-label'))element.setAttribute('aria-label',element.dataset.organicTooltip)}};O.ready(()=>document.querySelectorAll('[data-organic-tooltip]').forEach(O.Tooltip.init))})();

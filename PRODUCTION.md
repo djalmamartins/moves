@@ -27,7 +27,7 @@ As credenciais antigas precisam ser revogadas, pois já estiveram gravadas no c�
 Execute a cada minuto, ajustando o caminho absoluto do projeto:
 
 ```text
-* * * * * MOVESOS_ENV=production /usr/bin/php /caminho/do/projeto/bin/process-mail-queue.php >> /caminho/privado/movesos-mail.log 2>&1
+* * * * * MOVESOS_ENV=production /usr/bin/php /caminho/do/projeto/service/process-mail-queue.php >> /caminho/privado/movesos-mail.log 2>&1
 ```
 
 ## Antes de liberar tráfego

@@ -85,10 +85,10 @@
     </div>
 </div>
 <audio id="studio-notification-sound" preload="auto" src="<?= themeStudio('/assets/audio/notification.mp3', 'moves_studio') ?>"></audio>
-<script src="<?= url('/organic/scripts/jquery.min.js') ?>"></script>
-<script src="<?= url('/organic/scripts/jquery.form.js') ?>"></script>
-<script src="<?= url('/organic/scripts/jquery-ui.js') ?>"></script>
-<script src="<?= url('/organic/scripts/tinymce/tinymce.min.js') ?>"></script>
+<script src="<?= url('/container/shared/assets/vendor/scripts/jquery.min.js') ?>"></script>
+<script src="<?= url('/container/shared/assets/vendor/scripts/jquery.form.js') ?>"></script>
+<script src="<?= url('/container/shared/assets/vendor/scripts/jquery-ui.js') ?>"></script>
+<script src="<?= url('/container/shared/assets/vendor/scripts/tinymce/tinymce.min.js') ?>"></script>
 <script type="module" src="<?= url('/organic/organic.min.js') ?>"></script>
 <script src="<?= url('/organic/compat-v1.js') ?>"></script>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>

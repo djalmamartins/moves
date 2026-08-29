@@ -12,8 +12,8 @@
 <body class="studio-login-body">
 <div class="ajax_load"><div class="ajax_load_box"><div class="ajax_load_box_circle"></div><p class="ajax_load_box_title">Entrando...</p></div></div>
 <?= $this->section('content') ?>
-<script src="<?= url('/organic/scripts/jquery.min.js') ?>"></script>
-<script src="<?= url('/organic/scripts/jquery-ui.js') ?>"></script>
+<script src="<?= url('/container/shared/assets/vendor/scripts/jquery.min.js') ?>"></script>
+<script src="<?= url('/container/shared/assets/vendor/scripts/jquery-ui.js') ?>"></script>
 <script type="module" src="<?= url('/organic/organic.min.js') ?>"></script>
 <script src="<?= url('/organic/compat-v1.js') ?>"></script>
 <script src="<?= themeStudio('/assets/js/login.js', 'moves_studio') ?>"></script>
