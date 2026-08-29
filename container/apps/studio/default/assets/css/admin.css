@@ -1859,14 +1859,14 @@ a {
     }
 }
 
-/* Studio minimal — roxo #6E00B3 */
+/* Studio minimal — identidade Moves: verde institucional e dourado */
 .studio-v2 {
-    --studio-purple: #6e00b3;
-    --studio-purple-soft: #f5ecfb;
-    --studio-purple-line: #eadcf3;
-    --studio-ink: #17213a;
-    --studio-muted: #6f7890;
-    --studio-border: #e8eaf0;
+    --studio-purple: #9b7b22;
+    --studio-purple-soft: #f7f2df;
+    --studio-purple-line: #e8dcae;
+    --studio-ink: #10231d;
+    --studio-muted: #68746f;
+    --studio-border: #e4e9e6;
     background: #fff
 }
 

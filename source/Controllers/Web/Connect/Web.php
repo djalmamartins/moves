@@ -59,7 +59,7 @@ class Web extends Controller
                 ->findPost()
                 ->order("post_at DESC")
                 ->limit(4)
-                ->fetch(true),
+                ->fetch(true) ?? [],
         ]);
     }
 

@@ -806,9 +806,15 @@
         <header class="section__head reveal visible"><span class="eyebrow">DO NOSSO BLOG</span>
             <h2>Informação para uma <em>gestão melhor.</em></h2></header>
         <div class="cards cards--blog">
-            <?php foreach ($articles as $post): ?>
+            <?php foreach (($articles ?? []) as $post): ?>
                 <?php $this->insert("pages/articles-list", ["post" => $post]); ?>
             <?php endforeach; ?>
+            <?php if (empty($articles)): ?>
+                <article class="blog-empty">
+                    <h3>Novos conteúdos em preparação</h3>
+                    <p>Em breve, você encontrará aqui orientações para uma gestão condominial mais simples e segura.</p>
+                </article>
+            <?php endif; ?>
         </div>
         <div class="blog-all-posts">
             <a href="<?= url("/artigos"); ?>" title="Ver todos os artigos">
