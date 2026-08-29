@@ -18,6 +18,8 @@ $files = [
     'dist/organic.min.css' => 'organic.min.css',
     'dist/organic.js' => 'organic.js',
     'dist/organic.min.js' => 'organic.min.js',
+    'dist/organic.global.js' => 'organic.global.js',
+    'dist/organic.global.min.js' => 'organic.global.min.js',
     'src/css/compat-v1.css' => 'compat-v1.css',
     'src/js/compat-v1.js' => 'compat-v1.js',
 ];
