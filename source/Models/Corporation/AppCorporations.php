@@ -26,10 +26,10 @@ class AppCorporations extends Model
         string $corporation_name,
         string $fantasy_name,
         string $email,
-        string $document = null,
-        string $datebirth = null,
-        string $phone = null,
-        string $phone_cell = null,
+        ?string $document = null,
+        ?string $datebirth = null,
+        ?string $phone = null,
+        ?string $phone_cell = null,
 
     ): AppCorporations {
         $this->corporation_name = $corporation_name;

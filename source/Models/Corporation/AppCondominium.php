@@ -37,10 +37,10 @@ class AppCondominium extends Model
         string $condo_name,
         string $fantasy_name,
         string $email,
-        string $document = null,
-        string $datebirth = null,
-        string $phone = null,
-        string $phone_cell = null,
+        ?string $document = null,
+        ?string $datebirth = null,
+        ?string $phone = null,
+        ?string $phone_cell = null,
     ): AppCondominium
     {
         $this->condo_name = $condo_name;
