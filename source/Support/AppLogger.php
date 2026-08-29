@@ -175,7 +175,7 @@ final class AppLogger
     private static function pdo(): PDO
     {
         if (!self::$pdo) {
-            self::$pdo = new PDO('mysql:host=' . CONF_DB_HOST . ';dbname=' . CONF_DB_NAME . ';charset=utf8mb4', CONF_DB_USER, CONF_DB_PASS, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            self::$pdo = new PDO('mysql:host=' . CONF_DB_HOST . ';port=' . CONF_DB_PORT . ';dbname=' . CONF_DB_NAME . ';charset=utf8mb4', CONF_DB_USER, CONF_DB_PASS, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
         }
         return self::$pdo;
     }

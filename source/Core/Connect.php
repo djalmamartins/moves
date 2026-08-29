@@ -33,7 +33,7 @@ class Connect
         if (empty(self::$instance)) {
             try {
                 self::$instance = new PDO(
-                    "mysql:host=" . CONF_DB_HOST . ";dbname=" . CONF_DB_NAME . ";charset=utf8mb4",
+                    "mysql:host=" . CONF_DB_HOST . ";port=" . CONF_DB_PORT . ";dbname=" . CONF_DB_NAME . ";charset=utf8mb4",
                     CONF_DB_USER,
                     CONF_DB_PASS,
                     self::OPTIONS
