@@ -10296,7 +10296,19 @@ html[data-theme="dark"] .studio-v2 .studio-report-chart { background-color: var(
 /* Studio — camada final de composição. Mantê-la por último para neutralizar
    regras de temas legados ainda necessárias em telas não migradas. */
 .studio-v2 .studio-main {
-    background: #f5f4f7;
+    background: #f4f6f8;
+}
+
+.studio-v2 .studio-topbar-v2 {
+    background: rgba(255, 255, 255, .96);
+    border-bottom: 1px solid #e3e7ed;
+    box-shadow: 0 1px 0 rgb(23 31 44 / 3%);
+    backdrop-filter: blur(12px);
+}
+
+.studio-v2 .studio-sidebar {
+    background: #fff;
+    border-right-color: #e3e7ed;
 }
 
 .studio-v2 .studio-content {
@@ -10343,14 +10355,14 @@ html[data-theme="dark"] .studio-v2 .studio-report-chart { background-color: var(
     border: 1px solid var(--studio-border);
     border-radius: 12px;
     background: var(--org-bg);
-    box-shadow: 0 4px 18px rgb(34 25 41 / 5%);
+    box-shadow: 0 4px 16px rgb(23 31 44 / 5%);
     color: var(--studio-ink);
     transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 
 .studio-dashboard-kpis > a:hover {
     border-color: var(--studio-purple-line);
-    box-shadow: 0 9px 28px rgb(64 33 79 / 10%);
+    box-shadow: 0 9px 28px rgb(23 31 44 / 9%);
     transform: translateY(-2px);
 }
 
@@ -10404,6 +10416,7 @@ html[data-theme="dark"] .studio-v2 .studio-report-chart { background-color: var(
     border: 1px solid var(--studio-border);
     border-radius: 12px;
     background: var(--org-bg);
+    box-shadow: 0 4px 16px rgb(23 31 44 / 4%);
 }
 
 .studio-dashboard-actions .organic-cluster {
