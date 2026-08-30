@@ -10292,3 +10292,179 @@ html[data-theme="dark"] .studio-v2 .studio-report-chart { background-color: var(
     .studio-agenda-weekdays, .studio-agenda-grid { min-width: 720px }
     .studio-agenda-day { min-height: 96px }
 }
+
+/* Studio — camada final de composição. Mantê-la por último para neutralizar
+   regras de temas legados ainda necessárias em telas não migradas. */
+.studio-v2 .studio-main {
+    background: #f5f4f7;
+}
+
+.studio-v2 .studio-content {
+    width: 100%;
+    max-width: 1600px;
+    min-height: calc(100vh - 154px);
+    margin: 0 auto;
+    padding: clamp(20px, 2.4vw, 38px);
+    background: transparent;
+}
+
+.studio-dashboard-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.studio-dashboard-head .organic-page-title {
+    margin: 2px 0 6px;
+    color: var(--studio-ink);
+    font-size: clamp(1.65rem, 2.5vw, 2.2rem);
+}
+
+.studio-dashboard-head .organic-page-description {
+    margin: 0;
+    color: var(--studio-muted);
+}
+
+.studio-dashboard-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.studio-dashboard-kpis > a {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border: 1px solid var(--studio-border);
+    border-radius: 12px;
+    background: var(--org-bg);
+    box-shadow: 0 4px 18px rgb(34 25 41 / 5%);
+    color: var(--studio-ink);
+    transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.studio-dashboard-kpis > a:hover {
+    border-color: var(--studio-purple-line);
+    box-shadow: 0 9px 28px rgb(64 33 79 / 10%);
+    transform: translateY(-2px);
+}
+
+.studio-dashboard-kpis > a > i {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: var(--studio-purple-soft);
+    color: var(--studio-purple);
+    font-size: 23px;
+}
+
+.studio-dashboard-kpis > a > div,
+.studio-dashboard-kpis span,
+.studio-dashboard-kpis strong,
+.studio-dashboard-kpis small {
+    min-width: 0;
+    display: block;
+}
+
+.studio-dashboard-kpis span {
+    color: var(--studio-muted);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.studio-dashboard-kpis strong {
+    overflow: hidden;
+    margin: 3px 0;
+    color: var(--studio-ink);
+    font-size: 1.45rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.studio-dashboard-kpis small {
+    overflow: hidden;
+    color: var(--studio-muted);
+    font-size: .75rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.studio-dashboard-actions {
+    padding: 22px;
+    border: 1px solid var(--studio-border);
+    border-radius: 12px;
+    background: var(--org-bg);
+}
+
+.studio-dashboard-actions .organic-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.studio-v2 .message {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 14px 0;
+    padding: 14px 16px;
+    border: 1px solid #cbdff5;
+    border-left: 4px solid var(--org-info);
+    border-radius: 8px;
+    background: #f1f7fd;
+    color: #254766;
+    font-size: .875rem;
+    line-height: 1.5;
+    box-shadow: 0 3px 12px rgb(26 54 81 / 5%);
+}
+
+.studio-v2 .message::before {
+    content: "i";
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--org-info);
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 800;
+}
+
+.studio-v2 .message.success { border-color: #bfe4ca; border-left-color: var(--org-success); background: #f0faf3; color: #245b34 }
+.studio-v2 .message.success::before { content: "✓"; background: var(--org-success) }
+.studio-v2 .message.warning { border-color: #f2d99d; border-left-color: var(--org-warning); background: #fff9e9; color: #725516 }
+.studio-v2 .message.warning::before { content: "!"; background: var(--org-warning); color: #493500 }
+.studio-v2 .message.error { border-color: #efc2c7; border-left-color: var(--org-danger); background: #fff2f3; color: #7b2931 }
+.studio-v2 .message.error::before { content: "×"; background: var(--org-danger) }
+.studio-v2 .message a { color: inherit; font-weight: 700; text-decoration: underline }
+
+html[data-theme="dark"] .studio-v2 .studio-main { background: #151318 }
+html[data-theme="dark"] .studio-v2 .message { background: #172735; color: #cde6fb; border-color: #294b66 }
+html[data-theme="dark"] .studio-v2 .message.success { background: #172a1d; color: #ccebd5; border-color: #315a3d }
+html[data-theme="dark"] .studio-v2 .message.warning { background: #302814; color: #f5dfa8; border-color: #665221 }
+html[data-theme="dark"] .studio-v2 .message.error { background: #321a1d; color: #f2c9ce; border-color: #673138 }
+
+@media (max-width: 1280px) {
+    .studio-dashboard-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+}
+
+@media (max-width: 700px) {
+    .studio-dashboard-head { align-items: flex-start; flex-direction: column }
+    .studio-dashboard-kpis { grid-template-columns: 1fr }
+    .studio-dashboard-head .organic-page-actions,
+    .studio-dashboard-head .organic-page-actions .organic-btn { width: 100% }
+}
