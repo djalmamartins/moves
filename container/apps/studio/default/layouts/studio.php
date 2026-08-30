@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="<?= themeStudio('/assets/studio.min.css', 'default') . '?v=' . filemtime($studioCss) ?>">
     <link rel="icon" href="<?= themeStudio('/assets/images/favicon.png', 'default') ?>">
 </head>
-<body class="studio-body studio-v2">
+<body class="studio-body studio-v2" data-editor-upload="<?= url('/studio/media/editor') ?>">
 <a class="org-skip-link" href="#main-content">Ir para o conteúdo</a>
 <div class="ajax_load studio-preloader" role="status" aria-live="polite"><div class="studio-preloader-card"><span class="studio-preloader-mark"><i></i><i></i><i></i></span><strong>MOVES<small>OS</small></strong><p class="ajax_load_box_title">Preparando seu painel</p><span class="studio-preloader-line"><i></i></span></div></div>
 <div class="ajax_response"><?= flash() ?></div>

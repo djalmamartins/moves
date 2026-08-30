@@ -454,7 +454,12 @@ function themeStudio(?string $path = null, string $theme = 'moves_studio'): stri
 function image(?string $image, int $width, ?int $height = null): ?string
 {
     if ($image) {
-        return url() . "/" . (new \Source\Support\Thumb())->make($image, $width, $height);
+        $thumb = str_replace("\\", "/", (new \Source\Support\Thumb())->make($image, $width, $height));
+        $root = str_replace("\\", "/", dirname(__DIR__, 2)) . "/";
+        if (str_starts_with($thumb, $root)) {
+            $thumb = substr($thumb, strlen($root));
+        }
+        return url("/" . ltrim($thumb, "/"));
     }
 
     return null;

@@ -47,6 +47,7 @@ $route->get("/media", "Studio:media");
 $route->post("/media", "Studio:media");
 $route->get("/media/p/{page}", "Studio:media");
 $route->get("/media/library", "Studio:mediaLibrary");
+$route->post("/media/editor", "Studio:editorImage");
 $route->get("/users", "Studio:users");
 $route->get("/users/p/{page}", "Studio:users");
 $route->get("/user", "Studio:userForm");

@@ -923,6 +923,35 @@ class Studio extends Controller
         echo json_encode(["images" => array_slice($files, 0, 120)], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
+    public function editorImage(?array $data): void
+    {
+        $this->guard("media.manage");
+        if (!csrf_verify($data ?? [])) {
+            http_response_code(419);
+            echo json_encode(["error" => "Sessão expirada. Atualize a página."]);
+            return;
+        }
+        if (empty($_FILES["image"]["tmp_name"])) {
+            http_response_code(422);
+            echo json_encode(["error" => "Selecione uma imagem válida."]);
+            return;
+        }
+        $upload = new Upload();
+        $stored = $upload->image($_FILES["image"], "editor-" . date("YmdHis") . "-" . bin2hex(random_bytes(3)), 2000);
+        if (!$stored) {
+            http_response_code(422);
+            echo json_encode(["error" => "Não foi possível enviar a imagem."]);
+            return;
+        }
+        \Source\Support\Audit::record("create", "media_file", null, [], ["path" => $stored, "source" => "organic_editor"]);
+        echo json_encode([
+            "url" => url("/" . CONF_UPLOAD_DIR . "/" . $stored),
+            "path" => $stored,
+            "name" => basename($stored),
+            "type" => mime_content_type(dirname(__DIR__, 3) . "/" . CONF_UPLOAD_DIR . "/" . $stored) ?: "image/jpeg"
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
     private function mediaUsage(string $storedPath): array
     {
         $locations = [
