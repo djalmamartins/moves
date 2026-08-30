@@ -10301,7 +10301,6 @@ html[data-theme="dark"] .studio-v2 .studio-report-chart { background-color: var(
 
 .studio-v2 .studio-topbar-v2 {
     background: rgba(255, 255, 255, .96);
-    border-bottom: 1px solid #e3e7ed;
     box-shadow: 0 1px 0 rgb(23 31 44 / 3%);
     backdrop-filter: blur(12px);
 }
