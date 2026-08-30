@@ -90,7 +90,8 @@
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <script src="<?= themeStudio('/assets/studio.min.js', 'default') . '?v=' . filemtime($studioJs) ?>"></script>
-<script type="module" src="<?= themeStudio('/assets/js/editor.js', 'default') ?>"></script>
+<?php $editorJs=dirname(__DIR__).'/assets/js/editor.js'; ?>
+<script type="module" src="<?= themeStudio('/assets/js/editor.js', 'default') . '?v=' . filemtime($editorJs) ?>"></script>
 <script>
 const studioThemeButton=document.querySelector('.studio-theme-toggle');
 const studioApplyTheme=theme=>{document.documentElement.dataset.theme=theme;localStorage.setItem('studio-theme',theme);const dark=theme==='dark';studioThemeButton?.setAttribute('aria-pressed',String(dark));studioThemeButton?.setAttribute('aria-label',dark?'Ativar modo claro':'Ativar modo escuro');studioThemeButton?.querySelector('ion-icon')?.setAttribute('name',dark?'sunny-outline':'moon-outline')};

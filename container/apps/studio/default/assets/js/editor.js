@@ -1,5 +1,6 @@
 const editors = new Map();
-const editorModuleUrl = new URL("../../../../../../organic/editor/organic-editor.min.js", import.meta.url).href;
+// Distribuição ESM oficial do Organic Editor mantida dentro do próprio tema.
+const editorModuleUrl = new URL("../vendor/organic-editor/organic-editor.min.js", import.meta.url).href;
 const uploadUrl = document.body.dataset.editorUpload;
 
 const uploadImage = async (file) => {
@@ -35,7 +36,7 @@ const installToolbar = (editor, textarea) => {
     [["p", "Parágrafo"], ["h2", "Título 2"], ["h3", "Título 3"], ["h4", "Título 4"], ["blockquote", "Citação"], ["pre", "Código"]].forEach(([value, label]) => block.add(new Option(label, value)));
     block.addEventListener("change", () => { editor.commands.formatBlock(block.value); editor.focus(); });
     toolbar.append(block);
-    [["↶", "Desfazer", "undo"], ["↷", "Refazer", "redo"], ["B", "Negrito", "bold"], ["I", "Itálico", "italic"], ["U", "Sublinhado", "underline"], ["• Lista", "Lista com marcadores", "insertUnorderedList"], ["1. Lista", "Lista numerada", "insertOrderedList"], ["≡", "Alinhar à esquerda", "justifyLeft"], ["≣", "Centralizar", "justifyCenter"], ["☰", "Alinhar à direita", "justifyRight"]].forEach(([label, title, command]) => toolbar.append(editorButton(label, title, () => editor.execCommand(command))));
+    [["↶", "Desfazer", "undo"], ["↷", "Refazer", "redo"], ["B", "Negrito", "bold"], ["I", "Itálico", "italic"], ["U", "Sublinhado", "underline"], ["S", "Tachado", "strikeThrough"], ["• Lista", "Lista com marcadores", "insertUnorderedList"], ["1. Lista", "Lista numerada", "insertOrderedList"], ["←", "Diminuir recuo", "outdent"], ["→", "Aumentar recuo", "indent"], ["≡", "Alinhar à esquerda", "justifyLeft"], ["≣", "Centralizar", "justifyCenter"], ["☰", "Alinhar à direita", "justifyRight"], ["☷", "Justificar", "justifyFull"], ["Tx", "Limpar formatação", "removeFormat"]].forEach(([label, title, command]) => toolbar.append(editorButton(label, title, () => editor.execCommand(command))));
     toolbar.append(editorButton("🔗", "Inserir link", () => { editor.selection.restore(); const href = window.prompt("URL do link (https://...)"); if (href) editor.execCommand("createLink", href.trim()); }));
     const file = document.createElement("input");
     file.type = "file";
@@ -55,6 +56,29 @@ const installToolbar = (editor, textarea) => {
     const imageButton = editorButton("▧", "Enviar imagem", () => file.click());
     imageButton.dataset.uploadTool = "true";
     toolbar.append(imageButton, file);
+    toolbar.append(editorButton("▦", "Escolher imagem da biblioteca", () => {
+        let picker = document.querySelector(`[data-media-picker][data-media-editor="${CSS.escape(textarea.id)}"]`);
+        if (!picker) {
+            picker = document.createElement("button");
+            picker.type = "button";
+            picker.hidden = true;
+            picker.dataset.mediaPicker = "";
+            picker.dataset.mediaEditor = textarea.id;
+            toolbar.append(picker);
+        }
+        picker.click();
+    }));
+    toolbar.append(editorButton("▤", "Inserir tabela", () => {
+        const rowInput = window.prompt("Número de linhas:", "3");
+        if (rowInput === null) return;
+        const rows = Math.min(20, Math.max(1, Number(rowInput) || 1));
+        const columnInput = window.prompt("Número de colunas:", "3");
+        if (columnInput === null) return;
+        const columns = Math.min(10, Math.max(1, Number(columnInput) || 1));
+        const cells = (tag) => `<${tag}>Conteúdo</${tag}>`.repeat(columns);
+        editor.insertContent(`<div class="organic-table-wrap"><table class="organic-content-table"><thead><tr>${cells("th")}</tr></thead><tbody>${`<tr>${cells("td")}</tr>`.repeat(rows)}</tbody></table></div><p><br></p>`);
+    }));
+    toolbar.append(editorButton("—", "Inserir linha horizontal", () => editor.execCommand("insertHorizontalRule")));
     toolbar.append(editorButton("</>", "Editar HTML", () => { const html = window.prompt("Edite o HTML do conteúdo:", editor.getContent()); if (html !== null) editor.setExternalContent(html); }));
     toolbar.append(editorButton("⛶", "Tela cheia", () => textarea.closest(".studio-panel")?.classList.toggle("moves-organic-fullscreen")));
     editor.element.before(toolbar);
@@ -77,13 +101,26 @@ document.querySelectorAll("textarea[data-organic-editor]").forEach((textarea) =>
     }
     const wasRequired = textarea.required;
     textarea.required = false;
+    const storagePrefix = `moves-studio:${location.pathname}:${textarea.id}:`;
+    const storage = {
+        get(key, fallback = null) {
+            try { const value = localStorage.getItem(storagePrefix + key); return value === null ? fallback : JSON.parse(value); }
+            catch { return fallback; }
+        },
+        set(key, value) { localStorage.setItem(storagePrefix + key, JSON.stringify(value)); },
+        remove(key) { localStorage.removeItem(storagePrefix + key); }
+    };
     const editor = OrganicEditor.init({
         target: textarea,
         preset: "full",
         mode: "document",
         placeholder: "Comece a escrever o conteúdo...",
         upload: uploadImage,
-        plugins: "image persistence clipboard visual pages"
+        filePicker: async () => null,
+        storage,
+        plugins: "link image table media special workspace persistence export clipboard searchreplace visual pages",
+        toolbar: "undo redo blocks fontfamily fontsize bold italic underline strikethrough alignleft aligncenter alignright alignjustify bullist numlist outdent indent link image table upload library video audio embed file emoji symbol anchor codeblock searchreplace pasteplain visualblocks visualchars pdf word html print code",
+        menubar: "file edit insert format view"
     });
     editors.set(textarea.id, editor);
     installToolbar(editor, textarea);
@@ -95,8 +132,7 @@ document.querySelectorAll("textarea[data-organic-editor]").forEach((textarea) =>
             event.preventDefault();
             event.stopImmediatePropagation();
             editor.focus();
-            if (window.Organic?.Toast?.warning) window.Organic.Toast.warning("Preencha o conteúdo antes de salvar.");
-            else window.alert("Preencha o conteúdo antes de salvar.");
+            window.alert("Preencha o conteúdo antes de salvar.");
         }
     }, true);
 });
