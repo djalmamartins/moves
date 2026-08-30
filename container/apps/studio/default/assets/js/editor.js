@@ -113,13 +113,13 @@ document.querySelectorAll("textarea[data-organic-editor]").forEach((textarea) =>
     const editor = OrganicEditor.init({
         target: textarea,
         preset: "full",
-        mode: "document",
+        mode: "email",
         placeholder: "Comece a escrever o conteúdo...",
         upload: uploadImage,
         filePicker: async () => null,
         storage,
         plugins: "link image table media special workspace persistence export clipboard searchreplace visual pages",
-        toolbar: "undo redo blocks fontfamily fontsize bold italic underline strikethrough alignleft aligncenter alignright alignjustify bullist numlist outdent indent link image table upload library video audio embed file emoji symbol anchor codeblock searchreplace pasteplain visualblocks visualchars pdf word html print code",
+        toolbar: "undo redo blocks fontfamily fontsize bold italic underline strikethrough alignleft aligncenter alignright alignjustify bullist numlist outdent indent link image table upload library video audio embed file emoji symbol anchor codeblock pasteplain visualblocks visualchars pdf word html print code",
         menubar: "file edit insert format view"
     });
     editors.set(textarea.id, editor);
