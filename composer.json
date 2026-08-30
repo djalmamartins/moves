@@ -53,6 +53,7 @@
     "phpunit/phpunit": "^11.5"
   },
   "scripts": {
+    "build:studio": "@php service/commands/build-studio-assets.php",
     "test": "@php tests/run.php --colors=always",
     "test:unit": "@php tests/run.php --testsuite unit --colors=always",
     "test:integration": "@php tests/run.php --testsuite integration --colors=always"

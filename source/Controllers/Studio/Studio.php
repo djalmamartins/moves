@@ -1253,14 +1253,25 @@ class Studio extends Controller
             $endsAt = !empty($data["ends_at"]) ? strtotime((string)$data["ends_at"]) : null;
             $types = ["meeting", "task", "deadline", "support"];
             if (mb_strlen($title) < 3 || !$startsAt || ($endsAt && $endsAt < $startsAt)) { $this->jsonMessage("Informe título e período válidos.", "warning"); return; }
-            $stmt = $pdo->prepare("INSERT INTO studio_calendar_events(title,description,starts_at,ends_at,type,assigned_to,created_by) VALUES(:title,:description,:starts,:ends,:type,:assigned,:creator)");
+            $eventId = (int)($data["event_id"] ?? 0);
             $assignedTo = ($id = (int)($data["assigned_to"] ?? 0)) ?: null;
             $startsAtSql = date("Y-m-d H:i:s", $startsAt);
             $eventType = in_array($data["type"] ?? "", $types, true) ? $data["type"] : "meeting";
-            $stmt->execute(["title" => $title, "description" => trim(strip_tags((string)($data["description"] ?? ""))), "starts" => $startsAtSql, "ends" => $endsAt ? date("Y-m-d H:i:s", $endsAt) : null, "type" => $eventType, "assigned" => $assignedTo, "creator" => $user->id]);
-            $eventId = (int)$pdo->lastInsertId();
-            $this->notifyAgendaEvent($eventId, $title, $startsAtSql, $eventType, $assignedTo, $user);
-            \Source\Support\Audit::record("create", "studio_calendar_events", $eventId, [], ["title" => $title]);
+            $payload = ["title" => $title, "description" => trim(strip_tags((string)($data["description"] ?? ""))), "starts" => $startsAtSql, "ends" => $endsAt ? date("Y-m-d H:i:s", $endsAt) : null, "type" => $eventType, "assigned" => $assignedTo];
+            if ($eventId) {
+                $exists = $pdo->prepare("SELECT id FROM studio_calendar_events WHERE id=:id");
+                $exists->execute(["id" => $eventId]);
+                if (!$exists->fetchColumn()) { $this->jsonMessage("Compromisso não encontrado.", "warning"); return; }
+                $stmt = $pdo->prepare("UPDATE studio_calendar_events SET title=:title,description=:description,starts_at=:starts,ends_at=:ends,type=:type,assigned_to=:assigned WHERE id=:id");
+                $stmt->execute($payload + ["id" => $eventId]);
+                \Source\Support\Audit::record("update", "studio_calendar_events", $eventId, [], ["title" => $title]);
+            } else {
+                $stmt = $pdo->prepare("INSERT INTO studio_calendar_events(title,description,starts_at,ends_at,type,assigned_to,created_by) VALUES(:title,:description,:starts,:ends,:type,:assigned,:creator)");
+                $stmt->execute($payload + ["creator" => $user->id]);
+                $eventId = (int)$pdo->lastInsertId();
+                $this->notifyAgendaEvent($eventId, $title, $startsAtSql, $eventType, $assignedTo, $user);
+                \Source\Support\Audit::record("create", "studio_calendar_events", $eventId, [], ["title" => $title]);
+            }
             echo json_encode(["redirect" => url("/studio/agenda")]); return;
         }
         $month = (string)($_GET["month"] ?? date("Y-m"));
@@ -1782,7 +1793,7 @@ class Studio extends Controller
     {
         $user = $this->guard('logs.view');
         $role = AccessControl::role($user);
-        if (!$role || $role->slug !== 'developer') { redirect('/studio/ops/403'); }
+        if (($role->slug ?? null) !== 'developer' && (int)$user->level < 10) { redirect('/studio/ops/403'); }
         return $user;
     }
 

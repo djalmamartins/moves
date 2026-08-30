@@ -4,9 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <?= $head ?>
-    <link rel="stylesheet" href="<?= url('/organic/organic.min.css') ?>">
-    <link rel="stylesheet" href="<?= url('/organic/compat-v1.css') ?>">
-    <link rel="stylesheet" href="<?= themeStudio('/assets/css/admin.css', 'default') ?>">
+    <?php $studioCss=dirname(__DIR__).'/assets/studio.min.css'; $studioJs=dirname(__DIR__).'/assets/studio.min.js'; ?>
+    <link rel="stylesheet" href="<?= themeStudio('/assets/studio.min.css', 'default') . '?v=' . filemtime($studioCss) ?>">
     <link rel="icon" href="<?= themeStudio('/assets/images/favicon.png', 'default') ?>">
 </head>
 <body class="studio-body studio-v2">
@@ -50,6 +49,7 @@
             <button class="studio-menu" type="button" aria-label="Abrir menu"><ion-icon name="apps-outline"></ion-icon></button>
             <form class="studio-global-search" action="<?= url('/studio/buscar') ?>" method="get"><ion-icon name="search-outline"></ion-icon><input name="q" value="<?= htmlspecialchars((string)($_GET['q'] ?? '')) ?>" placeholder="Buscar páginas, artigos, categorias ou usuários..." autocomplete="off"></form>
             <nav class="studio-header-actions" aria-label="Atalhos do painel">
+                <button class="studio-theme-toggle" type="button" title="Alternar tema" aria-label="Ativar modo escuro" aria-pressed="false"><ion-icon name="moon-outline"></ion-icon></button>
                 <a class="studio-context-help" href="<?= $app==='notifications' ? url('/suporte/comunicacao/como-cadastrar-uma-comunicacao') : url('/suporte/buscar?q='.urlencode($title)) ?>" target="_blank" title="Ajuda sobre esta tela" aria-label="Abrir ajuda sobre esta tela"><ion-icon name="help-circle-outline"></ion-icon></a>
                 <a href="<?= url('/') ?>" target="_blank" title="Visualizar site"><ion-icon name="globe-outline"></ion-icon></a>
                 <div class="studio-notifications">
@@ -86,16 +86,16 @@
     </div>
 </div>
 <audio id="studio-notification-sound" preload="auto" src="<?= themeStudio('/assets/audio/notification.mp3', 'default') ?>"></audio>
-<script src="<?= url('/container/shared/assets/vendor/scripts/jquery.min.js') ?>"></script>
-<script src="<?= url('/container/shared/assets/vendor/scripts/jquery.form.js') ?>"></script>
-<script src="<?= url('/container/shared/assets/vendor/scripts/jquery-ui.js') ?>"></script>
 <script src="<?= url('/container/shared/assets/vendor/scripts/tinymce/tinymce.min.js') ?>"></script>
-<script src="<?= url('/organic/organic.global.min.js') ?>"></script>
-<script src="<?= url('/organic/compat-v1.js') ?>"></script>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-<script src="<?= themeStudio('/assets/js/scripts.js', 'default') ?>"></script>
+<script src="<?= themeStudio('/assets/studio.min.js', 'default') . '?v=' . filemtime($studioJs) ?>"></script>
+<script type="module" src="<?= themeStudio('/assets/js/editor.js', 'default') ?>"></script>
 <script>
+const studioThemeButton=document.querySelector('.studio-theme-toggle');
+const studioApplyTheme=theme=>{document.documentElement.dataset.theme=theme;localStorage.setItem('studio-theme',theme);const dark=theme==='dark';studioThemeButton?.setAttribute('aria-pressed',String(dark));studioThemeButton?.setAttribute('aria-label',dark?'Ativar modo claro':'Ativar modo escuro');studioThemeButton?.querySelector('ion-icon')?.setAttribute('name',dark?'sunny-outline':'moon-outline')};
+studioApplyTheme(localStorage.getItem('studio-theme')||'light');
+studioThemeButton?.addEventListener('click',()=>studioApplyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
 const studioMenuButton=document.querySelector('.studio-menu');
 const studioIsMobile=()=>window.matchMedia('(max-width:1024px)').matches;
 const studioSetMenuState=()=>studioMenuButton?.setAttribute('aria-expanded',studioIsMobile()?String(document.body.classList.contains('menu-open')):String(!document.body.classList.contains('menu-collapsed')));

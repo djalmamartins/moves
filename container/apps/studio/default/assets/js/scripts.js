@@ -193,8 +193,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const choose = function (image) {
         if (!activeTrigger) return;
         if (activeTrigger.dataset.mediaEditor) {
-            const editor = window.tinymce?.get(activeTrigger.dataset.mediaEditor) || window.tinymce?.activeEditor;
-            if (editor) editor.insertContent('<img src="' + image.url.replace(/"/g, '&quot;') + '" alt="' + image.name.replace(/"/g, '&quot;') + '">');
+            const editorId = activeTrigger.dataset.mediaEditor;
+            const html = '<img src="' + image.url.replace(/"/g, '&quot;') + '" alt="' + image.name.replace(/"/g, '&quot;') + '"><p><br></p>';
+            const inserted = window.MovesOrganicEditor?.insert(editorId, html);
+            if (!inserted) {
+                const editor = window.tinymce?.get(editorId) || window.tinymce?.activeEditor;
+                if (editor) editor.insertContent(html);
+            }
             document.querySelector(".mce_upload")?.style.setProperty("display", "none");
         } else if (activeTrigger.dataset.mediaTarget) {
             const target = document.querySelector(activeTrigger.dataset.mediaTarget);
