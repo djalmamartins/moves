@@ -16,6 +16,8 @@ if (!is_file($import)) {
 
 $imagesImport = dirname($import) . "/images";
 $imagesTarget = $root . "/storage/images";
+$imagesOnly = in_array("--images-only", $argv ?? [], true);
+$imageCounts = ["copied" => 0, "verified" => 0];
 if (is_dir($imagesImport)) {
     $iterator = new RecursiveIteratorIterator(
         new RecursiveDirectoryIterator($imagesImport, FilesystemIterator::SKIP_DOTS),
@@ -28,12 +30,31 @@ if (is_dir($imagesImport)) {
             if (!is_dir($target) && !mkdir($target, 0775, true) && !is_dir($target)) {
                 throw new RuntimeException("Não foi possível criar {$target}.");
             }
+            chmod($target, 0775);
             continue;
         }
-        if (!is_file($target) && !copy($source->getPathname(), $target)) {
-            throw new RuntimeException("Não foi possível copiar {$relative}.");
+        $mustCopy = !is_file($target) || filesize($target) !== $source->getSize()
+            || hash_file("sha256", $target) !== hash_file("sha256", $source->getPathname());
+        if ($mustCopy) {
+            if (!is_dir(dirname($target)) && !mkdir(dirname($target), 0775, true) && !is_dir(dirname($target))) {
+                throw new RuntimeException("Não foi possível criar " . dirname($target) . ".");
+            }
+            if (!copy($source->getPathname(), $target)) {
+                throw new RuntimeException("Não foi possível copiar {$relative}. Verifique as permissões de storage/images.");
+            }
+            chmod($target, 0664);
+            $imageCounts["copied"]++;
         }
+        if (!is_file($target) || filesize($target) !== $source->getSize()) {
+            throw new RuntimeException("A verificação da imagem {$relative} falhou.");
+        }
+        $imageCounts["verified"]++;
     }
+}
+
+printf("Imagens: %d copiadas/reparadas; %d verificadas.%s", $imageCounts["copied"], $imageCounts["verified"], PHP_EOL);
+if ($imagesOnly) {
+    exit(0);
 }
 
 $pdo = Connect::getInstance();
