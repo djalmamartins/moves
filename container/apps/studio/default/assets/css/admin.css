@@ -1,6 +1,6 @@
 @font-face {
     font-family: Gotham;
-    src: url("../../../../../organic/fonts/GothamBookRegular.otf") format("opentype");
+    src: url("../fonts/GothamBookRegular.otf") format("opentype");
     font-style: normal;
     font-weight: 400;
     font-display: swap;
@@ -8,7 +8,7 @@
 
 @font-face {
     font-family: Gotham;
-    src: url("../../../../../organic/fonts/GothamMedium.otf") format("opentype");
+    src: url("../fonts/GothamMedium.otf") format("opentype");
     font-style: normal;
     font-weight: 500 700;
     font-display: swap;
@@ -10683,6 +10683,7 @@ html[data-theme="dark"] .studio-v2 .studio-report-chart { background-color: var(
     background: var(--org-info);
     color: #fff;
     font-size: .7rem;
+    font-family: Gotham, Arial, sans-serif !important;
     font-weight: 800;
 }
 

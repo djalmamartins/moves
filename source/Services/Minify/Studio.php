@@ -13,7 +13,7 @@ $themeRoot = moves_container_path("studio", "default");
 $css = new CSS();
 // O Studio possui identidade e componentes próprios. Do Organic preservamos
 // exclusivamente o CSS do editor de conteúdo.
-foreach ([$movesRoot . "/organic/editor/organic-editor.min.css", $themeRoot . "/assets/css/admin.css"] as $asset) {
+foreach ([$movesRoot . "/organic/editor/organic-editor.min.css", $themeRoot . "/assets/css/studio-icons.css", $themeRoot . "/assets/css/admin.css"] as $asset) {
     if (is_file($asset)) $css->add($asset);
 }
 $cssTarget = $themeRoot . "/assets/studio.min.css";

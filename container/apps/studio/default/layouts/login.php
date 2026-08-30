@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= $head ?>
-    <link rel="stylesheet" href="<?= themeStudio('/assets/css/admin.css', 'default') ?>">
+    <?php $studioCss=dirname(__DIR__).'/assets/studio.min.css'; ?>
+    <link rel="stylesheet" href="<?= themeStudio('/assets/studio.min.css', 'default') . '?v=' . filemtime($studioCss) ?>">
     <link rel="icon" href="<?= theme('/assets/images/favicon.png') ?>">
 </head>
 <body class="studio-login-body">
