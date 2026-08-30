@@ -13,6 +13,57 @@ use Source\Support\Communication;
 
 final class ServiceDeskTest extends TestCase
 {
+    public function testAgendaControllerCreatesAndUpdatesAnEvent(): void
+    {
+        $userId = $this->createUser(['level' => 10]);
+        $_SESSION['authUser'] = $userId;
+        $_SESSION['csrf_token'] = 'agenda-token';
+        $studio = new Studio();
+
+        ob_start();
+        $studio->agenda([
+            'csrf' => 'agenda-token', 'action' => 'save', 'title' => 'Reunião de operação',
+            'description' => 'Revisar chamados pendentes.', 'starts_at' => '2026-09-03T10:00',
+            'ends_at' => '2026-09-03T11:00', 'type' => 'meeting', 'status' => 'scheduled',
+            'assigned_to' => (string)$userId,
+        ]);
+        $response = json_decode((string)ob_get_clean(), true);
+        self::assertStringContainsString('/studio/agenda', $response['redirect'] ?? '');
+
+        $event = $this->pdo->query('SELECT * FROM studio_calendar_events LIMIT 1')->fetch();
+        self::assertNotFalse($event);
+        ob_start();
+        $studio->agenda([
+            'csrf' => 'agenda-token', 'action' => 'save', 'event_id' => (string)$event->id,
+            'title' => 'Reunião de operação', 'description' => 'Concluída.',
+            'starts_at' => '2026-09-03T10:00', 'ends_at' => '2026-09-03T11:00',
+            'type' => 'meeting', 'status' => 'completed', 'assigned_to' => (string)$userId,
+        ]);
+        ob_end_clean();
+        self::assertSame('completed', $this->pdo->query("SELECT status FROM studio_calendar_events WHERE id={$event->id}")->fetchColumn());
+    }
+
+    public function testTicketsControllerCreatesTicketAndQueuesNotifications(): void
+    {
+        $userId = $this->createUser(['level' => 10, 'email' => 'operator@example.com']);
+        $_SESSION['authUser'] = $userId;
+        $_SESSION['csrf_token'] = 'ticket-token';
+
+        ob_start();
+        (new Studio())->tickets([
+            'csrf' => 'ticket-token', 'action' => 'create', 'subject' => 'Erro no cadastro de moradores',
+            'message' => 'O formulário não conclui o cadastro informado.', 'area' => 'technical',
+            'priority' => 'high', 'requester_id' => (string)$userId, 'assigned_to' => (string)$userId,
+        ]);
+        $response = json_decode((string)ob_get_clean(), true);
+
+        self::assertStringContainsString('/studio/tickets', $response['redirect'] ?? '');
+        self::assertSame(1, (int)$this->pdo->query('SELECT COUNT(*) FROM studio_support_tickets')->fetchColumn());
+        self::assertSame('high', $this->pdo->query('SELECT priority FROM studio_support_tickets LIMIT 1')->fetchColumn());
+        self::assertGreaterThanOrEqual(1, (int)$this->pdo->query('SELECT COUNT(*) FROM notifications')->fetchColumn());
+        self::assertGreaterThanOrEqual(1, (int)$this->pdo->query('SELECT COUNT(*) FROM mail_queue')->fetchColumn());
+    }
+
     public function testCommunicationCreatesMissingCategoryAndDeliversBothChannels(): void
     {
         $recipientId = $this->createUser(['email' => 'notification@example.com']);

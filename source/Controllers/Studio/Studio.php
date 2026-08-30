@@ -1273,33 +1273,42 @@ class Studio extends Controller
         if (!empty($data["action"])) {
             if (!csrf_verify($data)) { $this->jsonMessage("Sessão expirada. Atualize a página.", "error"); return; }
             if ($data["action"] === "delete") {
+                $eventId = (int)($data["event_id"] ?? 0);
+                if (!$eventId) { $this->jsonMessage("Compromisso inválido.", "warning"); return; }
                 $stmt = $pdo->prepare("DELETE FROM studio_calendar_events WHERE id=:id");
-                $stmt->execute(["id" => (int)($data["event_id"] ?? 0)]);
+                $stmt->execute(["id" => $eventId]);
+                if (!$stmt->rowCount()) { $this->jsonMessage("Compromisso não encontrado.", "warning"); return; }
+                \Source\Support\Audit::record("delete", "studio_calendar_events", $eventId);
+                $this->message->success("Compromisso excluído.")->flash();
                 echo json_encode(["redirect" => url("/studio/agenda")]); return;
             }
             $title = trim(strip_tags((string)($data["title"] ?? "")));
             $startsAt = strtotime((string)($data["starts_at"] ?? ""));
             $endsAt = !empty($data["ends_at"]) ? strtotime((string)$data["ends_at"]) : null;
             $types = ["meeting", "task", "deadline", "support"];
+            $statuses = ["scheduled", "completed", "cancelled"];
             if (mb_strlen($title) < 3 || !$startsAt || ($endsAt && $endsAt < $startsAt)) { $this->jsonMessage("Informe título e período válidos.", "warning"); return; }
             $eventId = (int)($data["event_id"] ?? 0);
             $assignedTo = ($id = (int)($data["assigned_to"] ?? 0)) ?: null;
             $startsAtSql = date("Y-m-d H:i:s", $startsAt);
             $eventType = in_array($data["type"] ?? "", $types, true) ? $data["type"] : "meeting";
-            $payload = ["title" => $title, "description" => trim(strip_tags((string)($data["description"] ?? ""))), "starts" => $startsAtSql, "ends" => $endsAt ? date("Y-m-d H:i:s", $endsAt) : null, "type" => $eventType, "assigned" => $assignedTo];
+            $eventStatus = in_array($data["status"] ?? "scheduled", $statuses, true) ? $data["status"] : "scheduled";
+            $payload = ["title" => $title, "description" => trim(strip_tags((string)($data["description"] ?? ""))), "starts" => $startsAtSql, "ends" => $endsAt ? date("Y-m-d H:i:s", $endsAt) : null, "type" => $eventType, "status" => $eventStatus, "assigned" => $assignedTo];
             if ($eventId) {
                 $exists = $pdo->prepare("SELECT id FROM studio_calendar_events WHERE id=:id");
                 $exists->execute(["id" => $eventId]);
                 if (!$exists->fetchColumn()) { $this->jsonMessage("Compromisso não encontrado.", "warning"); return; }
-                $stmt = $pdo->prepare("UPDATE studio_calendar_events SET title=:title,description=:description,starts_at=:starts,ends_at=:ends,type=:type,assigned_to=:assigned WHERE id=:id");
+                $stmt = $pdo->prepare("UPDATE studio_calendar_events SET title=:title,description=:description,starts_at=:starts,ends_at=:ends,type=:type,status=:status,assigned_to=:assigned WHERE id=:id");
                 $stmt->execute($payload + ["id" => $eventId]);
                 \Source\Support\Audit::record("update", "studio_calendar_events", $eventId, [], ["title" => $title]);
+                $this->message->success("Compromisso atualizado.")->flash();
             } else {
-                $stmt = $pdo->prepare("INSERT INTO studio_calendar_events(title,description,starts_at,ends_at,type,assigned_to,created_by) VALUES(:title,:description,:starts,:ends,:type,:assigned,:creator)");
+                $stmt = $pdo->prepare("INSERT INTO studio_calendar_events(title,description,starts_at,ends_at,type,status,assigned_to,created_by) VALUES(:title,:description,:starts,:ends,:type,:status,:assigned,:creator)");
                 $stmt->execute($payload + ["creator" => $user->id]);
                 $eventId = (int)$pdo->lastInsertId();
                 $this->notifyAgendaEvent($eventId, $title, $startsAtSql, $eventType, $assignedTo, $user);
                 \Source\Support\Audit::record("create", "studio_calendar_events", $eventId, [], ["title" => $title]);
+                $this->message->success("Compromisso cadastrado.")->flash();
             }
             echo json_encode(["redirect" => url("/studio/agenda")]); return;
         }
@@ -1307,9 +1316,17 @@ class Studio extends Controller
         if (!preg_match("/^\\d{4}-(0[1-9]|1[0-2])$/", $month)) $month = date("Y-m");
         $from = $month . "-01 00:00:00";
         $to = date("Y-m-d H:i:s", strtotime($from . " +1 month"));
-        $events = $pdo->prepare("SELECT e.*, CONCAT(u.first_name,' ',u.last_name) assigned_name FROM studio_calendar_events e LEFT JOIN users u ON u.id=e.assigned_to WHERE e.starts_at >= :from AND e.starts_at < :to ORDER BY e.starts_at");
-        $events->execute(["from" => $from, "to" => $to]);
-        echo $this->view->render("components/agenda/home", $this->viewData("Agenda", "agenda", $user, ["month" => $month, "events" => $events->fetchAll() ?: [], "users" => (new User())->find()->order("first_name,last_name")->fetch(true) ?: []]));
+        $eventType = in_array($_GET["type"] ?? "", ["meeting", "task", "deadline", "support"], true) ? $_GET["type"] : "";
+        $eventStatus = in_array($_GET["status"] ?? "", ["scheduled", "completed", "cancelled"], true) ? $_GET["status"] : "";
+        $assignedFilter = filter_var($_GET["assigned_to"] ?? null, FILTER_VALIDATE_INT) ?: null;
+        $terms = ["e.starts_at >= :from", "e.starts_at < :to"];
+        $params = ["from" => $from, "to" => $to];
+        if ($eventType) { $terms[] = "e.type=:type"; $params["type"] = $eventType; }
+        if ($eventStatus) { $terms[] = "e.status=:status"; $params["status"] = $eventStatus; }
+        if ($assignedFilter) { $terms[] = "e.assigned_to=:assigned"; $params["assigned"] = $assignedFilter; }
+        $events = $pdo->prepare("SELECT e.*, CONCAT(u.first_name,' ',u.last_name) assigned_name FROM studio_calendar_events e LEFT JOIN users u ON u.id=e.assigned_to WHERE " . implode(" AND ", $terms) . " ORDER BY e.starts_at");
+        $events->execute($params);
+        echo $this->view->render("components/agenda/home", $this->viewData("Agenda", "agenda", $user, ["month" => $month, "events" => $events->fetchAll() ?: [], "users" => (new User())->find("status != :status", "status=trash")->order("first_name,last_name")->fetch(true) ?: [], "typeFilter" => $eventType, "statusFilter" => $eventStatus, "assignedFilter" => $assignedFilter]));
     }
 
     public function tickets(?array $data): void
@@ -1347,11 +1364,22 @@ class Studio extends Controller
             $assignedTo = ($id = (int)($data["assigned_to"] ?? 0)) ?: null;
             $dueAt = date("Y-m-d H:i:s", strtotime("+" . $this->ticketSlaHours($priority) . " hours"));
             $requesterId = ($id = (int)($data["requester_id"] ?? 0)) ?: $user->id;
-            $stmt = $pdo->prepare("INSERT INTO studio_support_tickets(protocol,subject,message,area,priority,requester_id,assigned_to,created_by,due_at) VALUES(:protocol,:subject,:message,:area,:priority,:requester,:assigned,:creator,:due_at)");
-            $stmt->execute(["protocol" => $protocol, "subject" => $subject, "message" => $message, "area" => in_array($data["area"] ?? "", $areas, true) ? $data["area"] : "general", "priority" => $priority, "requester" => $requesterId, "assigned" => $assignedTo, "creator" => $user->id, "due_at" => $dueAt]);
-            $newTicketId = (int)$pdo->lastInsertId();
-            $this->notifyTicketOpened($newTicketId, $protocol, $subject, $priority, $dueAt, $assignedTo, $requesterId);
+            if (!(new User())->findById($requesterId)) { $this->jsonMessage("Selecione um solicitante válido.", "warning"); return; }
+            try {
+                $pdo->beginTransaction();
+                $stmt = $pdo->prepare("INSERT INTO studio_support_tickets(protocol,subject,message,area,priority,requester_id,assigned_to,created_by,due_at) VALUES(:protocol,:subject,:message,:area,:priority,:requester,:assigned,:creator,:due_at)");
+                $stmt->execute(["protocol" => $protocol, "subject" => $subject, "message" => $message, "area" => in_array($data["area"] ?? "", $areas, true) ? $data["area"] : "general", "priority" => $priority, "requester" => $requesterId, "assigned" => $assignedTo, "creator" => $user->id, "due_at" => $dueAt]);
+                $newTicketId = (int)$pdo->lastInsertId();
+                $pdo->commit();
+            } catch (\Throwable $exception) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                \Source\Support\AppLogger::exception($exception, "tickets", ["event_type" => "ticket_create_failed", "users_id" => $user->id]);
+                $this->jsonMessage("Não foi possível cadastrar o chamado. Tente novamente.", "error"); return;
+            }
+            try { $this->notifyTicketOpened($newTicketId, $protocol, $subject, $priority, $dueAt, $assignedTo, $requesterId); }
+            catch (\Throwable $exception) { \Source\Support\AppLogger::exception($exception, "tickets", ["event_type" => "ticket_notification_failed", "ticket_id" => $newTicketId]); }
             \Source\Support\Audit::record("create", "studio_support_tickets", $newTicketId, [], ["protocol" => $protocol, "subject" => $subject, "priority" => $priority, "due_at" => $dueAt]);
+            $this->message->success("Chamado {$protocol} cadastrado.")->flash();
             echo json_encode(["redirect" => url("/studio/tickets")]); return;
         }
         $status = (string)($_GET["status"] ?? "");
@@ -1370,7 +1398,7 @@ class Studio extends Controller
             $selected->execute(["id" => $ticketId]); $selectedTicket = $selected->fetch() ?: null;
             if ($selectedTicket) { $history = $pdo->prepare("SELECT m.*,CONCAT(u.first_name,' ',u.last_name) user_name FROM studio_support_ticket_messages m JOIN users u ON u.id=m.user_id WHERE m.ticket_id=:ticket ORDER BY m.created_at"); $history->execute(["ticket" => $ticketId]); $messages = $history->fetchAll() ?: []; }
         }
-        echo $this->view->render("components/tickets/home", $this->viewData("Chamados", "tickets", $user, ["tickets" => $stmt->fetchAll() ?: [], "users" => (new User())->find()->order("first_name,last_name")->fetch(true) ?: [], "status" => $status, "search" => $search, "counts" => $statusCounts, "selectedTicket" => $selectedTicket, "messages" => $messages, "settings" => Settings::dados()]));
+        echo $this->view->render("components/tickets/home", $this->viewData("Chamados", "tickets", $user, ["tickets" => $stmt->fetchAll() ?: [], "users" => (new User())->find("status != :status", "status=trash")->order("first_name,last_name")->fetch(true) ?: [], "status" => $status, "search" => $search, "counts" => $statusCounts, "selectedTicket" => $selectedTicket, "messages" => $messages, "settings" => Settings::dados()]));
     }
 
     private function ticketSlaHours(string $priority): int
