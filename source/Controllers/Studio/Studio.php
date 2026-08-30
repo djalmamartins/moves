@@ -1848,10 +1848,10 @@ class Studio extends Controller
 
     private function guardDeveloper(): User
     {
-        $user = $this->guard('logs.view');
-        $role = AccessControl::role($user);
-        if (($role->slug ?? null) !== 'developer' && (int)$user->level < 10) { redirect('/studio/ops/403'); }
-        return $user;
+        // A permissão é a fonte única de autorização. Antes, o menu permitia
+        // `logs.view`, mas o controller ainda bloqueava administradores que não
+        // usavam o perfil interno "developer", fazendo o Log parecer quebrado.
+        return $this->guard('logs.view');
     }
 
     private function safeMediaSelection(string $storedPath): ?string

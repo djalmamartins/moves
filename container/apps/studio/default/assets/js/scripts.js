@@ -1,5 +1,41 @@
 // JQUERY INIT
 
+window.StudioModal = {
+    get(target) {
+        const element = typeof target === "string" ? document.querySelector(target) : target;
+        if (!element) return null;
+        return {
+            open() {
+                element.classList.add("is-open");
+                element.setAttribute("aria-hidden", "false");
+                document.body.classList.add("studio-modal-open");
+                element.querySelector("input:not([type=hidden]),select,textarea,button")?.focus();
+            },
+            close() {
+                element.classList.remove("is-open");
+                element.setAttribute("aria-hidden", "true");
+                if (!document.querySelector(".studio-modal.is-open")) document.body.classList.remove("studio-modal-open");
+            }
+        };
+    }
+};
+
+document.addEventListener("click", function (event) {
+    const opener = event.target.closest("[data-studio-modal-open]");
+    if (opener) {
+        event.preventDefault();
+        window.StudioModal.get(opener.dataset.studioModalOpen)?.open();
+        return;
+    }
+    const closer = event.target.closest("[data-studio-modal-close]");
+    if (closer) window.StudioModal.get(closer.closest(".studio-modal"))?.close();
+    if (event.target.classList.contains("studio-modal")) window.StudioModal.get(event.target)?.close();
+});
+
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") window.StudioModal.get(document.querySelector(".studio-modal.is-open"))?.close();
+});
+
 $(function () {
     var ajaxResponseBaseTime = 3;
     var ajaxResponseRequestError = "<div class='message error icon-warning'>Desculpe mas não foi possível processar sua requisição...</div>";

@@ -16,9 +16,9 @@ $previousPages = $sumPages($firstHalf);
 $currentPages = $sumPages($secondHalf);
 $variation = $previousPages > 0 ? (($currentPages - $previousPages) / $previousPages) * 100 : ($currentPages > 0 ? 100 : 0);
 ?>
-<section class="studio-page-head organic-page-header studio-report-head">
-    <div><p class="organic-eyebrow">Análise</p><h1 class="organic-page-title">Relatórios de acesso</h1><p class="organic-page-description">Acompanhe o desempenho do site e as pessoas conectadas nos últimos 30 registros.</p></div>
-    <div class="studio-report-head-actions organic-page-actions"><span class="organic-badge organic-badge-success"><i></i><?= count($online) ?> online agora</span><a class="organic-btn" href="<?= url('/') ?>" target="_blank"><ion-icon name="open-outline"></ion-icon>Ver site</a></div>
+<section class="studio-page-head studio-report-head">
+    <div><p class="studio-eyebrow">Análise</p><h1 class="studio-page-title">Relatórios de acesso</h1><p class="studio-page-description">Acompanhe o desempenho do site e as pessoas conectadas nos últimos 30 registros.</p></div>
+    <div class="studio-report-head-actions"><span class="studio-badge success"><i></i><?= count($online) ?> online agora</span><a class="studio-btn" href="<?= url('/') ?>" target="_blank"><ion-icon name="open-outline"></ion-icon>Ver site</a></div>
 </section>
 <section class="studio-report-kpis studio-settings-summary">
     <article><i><ion-icon name="people-outline"></ion-icon></i><div><span>Visitantes</span><strong><?= number_format($totalUsers,0,',','.') ?></strong><small>Pessoas no período</small></div></article>

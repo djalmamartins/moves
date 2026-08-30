@@ -11,7 +11,9 @@ $movesRoot = dirname(__DIR__, 3);
 $themeRoot = moves_container_path("studio", "default");
 
 $css = new CSS();
-foreach ([$movesRoot . "/organic/organic.min.css", $movesRoot . "/organic/compat-v1.css", $movesRoot . "/organic/editor/organic-editor.min.css", $themeRoot . "/assets/css/admin.css"] as $asset) {
+// O Studio possui identidade e componentes próprios. Do Organic preservamos
+// exclusivamente o CSS do editor de conteúdo.
+foreach ([$movesRoot . "/organic/editor/organic-editor.min.css", $themeRoot . "/assets/css/admin.css"] as $asset) {
     if (is_file($asset)) $css->add($asset);
 }
 $cssTarget = $themeRoot . "/assets/studio.min.css";
@@ -19,7 +21,7 @@ $css->minify($cssTarget);
 chmod($cssTarget, 0664);
 
 $js = new JS();
-foreach ([$movesRoot . "/container/shared/assets/vendor/scripts/jquery.min.js", $movesRoot . "/container/shared/assets/vendor/scripts/jquery.form.js", $movesRoot . "/container/shared/assets/vendor/scripts/jquery-ui.js", $movesRoot . "/organic/organic.global.min.js", $movesRoot . "/organic/compat-v1.js", $themeRoot . "/assets/js/scripts.js"] as $asset) {
+foreach ([$movesRoot . "/container/shared/assets/vendor/scripts/jquery.min.js", $movesRoot . "/container/shared/assets/vendor/scripts/jquery.form.js", $movesRoot . "/container/shared/assets/vendor/scripts/jquery-ui.js", $themeRoot . "/assets/js/scripts.js"] as $asset) {
     if (is_file($asset)) $js->add($asset);
 }
 $jsTarget = $themeRoot . "/assets/studio.min.js";
