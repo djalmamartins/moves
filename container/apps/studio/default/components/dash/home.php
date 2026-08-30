@@ -3,7 +3,7 @@
 $totalViews = 0;
 foreach ($accessDays as $day) { $totalViews += (int)$day->pages; }
 ?>
-<section class="organic-page-header studio-dashboard-head">
+<section class="studio-page-head organic-page-header studio-dashboard-head">
     <div><p class="organic-eyebrow">Visão geral</p><h1 class="organic-page-title">Olá, <?= htmlspecialchars($user->first_name) ?>!</h1><p class="organic-page-description">Aqui está o resumo do seu site hoje.</p></div>
     <div class="organic-page-actions"><a class="organic-btn organic-btn-outline" href="<?= url('/') ?>" target="_blank"><ion-icon name="globe-outline"></ion-icon>Visualizar site</a></div>
 </section>
