@@ -24,6 +24,12 @@ $moduleRole = Access::role(Auth::user());
 $developerBypass = ($moduleRole->slug ?? null) === "developer";
 if (CONF_ACCESS_SITE || $developerBypass) {
     require moves_container_path('web', CONF_VIEW_THEMES) . "/default.php";
+} else {
+    $route->namespace("Source\\Controllers\\Web\\Connect");
+    $route->group("");
+    $route->get("/", "Web:unavailable");
+    $route->group("/ops");
+    $route->get("/{errcode}", "Web:error");
 }
 $supportRoutes = moves_container_path('web', CONF_VIEW_SUPPORT) . "/default.php";
 if ((CONF_ACCESS_SUPPORT || $developerBypass) && is_file($supportRoutes)) {
@@ -63,7 +69,9 @@ if ($route->error()) {
     AppLogger::log((int)$route->error() >= 500 ? 'error' : 'notice', 'Rota finalizada com erro HTTP', ['event_type' => 'http_error', 'code' => 'HTTP_' . $route->error(), 'http_status' => (int)$route->error(), 'status' => (int)$route->error() >= 500 ? 'open' : 'resolved'], 'http');
     $requestPath = parse_url($_SERVER["REQUEST_URI"] ?? "", PHP_URL_PATH);
     $isStudio = (bool)preg_match("~/studio(?:/|$)~", $requestPath);
-    $route->redirect(($isStudio ? "/studio/ops/" : "/ops/") . $route->error());
+    $isSystemArea = (bool)preg_match("~/(?:studio|app|erp|suporte)(?:/|$)~", $requestPath);
+    $publicError = !CONF_ACCESS_SITE && !$developerBypass && !$isSystemArea ? "indisponivel" : $route->error();
+    $route->redirect(($isStudio ? "/studio/ops/" : "/ops/") . $publicError);
 }
 
 ob_end_flush();

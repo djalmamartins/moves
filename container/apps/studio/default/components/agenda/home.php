@@ -5,7 +5,9 @@ $start = (int)date('N', $first);
 $days = (int)date('t', $first);
 $byDay = [];
 foreach ($events as $event) $byDay[(int)date('j', strtotime($event->starts_at))][] = $event;
-$monthLabel = function_exists('strftime') ? strftime('%B de %Y', $first) : date('m/Y', $first);
+$monthLabel = class_exists(\IntlDateFormatter::class)
+    ? (new \IntlDateFormatter('pt_BR', \IntlDateFormatter::NONE, \IntlDateFormatter::NONE, date_default_timezone_get(), null, "MMMM 'de' yyyy"))->format($first)
+    : date('m/Y', $first);
 ?>
 <section class="organic-page-header"><div><p class="organic-eyebrow">Atendimento</p><h1 class="organic-page-title">Agenda</h1><p class="organic-page-description">Organize atendimentos, tarefas e compromissos do time em uma visão mensal.</p></div><button class="organic-btn organic-btn-primary" type="button" data-agenda-new><ion-icon name="add-outline"></ion-icon>Novo evento</button></section>
 <section class="organic-card studio-agenda"><header class="organic-card-header"><a class="organic-btn organic-btn-icon" href="<?= url('/studio/agenda?month='.date('Y-m',strtotime($month.'-01 -1 month'))) ?>" aria-label="Mês anterior"><ion-icon name="chevron-back-outline"></ion-icon></a><h2 class="organic-card-title"><?= htmlspecialchars(ucfirst($monthLabel)) ?></h2><a class="organic-btn organic-btn-icon" href="<?= url('/studio/agenda?month='.date('Y-m',strtotime($month.'-01 +1 month'))) ?>" aria-label="Próximo mês"><ion-icon name="chevron-forward-outline"></ion-icon></a></header>

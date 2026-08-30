@@ -1651,11 +1651,6 @@ p {
     flex-shrink: 0;
 }
 
-.cta-actions .icon-whatsapp:before {
-    content: "\2e";
-    font-size: 1.4em;
-}
-
 .btn {
     height: 49px;
     padding: 0 31px;
@@ -1696,22 +1691,23 @@ p {
 
 /* WhatsApp */
 .btn-whatsapp {
-    min-width: 226px;
+    min-width: 210px;
 
     color: #fff;
 
-    background: transparent;
-    border: 2px solid #8b7128;
+    background: #168a50;
+    border: 1px solid #168a50;
 }
 
 .btn-whatsapp:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: #b39237;
+    background: #107442;
+    border-color: #107442;
+    transform: translateY(-1px);
 }
 
 .btn-whatsapp svg {
-    width: 25px;
-    height: 25px;
+    width: 20px;
+    height: 20px;
 
     margin-right: 9px;
 

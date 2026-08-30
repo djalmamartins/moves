@@ -9129,13 +9129,13 @@ body.studio-filter-open {
 
 .studio-profile-menu > header strong {
     margin-top: 10px;
-    font-size: .92em
+    font-size: 1rem
 }
 
 .studio-profile-menu > header small {
     margin-top: 4px;
     color: var(--studio-purple);
-    font-size: .7em
+    font-size: .78rem
 }
 
 .studio-profile-menu > nav {
@@ -9161,13 +9161,13 @@ body.studio-filter-open {
 }
 
 .studio-profile-menu nav a span {
-    font-size: .82em
+    font-size: .9rem
 }
 
 .studio-profile-menu nav a small {
     margin-top: 2px;
     color: var(--studio-muted);
-    font-size: .77em
+    font-size: .78rem
 }
 
 .studio-profile-menu > footer {
@@ -9187,7 +9187,7 @@ body.studio-filter-open {
 
 .studio-profile-menu > footer > small {
     color: var(--studio-muted);
-    font-size: .68em
+    font-size: .75rem
 }
 
 .studio-product-tabs {
@@ -10320,6 +10320,47 @@ html[data-theme="dark"] .studio-v2 .studio-report-chart { background-color: var(
     background: transparent;
 }
 
+.studio-v2 .organic-page-header {
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.studio-v2 .organic-page-header > div {
+    min-width: 0;
+}
+
+.studio-v2 .organic-page-title {
+    margin: 4px 0 6px;
+}
+
+.studio-v2 .organic-page-description {
+    margin: 0;
+}
+
+.studio-v2 .studio-agenda > header {
+    display: grid;
+    grid-template-columns: 42px minmax(0, auto) 42px;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+}
+
+.studio-v2 .studio-agenda > header .organic-card-title {
+    margin: 0;
+    font-size: 1.35rem;
+    text-align: center;
+}
+
+.studio-v2 .studio-agenda > header .organic-btn-icon {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+}
+
 .studio-dashboard-head {
     display: flex;
     align-items: flex-end;
@@ -10465,6 +10506,37 @@ html[data-theme="dark"] .studio-v2 .studio-report-chart { background-color: var(
 .studio-v2 .message.error::before { content: "×"; background: var(--org-danger) }
 .studio-v2 .message a { color: inherit; font-weight: 700; text-decoration: underline }
 
+.studio-v2 .ajax_response {
+    top: 20px;
+    right: 20px;
+    width: min(380px, calc(100vw - 40px));
+    max-width: none;
+    padding: 0;
+}
+
+.studio-v2 .ajax_response .message {
+    align-items: center;
+    margin: 0 0 12px;
+    padding: 14px 16px;
+    border: 1px solid currentColor;
+    border-left-width: 4px;
+    border-radius: 9px;
+    background: #fff;
+    font-size: .875rem;
+    font-weight: 600;
+    box-shadow: 0 12px 34px rgb(23 31 44 / 14%);
+}
+
+.studio-v2 .ajax_response .message::before {
+    margin: 0 !important;
+}
+
+.studio-v2 .ajax_response .message.info { color: #25648e; background: #f2f8fd }
+.studio-v2 .ajax_response .message.success { color: #28653a; background: #f1faf3 }
+.studio-v2 .ajax_response .message.warning { color: #755716; background: #fff9e9 }
+.studio-v2 .ajax_response .message.error { color: #842f39; background: #fff2f3 }
+.studio-v2 .ajax_response .message_time { height: 3px; background: currentColor }
+
 html[data-theme="dark"] .studio-v2 .studio-main { background: #151318 }
 html[data-theme="dark"] .studio-v2 .message { background: #172735; color: #cde6fb; border-color: #294b66 }
 html[data-theme="dark"] .studio-v2 .message.success { background: #172a1d; color: #ccebd5; border-color: #315a3d }
@@ -10476,6 +10548,8 @@ html[data-theme="dark"] .studio-v2 .message.error { background: #321a1d; color: 
 }
 
 @media (max-width: 700px) {
+    .studio-v2 .organic-page-header { align-items: stretch; flex-direction: column; gap: 16px }
+    .studio-v2 .organic-page-header > .organic-btn { width: 100% }
     .studio-dashboard-head { align-items: flex-start; flex-direction: column }
     .studio-dashboard-kpis { grid-template-columns: 1fr }
     .studio-dashboard-head .organic-page-actions,

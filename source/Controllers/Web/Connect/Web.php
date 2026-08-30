@@ -826,10 +826,18 @@ class Web extends Controller
 
         $data = filter_var_array($data, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $requestedError = (string)($data['errcode'] ?? '404');
-        $httpStatus = in_array((int)$requestedError, [403, 404, 500], true) ? (int)$requestedError : (in_array($requestedError, ['problemas', 'manutencao'], true) ? 503 : 404);
+        $httpStatus = in_array((int)$requestedError, [403, 404, 500, 503], true) ? (int)$requestedError : (in_array($requestedError, ['problemas', 'manutencao', 'indisponivel'], true) ? 503 : 404);
         http_response_code($httpStatus);
 
         switch ($data['errcode']) {
+            case "indisponivel":
+                $error->code = "503";
+                $error->title = "Site temporariamente indisponível";
+                $error->message = "Este site está fora do ar no momento. Nossa equipe já está cuidando disso e o acesso será restabelecido em breve.";
+                $error->linkTitle = "FALAR COM O SUPORTE";
+                $error->link = "mailto:" . CONF_MAIL_SUPPORT;
+                break;
+
             case "problemas":
                 $error->code = "OPS";
                 $error->title = "Estamos enfrentando problemas!";
@@ -867,5 +875,10 @@ class Web extends Controller
             "head" => $head,
             "error" => $error
         ]);
+    }
+
+    public function unavailable(): void
+    {
+        $this->error(["errcode" => "indisponivel"]);
     }
 }

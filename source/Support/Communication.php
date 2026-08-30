@@ -26,13 +26,10 @@ final class Communication
         $channels = $message->delivery_channels ?: "system";
         $sendSystem = in_array($channels, ["system", "both"], true);
         $sendEmail = in_array($channels, ["email", "both"], true);
-        $category = $sendSystem ? (new NotificationCategory())->findByUri("studio") : null;
-        if ($sendSystem && !$category) {
-            return;
-        }
+        $category = $sendSystem ? $this->systemCategory() : null;
 
         foreach ($this->recipients($message) as $recipient) {
-            if ($sendSystem && !(new Notification())->find("message_id = :message AND users_id = :user", "message={$message->id}&user={$recipient->id}")->count()) {
+            if ($sendSystem && $category && !(new Notification())->find("message_id = :message AND users_id = :user", "message={$message->id}&user={$recipient->id}")->count()) {
                 $notification = new Notification();
                 $notification->message_id = $message->id;
                 $notification->users_id = $recipient->id;
@@ -54,6 +51,19 @@ final class Communication
         $message->status = "sent";
         $message->delivered_at = date("Y-m-d H:i:s");
         $message->save();
+    }
+
+    private function systemCategory(): ?NotificationCategory
+    {
+        $category = (new NotificationCategory())->findByUri("studio");
+        if ($category) return $category;
+
+        $category = new NotificationCategory();
+        $category->title = "Studio";
+        $category->uri = "studio";
+        $category->description = "Notificações administrativas e alterações do sistema";
+        $category->type = "system";
+        return $category->save() ? $category : (new NotificationCategory())->findByUri("studio");
     }
 
     private function recipients(NotificationMessage $message): array

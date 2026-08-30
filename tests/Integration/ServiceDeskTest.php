@@ -7,10 +7,34 @@ namespace MovesOSTests\Integration;
 use MovesOSTests\TestCase;
 use ReflectionClass;
 use Source\Controllers\Studio\Studio;
+use Source\Models\Notification\NotificationMessage;
 use Source\Models\User;
+use Source\Support\Communication;
 
 final class ServiceDeskTest extends TestCase
 {
+    public function testCommunicationCreatesMissingCategoryAndDeliversBothChannels(): void
+    {
+        $recipientId = $this->createUser(['email' => 'notification@example.com']);
+        $this->pdo->exec("DELETE FROM notifications_categories WHERE uri='studio'");
+
+        $message = new NotificationMessage();
+        $message->title = 'Aviso operacional';
+        $message->body = 'Mensagem de validação dos canais.';
+        $message->audience = 'user';
+        $message->target_user_id = $recipientId;
+        $message->severity = 'info';
+        $message->delivery_channels = 'both';
+        $message->status = 'sent';
+        self::assertNotFalse($message->save());
+
+        (new Communication())->deliver($message);
+
+        self::assertSame(1, (int)$this->pdo->query("SELECT COUNT(*) FROM notifications_categories WHERE uri='studio'")->fetchColumn());
+        self::assertSame(1, (int)$this->pdo->query("SELECT COUNT(*) FROM notifications WHERE users_id={$recipientId}")->fetchColumn());
+        self::assertSame(1, (int)$this->pdo->query("SELECT COUNT(*) FROM mail_queue WHERE users_id={$recipientId}")->fetchColumn());
+    }
+
     public function testTicketStoresUrgentSlaAndInteractionHistory(): void
     {
         $userId = $this->createUser(['level' => 10]);
