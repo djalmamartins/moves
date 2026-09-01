@@ -179,3 +179,15 @@ $pdo->exec("ALTER TABLE mail_queue
     ADD COLUMN IF NOT EXISTS proposal_response_id INT UNSIGNED NULL AFTER notification_message_id,
     ADD COLUMN IF NOT EXISTS attachments_json LONGTEXT NULL AFTER body");
 $pdo->exec("ALTER TABLE movesos_versions MODIFY product ENUM('web','app','studio','erp','support') NOT NULL");
+
+foreach ([
+    dirname(__DIR__) . '/storage/database/migrations/20260831_operation_core.sql',
+    dirname(__DIR__) . '/storage/database/migrations/20260831_operation_visit_workflow.sql',
+    dirname(__DIR__) . '/storage/database/migrations/20260831_operation_completion.sql',
+] as $operationMigration) {
+    $sql = file_get_contents($operationMigration);
+    if ($sql === false) {
+        throw new RuntimeException("Não foi possível carregar {$operationMigration}");
+    }
+    $pdo->exec($sql);
+}

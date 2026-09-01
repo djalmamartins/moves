@@ -383,7 +383,7 @@ function moves_container_theme(string $area, string $theme): string
 
 function moves_container_path(string $area, string $theme): string
 {
-    $section = in_array($area, ['studio', 'erp', 'residents'], true)
+    $section = in_array($area, ['studio', 'operation', 'helpdesk', 'erp', 'residents'], true)
         ? "apps/{$area}"
         : $area;
 
@@ -392,7 +392,7 @@ function moves_container_path(string $area, string $theme): string
 
 function moves_container_url(string $area, string $theme, ?string $path = null): string
 {
-    $section = in_array($area, ['studio', 'erp', 'residents'], true)
+    $section = in_array($area, ['studio', 'operation', 'helpdesk', 'erp', 'residents'], true)
         ? "apps/{$area}"
         : $area;
     $theme = moves_container_theme($area, $theme);
@@ -441,9 +441,23 @@ function themeMail(?string $path = null, string $theme = CONF_VIEW_MAIL): string
  * @param string $theme
  * @return string
  */
-function themeStudio(?string $path = null, string $theme = 'moves_studio'): string
+function themeStudio(?string $path = null, ?string $theme = null): string
 {
+    if (studio_theme_name() === 'operation') {
+        return moves_container_url('operation', 'default', $path);
+    }
+    if ($theme === null || $theme === 'default') {
+        $theme = studio_theme_name();
+    }
     return moves_container_url('studio', $theme, $path);
+}
+
+function studio_theme_name(): string
+{
+    $path = (string)(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '');
+    if (preg_match('~/helpdesk(?:/|$)~', $path)) return 'default';
+    if (preg_match('~/operation(?:/|$)~', $path)) return 'operation';
+    return 'default';
 }
 /**
  * @param string $image

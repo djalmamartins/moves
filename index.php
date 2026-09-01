@@ -39,7 +39,18 @@ if ((CONF_ACCESS_SUPPORT || $developerBypass) && is_file($supportRoutes)) {
 /**
  * STUDIO ROUTES
  */
-require moves_container_path('studio', 'default') . "/default.php";
+$studioRoutes = moves_container_path('studio', 'default') . "/default.php";
+require $studioRoutes;
+$operationRoutes = moves_container_path('operation', 'default') . "/default.php";
+if (is_file($operationRoutes)) require $operationRoutes;
+
+/**
+ * HELP DESK ROUTES
+ */
+$helpDeskRoutes = moves_container_path('helpdesk', 'default') . "/default.php";
+if (is_file($helpDeskRoutes)) {
+    require $helpDeskRoutes;
+}
 
 /**
  * APP
@@ -69,9 +80,11 @@ if ($route->error()) {
     AppLogger::log((int)$route->error() >= 500 ? 'error' : 'notice', 'Rota finalizada com erro HTTP', ['event_type' => 'http_error', 'code' => 'HTTP_' . $route->error(), 'http_status' => (int)$route->error(), 'status' => (int)$route->error() >= 500 ? 'open' : 'resolved'], 'http');
     $requestPath = parse_url($_SERVER["REQUEST_URI"] ?? "", PHP_URL_PATH);
     $isStudio = (bool)preg_match("~/studio(?:/|$)~", $requestPath);
-    $isSystemArea = (bool)preg_match("~/(?:studio|app|erp|suporte)(?:/|$)~", $requestPath);
+    $isOperation = (bool)preg_match("~/operation(?:/|$)~", $requestPath);
+    $isHelpDesk = (bool)preg_match("~/helpdesk(?:/|$)~", $requestPath);
+    $isSystemArea = (bool)preg_match("~/(?:studio|operation|helpdesk|app|erp|suporte)(?:/|$)~", $requestPath);
     $publicError = !CONF_ACCESS_SITE && !$developerBypass && !$isSystemArea ? "indisponivel" : $route->error();
-    $route->redirect(($isStudio ? "/studio/ops/" : "/ops/") . $publicError);
+    $route->redirect(($isHelpDesk ? "/helpdesk/ops/" : ($isOperation ? "/operation/ops/" : ($isStudio ? "/studio/ops/" : "/ops/"))) . $publicError);
 }
 
 ob_end_flush();

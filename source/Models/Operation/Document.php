@@ -1,0 +1,1 @@
+<?php namespace Source\Models\Operation; use Source\Core\Model; final class Document extends Model { public function __construct(){parent::__construct('operation_documents',['id'],['condominium_id','title','category','file_path','original_name','created_by']);} }

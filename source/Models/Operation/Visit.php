@@ -1,0 +1,1 @@
+<?php namespace Source\Models\Operation; use Source\Core\Model; final class Visit extends Model { public function __construct(){parent::__construct('operation_visits',['id'],['condominium_id','title','scheduled_at','created_by']);} }
