@@ -170,6 +170,11 @@ $schema = [
     "CREATE TABLE IF NOT EXISTS studio_support_ticket_messages (
         id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, ticket_id INT UNSIGNED NOT NULL, user_id INT UNSIGNED NOT NULL,
         message TEXT NOT NULL, is_internal TINYINT(1) NOT NULL DEFAULT 1, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+    "CREATE TABLE IF NOT EXISTS app_condominium (
+        id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        fantasy_name VARCHAR(180) NULL, condominium_name VARCHAR(180) NOT NULL,
+        document VARCHAR(30) NULL, status VARCHAR(20) NOT NULL DEFAULT 'active'
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
 ];
 foreach ($schema as $statement) {
@@ -181,7 +186,9 @@ $pdo->exec("ALTER TABLE mail_queue
 $pdo->exec("ALTER TABLE movesos_versions MODIFY product ENUM('web','app','studio','erp','support') NOT NULL");
 
 foreach ([
+    dirname(__DIR__) . '/storage/database/migrations/20260830_help_desk_operations.sql',
     dirname(__DIR__) . '/storage/database/migrations/20260831_operation_core.sql',
+    dirname(__DIR__) . '/storage/database/migrations/20260831_operation_integrated.sql',
     dirname(__DIR__) . '/storage/database/migrations/20260831_operation_visit_workflow.sql',
     dirname(__DIR__) . '/storage/database/migrations/20260831_operation_completion.sql',
 ] as $operationMigration) {

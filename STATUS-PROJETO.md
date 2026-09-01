@@ -1,7 +1,7 @@
 # STATUS GERAL
 
 Versão atual: `VERSION_STUDIO` do ambiente / base `7857bac`
-Branch ativa: `codex/ARC-001-operation-boundary`
+Branch ativa: `codex/TST-002-critical-cruds`
 Última auditoria: 01/09/2026
 
 ## Progresso geral
@@ -33,7 +33,8 @@ Conclusão estimada ponderada: **58%**
 - SEC-001 integrada pelo PR #71.
 - TST-001 integrada pelo PR #72.
 - SEC-002 integrada pelo PR #73.
-- BASE-001 integrada pela PR #75; ARC-001 em revisão na PR #76 com controller, ACL, rotas e views próprios do Operation.
+- BASE-001 e ARC-001 integradas pelas PRs #75 e #76.
+- TST-002 em revisão com cobertura integrada dos seis CRUDs críticos por perfil operacional ID 2.
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
 - Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
@@ -46,6 +47,7 @@ Conclusão estimada ponderada: **58%**
 - SEC-002: integrada após CI verde no PR #73.
 - BASE-001: 4 testes focados/13 asserções do workflow de visitas aprovados; sintaxe PHP de controllers, views, models e jobs aprovada.
 - ARC-001: 9 testes focados/45 asserções aprovados; Operation não herda Studio nem exige `studio.access`.
+- TST-002: 2 cenários/42 asserções cobrem Usuários, Agenda, Chamados, Condomínios, Demandas e Visitas, incluindo CSRF, filtros, paginação e exclusão/encerramento.
 - Schema atual: fingerprint compatível em verificação somente leitura.
 - PHPUnit global: a execução agregada ainda é interrompida por testes legados de controllers que encerram o processo; validações focadas permanecem obrigatórias até a correção do runner.
 
@@ -56,9 +58,9 @@ Conclusão estimada ponderada: **58%**
 
 ## Próximas 10 tarefas
 
-1. Revisar e integrar ARC-001 — separar Operation do Studio.
-2. TST-002 — E2E dos CRUDs críticos.
-3. ARC-002 — extrair o adaptador transitório de Chamados.
+1. Revisar e integrar TST-002 — E2E dos CRUDs críticos.
+2. ARC-002 — extrair o adaptador transitório de Chamados.
+3. ERP-001 — escolher geração ERP.
 4. ARC-002 — extrair Help Desk.
 5. ERP-001 — escolher geração ERP.
 6. APP-001 — definir o portal de moradores.
@@ -74,7 +76,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próxima tarefa recomendada
 
-**Revisar e integrar ARC-001; depois executar TST-002 sobre a fronteira operacional consolidada.**
+**Revisar e integrar TST-002; depois iniciar ARC-002 para extrair o Help Desk compartilhado.**
 
 ## Fontes oficiais
 
