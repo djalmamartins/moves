@@ -1,7 +1,7 @@
 # STATUS GERAL
 
 Versão atual: `VERSION_STUDIO` do ambiente / base `7857bac`
-Branch ativa: `codex/TST-002-critical-cruds`
+Branch ativa: `codex/ARC-002-helpdesk-boundary`
 Última auditoria: 01/09/2026
 
 ## Progresso geral
@@ -34,7 +34,7 @@ Conclusão estimada ponderada: **58%**
 - TST-001 integrada pelo PR #72.
 - SEC-002 integrada pelo PR #73.
 - BASE-001 e ARC-001 integradas pelas PRs #75 e #76.
-- TST-002 em revisão com cobertura integrada dos seis CRUDs críticos por perfil operacional ID 2.
+- TST-002 integrada pela PR #77; ARC-002 em desenvolvimento com a Agenda migrada para serviço compartilhado independente de views.
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
 - Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
@@ -58,9 +58,9 @@ Conclusão estimada ponderada: **58%**
 
 ## Próximas 10 tarefas
 
-1. Revisar e integrar TST-002 — E2E dos CRUDs críticos.
-2. ARC-002 — extrair o adaptador transitório de Chamados.
-3. ERP-001 — escolher geração ERP.
+1. Concluir ARC-002 — extrair Agenda e Chamados do controller Studio.
+2. ERP-001 — escolher geração ERP.
+3. APP-001 — definir o portal de moradores.
 4. ARC-002 — extrair Help Desk.
 5. ERP-001 — escolher geração ERP.
 6. APP-001 — definir o portal de moradores.
@@ -76,7 +76,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próxima tarefa recomendada
 
-**Revisar e integrar TST-002; depois iniciar ARC-002 para extrair o Help Desk compartilhado.**
+**Concluir ARC-002 removendo o adaptador transitório de Chamados e aplicando ACL própria por ambiente.**
 
 ## Fontes oficiais
 
