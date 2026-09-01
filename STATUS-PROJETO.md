@@ -1,7 +1,7 @@
 # STATUS GERAL
 
-Versão atual: `VERSION_STUDIO` do ambiente / commit `daa7922`
-Branch ativa: `codex/SEC-001-settings-acl`
+Versão atual: `VERSION_STUDIO` do ambiente / commit `a3ec799`
+Branch ativa: `codex/TST-001-auth-smoke`
 Última auditoria: 31/08/2026
 
 ## Progresso geral
@@ -30,7 +30,8 @@ Conclusão estimada ponderada: **58%**
 ## Em desenvolvimento
 
 - EST-001 e LEG-001 integradas pelos PRs #69 e #70.
-- SEC-001 em revisão: bootstrap idempotente de settings e ACL fail-closed implementados.
+- SEC-001 integrada pelo PR #71.
+- TST-001 em revisão: smoke HTTP autenticado com ID 2 implementado para Studio, ERP e App.
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
 - Operation possui implementações recentes ainda sem validação E2E autenticada.
@@ -38,7 +39,8 @@ Conclusão estimada ponderada: **58%**
 ## Validação atual
 
 - EST-001: integrado e aprovado em banco vazio e clone descartável; repetição idempotente.
-- SEC-001: 12 testes focados/231 asserções e suíte completa aprovados; migration validada com IDs descartáveis 1 e 2.
+- SEC-001: integrada após CI verde; migration validada com IDs descartáveis 1 e 2.
+- TST-001: 24 rotas autenticadas retornam HTTP 200; suíte completa aprovada.
 - Schema atual: fingerprint compatível em verificação somente leitura.
 - PHPUnit global: suíte completa aprovada no banco automatizado isolado.
 
@@ -49,9 +51,9 @@ Conclusão estimada ponderada: **58%**
 
 ## Próximas 10 tarefas
 
-1. Revisar e integrar SEC-001 — settings e ACL.
-2. TST-001 — smoke tests autenticados.
-3. SEC-002 — recuperação de senha.
+1. Revisar e integrar TST-001 — smoke tests autenticados.
+2. SEC-002 — recuperação de senha.
+3. TST-002 — E2E dos CRUDs críticos.
 4. ARC-001 — separar Operation do Studio.
 5. ARC-002 — extrair Help Desk.
 6. ERP-001 — escolher geração ERP.
@@ -67,7 +69,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próxima tarefa recomendada
 
-**Revisar e integrar SEC-001; depois iniciar TST-001 com o usuário ID 2 em banco isolado.**
+**Revisar e integrar TST-001; depois iniciar SEC-002 — recuperação segura de senha.**
 
 ## Fontes oficiais
 
