@@ -28,4 +28,34 @@ final class OperationBaselineTest extends TestCase
         self::assertStringContainsString("['studio', 'operation', 'helpdesk', 'erp', 'residents']", $helpers);
         self::assertStringContainsString("moves_container_url('operation', 'default', \$path)", $helpers);
     }
+
+    public function testOperationDoesNotRepublishStudioCmsRoutes(): void
+    {
+        $routes = file_get_contents(dirname(__DIR__, 2) . '/container/apps/operation/default/default.php');
+
+        self::assertIsString($routes);
+        foreach ([
+            '/blog', '/pages', '/page', '/media', '/users', '/user', '/faqs',
+            '/testimonials', '/slides', '/slide', '/versions', '/system-logs',
+            '/settings', '/formularios', '/notifications',
+        ] as $forbiddenPrefix) {
+            self::assertStringNotContainsString('"' . $forbiddenPrefix, $routes);
+        }
+    }
+
+    public function testOperationPackageContainsOnlyOperationalViewGroups(): void
+    {
+        $components = dirname(__DIR__, 2) . '/container/apps/operation/default/components';
+        $allowed = ['agenda', 'dash', 'error', 'login', 'logs', 'operation', 'support', 'tickets', 'visits'];
+        $actual = [];
+        foreach (new \DirectoryIterator($components) as $entry) {
+            if ($entry->isDir() && !$entry->isDot()) {
+                $actual[] = $entry->getFilename();
+            }
+        }
+        sort($actual);
+        sort($allowed);
+
+        self::assertSame($allowed, $actual);
+    }
 }

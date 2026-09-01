@@ -1,7 +1,7 @@
 # STATUS GERAL
 
 Versão atual: `VERSION_STUDIO` do ambiente / base `7857bac`
-Branch ativa: `codex/BASE-001-operation-baseline`
+Branch ativa: `codex/ARC-001-operation-boundary`
 Última auditoria: 01/09/2026
 
 ## Progresso geral
@@ -33,7 +33,7 @@ Conclusão estimada ponderada: **58%**
 - SEC-001 integrada pelo PR #71.
 - TST-001 integrada pelo PR #72.
 - SEC-002 integrada pelo PR #73.
-- BASE-001 consolida em branch isolada a implementação local do Operation para desbloquear TST-002 e ARC-001.
+- BASE-001 integrada pela PR #75; ARC-001 em desenvolvimento para remover rotas e views CMS do Operation.
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
 - Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
@@ -55,9 +55,9 @@ Conclusão estimada ponderada: **58%**
 
 ## Próximas 10 tarefas
 
-1. Revisar e integrar BASE-001 — base versionada do Operation.
-2. ARC-001 — separar Operation do Studio.
-3. TST-002 — E2E dos CRUDs críticos.
+1. Concluir ARC-001 — separar Operation do Studio.
+2. TST-002 — E2E dos CRUDs críticos.
+3. ARC-002 — extrair Help Desk.
 4. ARC-002 — extrair Help Desk.
 5. ERP-001 — escolher geração ERP.
 6. APP-001 — definir o portal de moradores.
@@ -73,7 +73,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próxima tarefa recomendada
 
-**Revisar e integrar BASE-001; depois retomar ARC-001 e TST-002 sobre a base oficial.**
+**Concluir ARC-001 removendo a herança total do controller Studio; depois executar TST-002.**
 
 ## Fontes oficiais
 
