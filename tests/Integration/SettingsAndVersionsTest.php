@@ -9,6 +9,21 @@ use Source\Models\Settings\Settings;
 
 final class SettingsAndVersionsTest extends TestCase
 {
+    public function testEmptySettingsTableReceivesSafeDefaults(): void
+    {
+        $this->pdo->exec('TRUNCATE TABLE settings');
+
+        $settings = Settings::dados();
+
+        self::assertSame(1, (int)$settings->id);
+        self::assertSame('MOVES', $settings->site_name);
+        self::assertSame(0, (int)$settings->access_studio);
+        self::assertSame(0, (int)$settings->access_erp);
+        self::assertSame(0, (int)$settings->access_app);
+        self::assertSame(1, (int)$settings->access_site);
+        self::assertSame(1, (int)$settings->access_support);
+    }
+
     public function testUpdatesSettingsWithoutCreatingAnotherConfigurationRow(): void
     {
         $settings = Settings::dados();
