@@ -3,7 +3,10 @@
 namespace Source\Controllers\Operation;
 
 use Source\Core\Connect;
+use Source\Core\Controller;
 use Source\Models\Auth;
+use Source\Models\Report\Access as AccessReport;
+use Source\Models\Report\Online;
 use Source\Models\User;
 use Source\Support\Access;
 use Source\Support\Audit;
@@ -12,11 +15,10 @@ use Source\Support\Upload;
 /**
  * Ambiente operacional da Connect.
  *
- * A camada HTTP possui rotas, views e assets próprios. As regras de negócio
- * administrativas permanecem herdadas enquanto os módulos são compartilhados,
- * evitando duplicar ACL, auditoria e persistência.
+ * Mantém autenticação, ACL, rotas, views e casos de uso operacionais próprios,
+ * sem herdar ações de conteúdo do Studio.
  */
-class Operation extends \Source\Controllers\Studio\Studio
+class Operation extends Controller
 {
     private const RESOURCES = [
         'demands' => ['table' => 'operation_demands', 'title' => 'Demandas', 'singular' => 'Demanda', 'icon' => 'warning-outline', 'permission' => 'operation.demands.view', 'auto_protocol' => 'DEM', 'fields' => [
@@ -62,16 +64,69 @@ class Operation extends \Source\Controllers\Studio\Studio
         ]]
     ];
 
+    public function __construct()
+    {
+        parent::__construct(moves_container_path('operation', 'default') . '/');
+        (new AccessReport())->report();
+        (new Online())->report();
+    }
+
     public function root(): void
     {
         $user=Auth::user();
-        redirect($user && Access::can('studio.access',$user) && Access::can('operation.access',$user) ? '/operation/dash' : '/operation/login');
+        redirect($user && Access::can('operation.access',$user) ? '/operation/dash' : '/operation/login');
     }
 
     public function dash(): void
     {
-        $this->operationUser('operation.access');
-        parent::dash();
+        $user = $this->operationUser('dashboard.view');
+        $data = ['appointmentsCount'=>0,'scheduledTasksCount'=>0,'toScheduleCount'=>0,'waitingThirdPartiesCount'=>0,'weeklyVisitsCount'=>0,'dayAgenda'=>[],'pendingTasks'=>[],'currentVisit'=>null,'demandsOpen'=>0,'ticketsOpen'=>0,'quotesPending'=>0,'criticalIssues'=>0,'recentDemands'=>[],'condominiumsAttention'=>[],'recentActivity'=>[]];
+        try {
+            $pdo=Connect::getInstance();
+            $data['dayAgenda']=$pdo->query("SELECT v.id,v.title,v.notes description,'meeting' type,v.status,v.scheduled_at starts_at,DATE_FORMAT(v.scheduled_at,'%H:%i') time,c.name condominium_name FROM operation_visits v JOIN operation_condominiums c ON c.id=v.condominium_id WHERE DATE(v.scheduled_at)=CURDATE() AND v.status<>'cancelled' ORDER BY v.scheduled_at")->fetchAll()?:[];
+            $data['appointmentsCount']=count($data['dayAgenda']);
+            $data['scheduledTasksCount']=(int)$pdo->query("SELECT COUNT(*) FROM operation_visit_items WHERE result='pending'")->fetchColumn();
+            $data['weeklyVisitsCount']=(int)$pdo->query("SELECT COUNT(*) FROM operation_visits WHERE status<>'cancelled' AND YEARWEEK(scheduled_at,1)=YEARWEEK(CURDATE(),1)")->fetchColumn();
+            $data['waitingThirdPartiesCount']=(int)$pdo->query("SELECT COUNT(*) FROM operation_issues WHERE status IN ('open','in_progress','waiting')")->fetchColumn();
+            $data['toScheduleCount']=(int)$pdo->query("SELECT COUNT(*) FROM operation_visits WHERE status='scheduled' AND scheduled_at>NOW()")->fetchColumn();
+            $data['pendingTasks']=$pdo->query("SELECT title,COALESCE(description,category,'Pendência operacional') subtitle,DATE_FORMAT(due_at,'%d/%m %H:%i') due,CASE priority WHEN 'critical' THEN 'alert-circle-outline' WHEN 'high' THEN 'warning-outline' ELSE 'checkbox-outline' END icon FROM operation_issues WHERE status IN ('open','in_progress','waiting') ORDER BY due_at IS NULL,due_at,FIELD(priority,'critical','high','medium','low') LIMIT 8")->fetchAll()?:[];
+            $data['demandsOpen']=(int)$pdo->query("SELECT COUNT(*) FROM operation_demands WHERE status NOT IN ('completed','cancelled')")->fetchColumn();
+            $data['ticketsOpen']=(int)$pdo->query("SELECT COUNT(*) FROM studio_support_tickets WHERE status NOT IN ('resolved','closed')")->fetchColumn();
+            $data['quotesPending']=(int)$pdo->query("SELECT COUNT(*) FROM operation_quotes WHERE status IN ('requested','received','analysis','waiting_approval')")->fetchColumn();
+            $data['criticalIssues']=(int)$pdo->query("SELECT COUNT(*) FROM operation_issues WHERE priority='critical' AND status NOT IN ('resolved','cancelled')")->fetchColumn();
+            $data['recentDemands']=$pdo->query("SELECT d.id,d.protocol,d.title,d.priority,d.status,d.due_at,c.name condominium_name,CONCAT(u.first_name,' ',u.last_name) assigned_name FROM operation_demands d JOIN operation_condominiums c ON c.id=d.condominium_id LEFT JOIN users u ON u.id=d.assigned_to ORDER BY d.id DESC LIMIT 6")->fetchAll()?:[];
+            $data['condominiumsAttention']=$pdo->query("SELECT c.id,c.name,COUNT(DISTINCT d.id) demands_open,COUNT(DISTINCT i.id) issues_open,COUNT(DISTINCT q.id) quotes_pending FROM operation_condominiums c LEFT JOIN operation_demands d ON d.condominium_id=c.id AND d.status NOT IN ('completed','cancelled') LEFT JOIN operation_issues i ON i.condominium_id=c.id AND i.status NOT IN ('resolved','cancelled') LEFT JOIN operation_quotes q ON q.condominium_id=c.id AND q.status IN ('requested','received','analysis','waiting_approval') GROUP BY c.id,c.name HAVING demands_open+issues_open+quotes_pending>0 ORDER BY issues_open DESC,demands_open DESC LIMIT 5")->fetchAll()?:[];
+            $data['recentActivity']=$pdo->query("SELECT a.*,CONCAT(u.first_name,' ',u.last_name) user_name FROM operation_activity a LEFT JOIN users u ON u.id=a.user_id ORDER BY a.id DESC LIMIT 8")->fetchAll()?:[];
+            if ($data['dayAgenda']) $data['currentVisit']=(object)['title'=>$data['dayAgenda'][0]->title,'items'=>[],'url'=>url('/operation/visits/'.(int)$data['dayAgenda'][0]->id)];
+        } catch (\Throwable $exception) {
+            \Source\Support\AppLogger::exception($exception,'operation',['event_type'=>'operation_dashboard_failed']);
+        }
+        echo $this->view->render('components/dash/home',$this->operationView('Dashboard','dash',$user,$data));
+    }
+
+    public function login(?array $data): void
+    {
+        if (Access::can('operation.access', Auth::user())) redirect('/operation/dash');
+        if (!empty($data)) {
+            $data=filter_var_array($data,FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            if (!csrf_verify($data)) { echo json_encode(['message'=>$this->message->error('Sessão expirada. Atualize a página e tente novamente.')->render()]); return; }
+            if (request_limit('operation_login',8,300)) { echo json_encode(['message'=>$this->message->warning('Muitas tentativas. Aguarde alguns minutos.')->render()]); return; }
+            if (empty($data['email'])||empty($data['password'])) { echo json_encode(['message'=>$this->message->warning('Informe e-mail e senha.')->render()]); return; }
+            $auth=new Auth();
+            if (!$auth->login($data['email'],$data['password'],!empty($data['save']),1)) { echo json_encode(['message'=>$auth->message()->render()]); return; }
+            if (!Access::can('operation.access',Auth::user())) { Auth::logout(); echo json_encode(['message'=>$this->message->warning('Sua conta não possui acesso ao ambiente operacional.')->render()]); return; }
+            echo json_encode(['redirect'=>url('/operation/dash')]); return;
+        }
+        echo $this->view->render('components/login/login',['head'=>$this->seo->render('Connect Operações - '.CONF_SITE_NAME,CONF_SITE_DESC,url('/operation/login'),moves_container_url('operation','default','/assets/images/favicon.png')),'cookie'=>filter_input(INPUT_COOKIE,'authEmail'),'adminBase'=>'/operation','loginEnvironment'=>'operation']);
+    }
+
+    public function logout(): void { Auth::logout(); redirect('/operation/login'); }
+    public function environment(?array $data): void { $this->operationUser('operation.access'); redirect(($data['theme']??'')==='default'?'/studio/dash':'/operation/dash'); }
+    public function error(array $data): void
+    {
+        $code=(int)($data['errcode']??404); if(!in_array($code,[403,404,500],true))$code=404; http_response_code($code);
+        $content=[403=>['Acesso não autorizado','Seu perfil não possui permissão para abrir esta área.'],404=>['Página não encontrada','O endereço pode estar incorreto ou o conteúdo foi removido.'],500=>['Falha interna do sistema','O incidente foi registrado. Tente novamente em alguns instantes.']][$code];
+        echo $this->view->render('components/error/error',['code'=>$code,'errorTitle'=>$content[0],'errorMessage'=>$content[1]]);
     }
 
     public function realtime(): void
@@ -79,7 +134,7 @@ class Operation extends \Source\Controllers\Studio\Studio
         header('Content-Type: application/json; charset=UTF-8');
         header('Cache-Control: no-store');
         $user = Auth::user();
-        if (!$user || !Access::can('studio.access', $user) || !Access::can('operation.access', $user)) {
+        if (!$user || !Access::can('operation.access', $user)) {
             http_response_code(401);
             echo json_encode(['error' => 'unauthorized']);
             return;
@@ -109,7 +164,7 @@ class Operation extends \Source\Controllers\Studio\Studio
     public function meuDia(): void
     {
         $user = Auth::user();
-        if (!$user || !Access::can('studio.access', $user) || !Access::can('operation.access', $user) || !Access::can('dashboard.view', $user)) {
+        if (!$user || !Access::can('operation.access', $user) || !Access::can('dashboard.view', $user)) {
             redirect($user ? '/operation/ops/403' : '/operation/login');
         }
         $data = ['dayAgenda' => [], 'pendingTasks' => [], 'currentVisit' => null, 'appointmentsCount' => 0, 'scheduledTasksCount' => 0, 'toScheduleCount' => 0, 'waitingThirdPartiesCount' => 0, 'weeklyVisitsCount' => 0, 'overdueCount'=>0, 'criticalTicketsCount'=>0, 'unassignedDemandsCount'=>0];
@@ -135,7 +190,7 @@ class Operation extends \Source\Controllers\Studio\Studio
             \Source\Support\AppLogger::exception($exception, 'operation', ['event_type' => 'operation_my_day_failed']);
         }
         echo $this->view->render('components/dash/my-day', array_merge([
-            'head' => $this->seo->render('Meu Dia - Connect Operações', CONF_SITE_DESC, url('/operation/meu-dia'), themeStudio('/assets/images/favicon.png', 'default')),
+            'head' => $this->seo->render('Meu Dia - Connect Operações', CONF_SITE_DESC, url('/operation/meu-dia'), moves_container_url('operation','default','/assets/images/favicon.png')),
             'title' => 'Meu Dia', 'app' => 'meu-dia', 'user' => $user, 'currentVersion' => VERSION_STUDIO, 'adminBase' => '/operation'
         ], $data));
     }
@@ -228,12 +283,12 @@ class Operation extends \Source\Controllers\Studio\Studio
 
     private function operationUser(string $permission)
     {
-        $user=Auth::user(); if(!$user||!Access::can('studio.access',$user)) redirect('/operation/login'); if(!Access::can($permission,$user)) redirect('/operation/ops/403'); return $user;
+        $user=Auth::user(); if(!$user||!Access::can('operation.access',$user)) redirect('/operation/login'); if(!Access::can($permission,$user)) redirect('/operation/ops/403'); return $user;
     }
 
     private function operationView(string $title,string $app,$user,array $data=[]): array
     {
-        return array_merge(['head'=>$this->seo->render($title.' - Connect Operações',CONF_SITE_DESC,url('/operation'),themeStudio('/assets/images/favicon.png','default')),'title'=>$title,'app'=>$app,'user'=>$user,'currentVersion'=>VERSION_STUDIO,'adminBase'=>'/operation'],$data);
+        return array_merge(['head'=>$this->seo->render($title.' - Connect Operações',CONF_SITE_DESC,url('/operation'),moves_container_url('operation','default','/assets/images/favicon.png')),'title'=>$title,'app'=>$app,'user'=>$user,'currentVersion'=>VERSION_STUDIO,'adminBase'=>'/operation'],$data);
     }
 
     public function visitReport(array $data): void
@@ -355,7 +410,7 @@ class Operation extends \Source\Controllers\Studio\Studio
     private function resource(string $slug, ?array $request): void
     {
         $user = Auth::user();
-        if (!$user || !Access::can('studio.access', $user)) {
+        if (!$user || !Access::can('operation.access', $user)) {
             redirect('/operation/login');
         }
         $config = self::RESOURCES[$slug];
@@ -478,7 +533,7 @@ class Operation extends \Source\Controllers\Studio\Studio
         $offers=[];if($slug==='quotes'&&$id){$offerStmt=$pdo->prepare("SELECT o.*,COALESCE(NULLIF(s.trade_name,''),s.legal_name) supplier_name FROM operation_quote_offers o JOIN operation_suppliers s ON s.id=o.supplier_id WHERE o.quote_id=:id ORDER BY o.amount IS NULL,o.amount");$offerStmt->execute(['id'=>$id]);$offers=$offerStmt->fetchAll()?:[];}
         $comments=[];$attachments=[];$activity=[];$tasks=[];if($record){$query=$pdo->prepare("SELECT c.*,CONCAT(u.first_name,' ',u.last_name) user_name FROM operation_comments c LEFT JOIN users u ON u.id=c.created_by WHERE c.entity_type=:type AND c.entity_id=:id ORDER BY c.created_at DESC");$query->execute(['type'=>$slug,'id'=>$record->id]);$comments=$query->fetchAll()?:[];$query=$pdo->prepare('SELECT * FROM operation_attachments WHERE entity_type=:type AND entity_id=:id ORDER BY created_at DESC');$query->execute(['type'=>$slug,'id'=>$record->id]);$attachments=$query->fetchAll()?:[];$query=$pdo->prepare("SELECT a.*,CONCAT(u.first_name,' ',u.last_name) user_name FROM operation_activity a LEFT JOIN users u ON u.id=a.user_id WHERE a.entity_type=:type AND a.entity_id=:id ORDER BY a.created_at DESC LIMIT 50");$query->execute(['type'=>$slug,'id'=>$record->id]);$activity=$query->fetchAll()?:[];if($slug==='demands'){$query=$pdo->prepare('SELECT * FROM operation_tasks WHERE demand_id=:id ORDER BY due_at IS NULL,due_at');$query->execute(['id'=>$record->id]);$tasks=$query->fetchAll()?:[];}}
         echo $this->view->render('components/operation/resource', [
-            'head' => $this->seo->render($config['title'] . ' - Connect Operações', CONF_SITE_DESC, url('/operation/' . $slug), themeStudio('/assets/images/favicon.png', 'default')),
+            'head' => $this->seo->render($config['title'] . ' - Connect Operações', CONF_SITE_DESC, url('/operation/' . $slug), moves_container_url('operation','default','/assets/images/favicon.png')),
             'title' => $config['title'], 'app' => $slug, 'user' => $user, 'currentVersion' => VERSION_STUDIO, 'adminBase' => '/operation',
             'resource' => $slug, 'config' => $config, 'items' => $items, 'record' => $record, 'condominiums' => $condominiums, 'issues' => $issues, 'demands' => $demands, 'users' => $users, 'suppliers'=>$suppliers, 'offers'=>$offers, 'comments'=>$comments, 'attachments'=>$attachments, 'activity'=>$activity, 'tasks'=>$tasks,'filters'=>$filters,'page'=>$page,'perPage'=>$perPage,'totalItems'=>$totalItems,'totalPages'=>$totalPages
         ]);

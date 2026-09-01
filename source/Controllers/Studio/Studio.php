@@ -126,36 +126,6 @@ class Studio extends Controller
     public function dash(): void
     {
         $user = $this->guard("dashboard.view");
-        if ($this->isOperationRequest()) {
-            $operationData = ["appointmentsCount" => 0, "scheduledTasksCount" => 0, "toScheduleCount" => 0, "waitingThirdPartiesCount" => 0, "weeklyVisitsCount" => 0, "dayAgenda" => [], "pendingTasks" => [], "currentVisit" => null, "demandsOpen" => 0, "ticketsOpen" => 0, "quotesPending" => 0, "criticalIssues" => 0, "recentDemands" => [], "condominiumsAttention" => [], "recentActivity" => []];
-            try {
-                $pdo = Connect::getInstance();
-                $today = $pdo->query("SELECT v.id,v.title,v.notes description,'meeting' type,v.status,v.scheduled_at starts_at,DATE_FORMAT(v.scheduled_at,'%H:%i') time,c.name condominium_name FROM operation_visits v JOIN operation_condominiums c ON c.id=v.condominium_id WHERE DATE(v.scheduled_at)=CURDATE() AND v.status<>'cancelled' ORDER BY v.scheduled_at")->fetchAll() ?: [];
-                $operationData["dayAgenda"] = $today;
-                $operationData["appointmentsCount"] = count($today);
-                $operationData["scheduledTasksCount"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_visit_items WHERE result='pending'")->fetchColumn();
-                $operationData["weeklyVisitsCount"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_visits WHERE status<>'cancelled' AND YEARWEEK(scheduled_at,1)=YEARWEEK(CURDATE(),1)")->fetchColumn();
-                $operationData["waitingThirdPartiesCount"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_issues WHERE status IN ('open','in_progress','waiting')")->fetchColumn();
-                $operationData["toScheduleCount"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_visits WHERE status='scheduled' AND scheduled_at>NOW()")->fetchColumn();
-                $pending = $pdo->query("SELECT title,COALESCE(description,category,'Pendência operacional') subtitle,DATE_FORMAT(due_at,'%d/%m %H:%i') due,CASE priority WHEN 'critical' THEN 'alert-circle-outline' WHEN 'high' THEN 'warning-outline' ELSE 'checkbox-outline' END icon FROM operation_issues WHERE status IN ('open','in_progress','waiting') ORDER BY due_at IS NULL,due_at,FIELD(priority,'critical','high','medium','low') LIMIT 8")->fetchAll() ?: [];
-                $operationData["pendingTasks"] = $pending;
-                $operationData["demandsOpen"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_demands WHERE status NOT IN ('completed','cancelled')")->fetchColumn();
-                $operationData["ticketsOpen"] = (int)$pdo->query("SELECT COUNT(*) FROM studio_support_tickets WHERE status NOT IN ('resolved','closed')")->fetchColumn();
-                $operationData["quotesPending"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_quotes WHERE status IN ('requested','received','analysis','waiting_approval')")->fetchColumn();
-                $operationData["criticalIssues"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_issues WHERE priority='critical' AND status NOT IN ('resolved','cancelled')")->fetchColumn();
-                $operationData["recentDemands"] = $pdo->query("SELECT d.id,d.protocol,d.title,d.priority,d.status,d.due_at,c.name condominium_name,CONCAT(u.first_name,' ',u.last_name) assigned_name FROM operation_demands d JOIN operation_condominiums c ON c.id=d.condominium_id LEFT JOIN users u ON u.id=d.assigned_to ORDER BY d.id DESC LIMIT 6")->fetchAll() ?: [];
-                $operationData["condominiumsAttention"] = $pdo->query("SELECT c.id,c.name,COUNT(DISTINCT d.id) demands_open,COUNT(DISTINCT i.id) issues_open,COUNT(DISTINCT q.id) quotes_pending FROM operation_condominiums c LEFT JOIN operation_demands d ON d.condominium_id=c.id AND d.status NOT IN ('completed','cancelled') LEFT JOIN operation_issues i ON i.condominium_id=c.id AND i.status NOT IN ('resolved','cancelled') LEFT JOIN operation_quotes q ON q.condominium_id=c.id AND q.status IN ('requested','received','analysis','waiting_approval') GROUP BY c.id,c.name HAVING demands_open+issues_open+quotes_pending>0 ORDER BY issues_open DESC,demands_open DESC LIMIT 5")->fetchAll() ?: [];
-                $operationData["recentActivity"] = $pdo->query("SELECT a.*,CONCAT(u.first_name,' ',u.last_name) user_name FROM operation_activity a LEFT JOIN users u ON u.id=a.user_id ORDER BY a.id DESC LIMIT 8")->fetchAll() ?: [];
-                foreach ($today as $event) {
-                    $operationData["currentVisit"] = (object)["title" => $event->title, "items" => [], "url" => url('/operation/visits/' . (int)$event->id)];
-                    break;
-                }
-            } catch (\Throwable $exception) {
-                \Source\Support\AppLogger::exception($exception, "operation", ["event_type" => "operation_dashboard_failed"]);
-            }
-            echo $this->view->render("components/dash/home", $this->viewData("Dashboard", "dash", $user, $operationData));
-            return;
-        }
         echo $this->view->render("components/dash/home", $this->viewData("Dashboard", "dash", $user, [
             "pagesCount" => (new Page())->find()->count(),
             "postsCount" => (new Post())->find()->count(),
