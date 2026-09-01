@@ -16,6 +16,51 @@ composer test
 Configure o banco local no `.env`. Nunca versione esse arquivo, certificados,
 uploads, logs, backups ou outros dados gerados em `storage/`.
 
+## Publicação no servidor
+
+O servidor deve apontar o DocumentRoot para a raiz deste projeto e permitir a
+reescrita de URLs pelo `.htaccess`. Antes de liberar o acesso público:
+
+```bash
+composer install --no-dev --optimize-autoloader
+composer build:studio
+composer db:status
+composer db:migrate
+composer deploy:check
+```
+
+Use `APP_ENV=production`, `APP_DEBUG=false`, uma `APP_URL` HTTPS e credenciais
+exclusivas do banco de produção. Os diretórios operacionais dentro de `storage/`
+precisam ter permissão de escrita para o usuário do PHP, mas `.env`, certificados,
+SQL e logs não devem ser servidos publicamente.
+
+O comando `db:migrate` registra cada SQL em `movesos_schema_migrations` e nunca
+reexecuta uma migration aplicada. Para um banco vazio, carregue o baseline
+estrutural versionado (sem dados de aplicação):
+
+```bash
+php service/commands/database-migrate.php install --confirm-install
+composer db:verify
+composer db:status
+```
+
+Em instalação antiga, primeiro faça backup e valide um clone. O baseline só é
+registrado quando o fingerprint do schema corresponde ao manifesto versionado:
+
+```bash
+php service/commands/database-migrate.php verify
+php service/commands/database-migrate.php baseline --confirm-baseline
+```
+
+Em produção, `install` e `baseline` também exigem `--confirm-production`. O
+exportador `database-schema-export.php --confirm-export` é destinado apenas à
+criação revisada de uma nova versão de baseline; nunca deve ser usado como etapa
+automática de deploy.
+
+Faça backup do banco e de `storage/images`, `storage/files` e `storage/uploads`
+antes de cada atualização. Depois da publicação, valide `/`, `/studio`,
+`/helpdesk` e `/erp`, além do envio de arquivos e da fila de e-mails.
+
 ## Estrutura
 
 ```text
