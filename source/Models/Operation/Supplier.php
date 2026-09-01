@@ -1,0 +1,1 @@
+<?php namespace Source\Models\Operation; use Source\Core\Model; final class Supplier extends Model { public function __construct(){parent::__construct('operation_suppliers',['id'],['legal_name','created_by']);} }

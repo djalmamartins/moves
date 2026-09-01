@@ -49,6 +49,12 @@ abstract class TestCase extends PHPUnitTestCase
     private function resetDatabase(): void
     {
         $this->pdo->exec('SET FOREIGN_KEY_CHECKS=0');
+        foreach (['operation_visit_outcomes','operation_visit_agenda_items','operation_visit_sync_queue','operation_visit_events','operation_visit_evidence','operation_visit_participants','operation_visit_items','operation_visits','operation_checklist_items','operation_checklists','operation_issues','operation_action_plans','operation_assets','operation_resident_requests','operation_activity','operation_condominiums'] as $table) {
+            $exists = $this->pdo->query("SHOW TABLES LIKE " . $this->pdo->quote($table))->fetchColumn();
+            if ($exists) {
+                $this->pdo->exec("TRUNCATE TABLE {$table}");
+            }
+        }
         foreach (['password_reset_tokens','studio_support_ticket_messages','studio_support_tickets','studio_calendar_events','movesos_versions','notifications','notification_messages','notifications_categories','mail_queue','support_articles','support_categories','faq_questions','faq_channels','posts','pages','categories','access_user_overrides','access_user_roles','access_role_permissions','access_permissions','access_roles','system_audit_logs','app_log','users'] as $table) {
             $this->pdo->exec("TRUNCATE TABLE {$table}");
         }

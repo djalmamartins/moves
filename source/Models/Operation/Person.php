@@ -1,0 +1,1 @@
+<?php namespace Source\Models\Operation; use Source\Core\Model; final class Person extends Model { public function __construct(){parent::__construct('operation_people',['id'],['name','created_by']);} }

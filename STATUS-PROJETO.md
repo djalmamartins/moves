@@ -1,8 +1,8 @@
 # STATUS GERAL
 
-Versão atual: `VERSION_STUDIO` do ambiente / commit `bcb3e59`
-Branch ativa: `codex/SEC-002-password-recovery`
-Última auditoria: 31/08/2026
+Versão atual: `VERSION_STUDIO` do ambiente / base `7857bac`
+Branch ativa: `codex/BASE-001-operation-baseline`
+Última auditoria: 01/09/2026
 
 ## Progresso geral
 
@@ -32,19 +32,21 @@ Conclusão estimada ponderada: **58%**
 - EST-001 e LEG-001 integradas pelos PRs #69 e #70.
 - SEC-001 integrada pelo PR #71.
 - TST-001 integrada pelo PR #72.
-- SEC-002 em revisão: recuperação com token hashado, expirável, revogável e de uso único.
+- SEC-002 integrada pelo PR #73.
+- BASE-001 consolida em branch isolada a implementação local do Operation para desbloquear TST-002 e ARC-001.
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
-- Operation possui implementações recentes ainda sem validação E2E autenticada.
+- Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
 
 ## Validação atual
 
 - EST-001: integrado e aprovado em banco vazio e clone descartável; repetição idempotente.
 - SEC-001: integrada após CI verde; migration validada com IDs descartáveis 1 e 2.
 - TST-001: integrada após 24 rotas autenticadas retornarem HTTP 200.
-- SEC-002: 9 testes focados/26 asserções e suíte completa aprovados; migration validada em banco descartável.
+- SEC-002: integrada após CI verde no PR #73.
+- BASE-001: 4 testes focados/13 asserções do workflow de visitas aprovados; sintaxe PHP de controllers, views, models e jobs aprovada.
 - Schema atual: fingerprint compatível em verificação somente leitura.
-- PHPUnit global: suíte completa aprovada no banco automatizado isolado.
+- PHPUnit global: a execução agregada ainda é interrompida por testes legados de controllers que encerram o processo; validações focadas permanecem obrigatórias até a correção do runner.
 
 ## Bloqueado
 
@@ -53,9 +55,9 @@ Conclusão estimada ponderada: **58%**
 
 ## Próximas 10 tarefas
 
-1. Revisar e integrar SEC-002 — recuperação de senha.
-2. TST-002 — E2E dos CRUDs críticos.
-3. ARC-001 — separar Operation do Studio.
+1. Revisar e integrar BASE-001 — base versionada do Operation.
+2. ARC-001 — separar Operation do Studio.
+3. TST-002 — E2E dos CRUDs críticos.
 4. ARC-002 — extrair Help Desk.
 5. ERP-001 — escolher geração ERP.
 6. APP-001 — definir o portal de moradores.
@@ -71,7 +73,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próxima tarefa recomendada
 
-**Revisar e integrar SEC-002; depois iniciar TST-002 — E2E dos CRUDs críticos.**
+**Revisar e integrar BASE-001; depois retomar ARC-001 e TST-002 sobre a base oficial.**
 
 ## Fontes oficiais
 

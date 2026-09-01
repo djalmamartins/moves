@@ -35,25 +35,43 @@ use Source\Core\Connect;
 
 class Studio extends Controller
 {
-    private const VIEW_PATH = __DIR__ . "/../../../container/apps/studio/default/";
     private const ADMIN_LEVEL = 5;
 
     public function __construct()
     {
-        parent::__construct(self::VIEW_PATH);
+        // Studio e Help Desk compartilham os mesmos componentes. A URL atual
+        // define identidade, navegação e destinos sem duplicar a implementação.
+        $viewPath = $this->isOperationRequest()
+            ? moves_container_path("operation", "default")
+            : moves_container_path("studio", studio_theme_name());
+        if (!is_file($viewPath . "/layouts/studio.php")) {
+            $viewPath = moves_container_path("studio", "default");
+        }
+        parent::__construct($viewPath . "/");
         (new Access())->report();
         (new Online())->report();
     }
 
     public function root(): void
     {
-        redirect(AccessControl::can("studio.access", Auth::user()) ? "/studio/dash" : "/studio/login");
+        $base = $this->environmentBase();
+        redirect(AccessControl::can("studio.access", Auth::user()) ? "{$base}/dash" : "{$base}/login");
+    }
+
+    public function environment(?array $data): void
+    {
+        $this->guard("studio.access");
+        $theme = (string)($data["theme"] ?? "default");
+        if (!in_array($theme, ["default", "operation"], true)) $theme = "default";
+        redirect($theme === "operation" ? "/operation/dash" : "/studio/dash");
     }
 
     public function login(?array $data): void
     {
+        $helpDesk = $this->isHelpDeskRequest();
+        $base = $this->environmentBase();
         if (AccessControl::can("studio.access", Auth::user())) {
-            redirect("/studio/dash");
+            redirect($helpDesk ? "/helpdesk/tickets" : "{$base}/dash");
         }
 
         if (!empty($data)) {
@@ -78,10 +96,10 @@ class Studio extends Controller
             }
             if (!AccessControl::can("studio.access", Auth::user())) {
                 Auth::logout();
-                echo json_encode(["message" => $this->message->warning("Sua conta não possui acesso ao Studio.")->render()]);
+                echo json_encode(["message" => $this->message->warning("Sua conta não possui acesso a este ambiente.")->render()]);
                 return;
             }
-            echo json_encode(["redirect" => url("/studio/dash")]);
+            echo json_encode(["redirect" => url($helpDesk ? "/helpdesk/tickets" : "{$base}/dash")]);
             return;
         }
 
@@ -89,22 +107,55 @@ class Studio extends Controller
             "head" => $this->seo->render(
                 "MovesOS - " . CONF_SITE_NAME,
                 CONF_SITE_DESC,
-                url("/studio/login"),
+                url("{$base}/login"),
                 themeStudio("/assets/images/favicon.png", "default")
             ),
-            "cookie" => filter_input(INPUT_COOKIE, "authEmail")
+            "cookie" => filter_input(INPUT_COOKIE, "authEmail"),
+            "adminBase" => $base,
+            "loginEnvironment" => $helpDesk ? "helpdesk" : ($this->isOperationRequest() ? "operation" : "studio")
         ]);
     }
 
     public function logout(): void
     {
+        $base = $this->environmentBase();
         Auth::logout();
-        redirect("/studio/login");
+        redirect("{$base}/login");
     }
 
     public function dash(): void
     {
         $user = $this->guard("dashboard.view");
+        if ($this->isOperationRequest()) {
+            $operationData = ["appointmentsCount" => 0, "scheduledTasksCount" => 0, "toScheduleCount" => 0, "waitingThirdPartiesCount" => 0, "weeklyVisitsCount" => 0, "dayAgenda" => [], "pendingTasks" => [], "currentVisit" => null, "demandsOpen" => 0, "ticketsOpen" => 0, "quotesPending" => 0, "criticalIssues" => 0, "recentDemands" => [], "condominiumsAttention" => [], "recentActivity" => []];
+            try {
+                $pdo = Connect::getInstance();
+                $today = $pdo->query("SELECT v.id,v.title,v.notes description,'meeting' type,v.status,v.scheduled_at starts_at,DATE_FORMAT(v.scheduled_at,'%H:%i') time,c.name condominium_name FROM operation_visits v JOIN operation_condominiums c ON c.id=v.condominium_id WHERE DATE(v.scheduled_at)=CURDATE() AND v.status<>'cancelled' ORDER BY v.scheduled_at")->fetchAll() ?: [];
+                $operationData["dayAgenda"] = $today;
+                $operationData["appointmentsCount"] = count($today);
+                $operationData["scheduledTasksCount"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_visit_items WHERE result='pending'")->fetchColumn();
+                $operationData["weeklyVisitsCount"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_visits WHERE status<>'cancelled' AND YEARWEEK(scheduled_at,1)=YEARWEEK(CURDATE(),1)")->fetchColumn();
+                $operationData["waitingThirdPartiesCount"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_issues WHERE status IN ('open','in_progress','waiting')")->fetchColumn();
+                $operationData["toScheduleCount"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_visits WHERE status='scheduled' AND scheduled_at>NOW()")->fetchColumn();
+                $pending = $pdo->query("SELECT title,COALESCE(description,category,'Pendência operacional') subtitle,DATE_FORMAT(due_at,'%d/%m %H:%i') due,CASE priority WHEN 'critical' THEN 'alert-circle-outline' WHEN 'high' THEN 'warning-outline' ELSE 'checkbox-outline' END icon FROM operation_issues WHERE status IN ('open','in_progress','waiting') ORDER BY due_at IS NULL,due_at,FIELD(priority,'critical','high','medium','low') LIMIT 8")->fetchAll() ?: [];
+                $operationData["pendingTasks"] = $pending;
+                $operationData["demandsOpen"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_demands WHERE status NOT IN ('completed','cancelled')")->fetchColumn();
+                $operationData["ticketsOpen"] = (int)$pdo->query("SELECT COUNT(*) FROM studio_support_tickets WHERE status NOT IN ('resolved','closed')")->fetchColumn();
+                $operationData["quotesPending"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_quotes WHERE status IN ('requested','received','analysis','waiting_approval')")->fetchColumn();
+                $operationData["criticalIssues"] = (int)$pdo->query("SELECT COUNT(*) FROM operation_issues WHERE priority='critical' AND status NOT IN ('resolved','cancelled')")->fetchColumn();
+                $operationData["recentDemands"] = $pdo->query("SELECT d.id,d.protocol,d.title,d.priority,d.status,d.due_at,c.name condominium_name,CONCAT(u.first_name,' ',u.last_name) assigned_name FROM operation_demands d JOIN operation_condominiums c ON c.id=d.condominium_id LEFT JOIN users u ON u.id=d.assigned_to ORDER BY d.id DESC LIMIT 6")->fetchAll() ?: [];
+                $operationData["condominiumsAttention"] = $pdo->query("SELECT c.id,c.name,COUNT(DISTINCT d.id) demands_open,COUNT(DISTINCT i.id) issues_open,COUNT(DISTINCT q.id) quotes_pending FROM operation_condominiums c LEFT JOIN operation_demands d ON d.condominium_id=c.id AND d.status NOT IN ('completed','cancelled') LEFT JOIN operation_issues i ON i.condominium_id=c.id AND i.status NOT IN ('resolved','cancelled') LEFT JOIN operation_quotes q ON q.condominium_id=c.id AND q.status IN ('requested','received','analysis','waiting_approval') GROUP BY c.id,c.name HAVING demands_open+issues_open+quotes_pending>0 ORDER BY issues_open DESC,demands_open DESC LIMIT 5")->fetchAll() ?: [];
+                $operationData["recentActivity"] = $pdo->query("SELECT a.*,CONCAT(u.first_name,' ',u.last_name) user_name FROM operation_activity a LEFT JOIN users u ON u.id=a.user_id ORDER BY a.id DESC LIMIT 8")->fetchAll() ?: [];
+                foreach ($today as $event) {
+                    $operationData["currentVisit"] = (object)["title" => $event->title, "items" => [], "url" => url('/operation/visits/' . (int)$event->id)];
+                    break;
+                }
+            } catch (\Throwable $exception) {
+                \Source\Support\AppLogger::exception($exception, "operation", ["event_type" => "operation_dashboard_failed"]);
+            }
+            echo $this->view->render("components/dash/home", $this->viewData("Dashboard", "dash", $user, $operationData));
+            return;
+        }
         echo $this->view->render("components/dash/home", $this->viewData("Dashboard", "dash", $user, [
             "pagesCount" => (new Page())->find()->count(),
             "postsCount" => (new Post())->find()->count(),
@@ -152,7 +203,7 @@ class Studio extends Controller
             $params['status'] = $status;
         }
         $query = (new Proposal())->find($terms ? implode(' AND ', $terms) : null, $params ? http_build_query($params) : null);
-        $pager = new Pager(url('/studio/proposals/p/'));
+        $pager = new Pager(url($this->environmentBase() . '/proposals/p/'));
         $pager->pager($query->count(), 12, (int)($data['page'] ?? 1));
         $pdo = Connect::getInstance();
         $stats = $pdo->query("SELECT COUNT(*) total, SUM(status='new') new_count, SUM(status IN ('contacted','qualified','proposal_sent')) progress_count, SUM(status='won') won_count FROM proposals")->fetch();
@@ -166,7 +217,7 @@ class Studio extends Controller
     {
         $user = $this->guard('proposals.manage');
         $proposal = (new Proposal())->findById((int)($data['id'] ?? 0));
-        if (!$proposal) { redirect('/studio/proposals'); return; }
+        if (!$proposal) { redirect($this->environmentBase() . '/proposals'); return; }
         if (!empty($data['action'])) {
             if (!csrf_verify($data)) { $this->jsonMessage('Sessão expirada. Atualize a página.', 'error'); return; }
             if (in_array($data['action'], ['generate_pdf','send_pdf'], true)) {
@@ -195,7 +246,7 @@ class Studio extends Controller
                     $response->status = 'queued'; $response->queued_at = date('Y-m-d H:i:s'); $response->save();
                     $proposal->status = 'proposal_sent'; $proposal->save();
                 }
-                echo json_encode(['redirect' => url('/studio/proposals/' . $proposal->id)]); return;
+                echo json_encode(['redirect' => url($this->environmentBase() . '/proposals/' . $proposal->id)]); return;
             }
             $statuses = ['new','contacted','qualified','proposal_sent','won','lost','archived'];
             $next = (string)($data['status'] ?? '');
@@ -204,7 +255,7 @@ class Studio extends Controller
             $proposal->assigned_to = filter_var($data['assigned_to'] ?? null, FILTER_VALIDATE_INT) ?: null;
             if ($next === 'contacted' && !$proposal->contacted_at) $proposal->contacted_at = date('Y-m-d H:i:s');
             if (!$proposal->save()) { $this->jsonMessage('Não foi possível atualizar a proposta.', 'error'); return; }
-            echo json_encode(['redirect' => url('/studio/proposals/' . $proposal->id)]); return;
+            echo json_encode(['redirect' => url($this->environmentBase() . '/proposals/' . $proposal->id)]); return;
         }
         $team = Connect::getInstance()->query("SELECT DISTINCT u.id,u.first_name,u.last_name FROM users u JOIN access_user_roles ur ON ur.user_id=u.id JOIN access_roles r ON r.id=ur.role_id WHERE r.slug IN ('developer','super_admin','client_admin','manager') AND u.status<>'trash' ORDER BY u.first_name")->fetchAll() ?: [];
         $responses = (new ProposalResponse())->find('proposal_id=:proposal', 'proposal='.$proposal->id)->order('id DESC')->fetch(true) ?: [];
@@ -215,10 +266,10 @@ class Studio extends Controller
     {
         $this->guard('proposals.manage');
         $response = (new ProposalResponse())->findById((int)($data['id'] ?? 0));
-        if (!$response || !$response->pdf_path) { redirect('/studio/proposals'); return; }
+        if (!$response || !$response->pdf_path) { redirect($this->environmentBase() . '/proposals'); return; }
         $root = realpath(dirname(__DIR__, 3) . '/storage/files/proposals');
         $file = realpath(dirname(__DIR__, 3) . '/storage/' . $response->pdf_path);
-        if (!$root || !$file || !is_file($file) || !str_starts_with($file, $root . DIRECTORY_SEPARATOR)) { redirect('/studio/ops/404'); return; }
+        if (!$root || !$file || !is_file($file) || !str_starts_with($file, $root . DIRECTORY_SEPARATOR)) { redirect($this->environmentBase() . '/ops/404'); return; }
         header('Content-Type: application/pdf'); header('Content-Length: ' . filesize($file));
         header('Content-Disposition: inline; filename="proposta-' . (int)$response->id . '.pdf"');
         readfile($file);
@@ -229,11 +280,11 @@ class Studio extends Controller
         $user = $this->guard("articles.manage");
         $search = trim((string)($data["s"] ?? ""));
         if ($search !== "" && empty($data["page"])) {
-            redirect("/studio/blog/home?search=" . urlencode($search));
+            redirect($this->environmentBase() . "/blog/home?search=" . urlencode($search));
         }
         $search = trim((string)($_GET["search"] ?? $search));
         $find = (new Post())->find($search ? "title LIKE :s" : null, $search ? "s=%{$search}%" : null);
-        $pager = new Pager(url("/studio/blog/home/p/") . "page" . ($search ? "?search=" . urlencode($search) : ""));
+        $pager = new Pager(url($this->environmentBase() . "/blog/home/p/") . "page" . ($search ? "?search=" . urlencode($search) : ""));
         $pager->pager($find->count(), 20, (int)($data["page"] ?? 1));
 
         echo $this->view->render("components/blog/home", $this->viewData("Artigos", "blog", $user, [
@@ -249,7 +300,7 @@ class Studio extends Controller
         $id = filter_var($data["id"] ?? null, FILTER_VALIDATE_INT);
         $post = $id ? (new Post())->findById($id) : null;
         if ($id && !$post) {
-            redirect("/studio/blog/home");
+            redirect($this->environmentBase() . "/blog/home");
             return;
         }
 
@@ -272,7 +323,7 @@ class Studio extends Controller
                 if ($coverPath) {
                     (new Upload())->remove($coverPath);
                 }
-                echo json_encode(["redirect" => url("/studio/blog/home")]);
+                echo json_encode(["redirect" => url($this->environmentBase() . "/blog/home")]);
                 return;
             }
 
@@ -371,7 +422,7 @@ class Studio extends Controller
                 }
             }
             $this->message->success($status === "post" ? "Artigo publicado com sucesso." : "Rascunho salvo com sucesso.")->flash();
-            echo json_encode(["redirect" => url("/studio/blog/post/{$post->id}")]);
+            echo json_encode(["redirect" => url($this->environmentBase() . "/blog/post/{$post->id}")]);
             return;
         }
 
@@ -424,7 +475,7 @@ class Studio extends Controller
                 "title" => htmlspecialchars($item->title, ENT_QUOTES, "UTF-8"),
                 "body" => htmlspecialchars((string)$item->body, ENT_QUOTES, "UTF-8"),
                 "severity" => $item->severity ?: "info",
-                "action_url" => url("/studio/notifications/action/{$item->id}"),
+                "action_url" => url($this->environmentBase() . "/notifications/action/{$item->id}"),
                 "content_url" => $this->safeNotificationLink((string)$item->link),
                 "created_at" => date_fmt($item->created_at, "d/m/Y H:i"),
                 "view" => (int)$item->view
@@ -439,10 +490,10 @@ class Studio extends Controller
         $id = filter_var($data["id"] ?? null, FILTER_VALIDATE_INT);
         $notification = $id ? (new Notification())->find("id = :id AND users_id = :user", "id={$id}&user={$user->id}")->fetch() : null;
         if (!$notification) {
-            redirect("/studio/dash");
+            redirect($this->environmentBase() . "/dash");
             return;
         }
-        $link = $this->safeNotificationLink((string)$notification->link) ?: url("/studio/dash");
+        $link = $this->safeNotificationLink((string)$notification->link) ?: url($this->environmentBase() . "/dash");
         $notification->view = 1;
         $notification->read_at = date("Y-m-d H:i:s");
         $notification->save();
@@ -467,7 +518,7 @@ class Studio extends Controller
         $notification->read_at = date("Y-m-d H:i:s");
         $notification->save();
         $response = ["read" => true];
-        if ($action === "open") { $response["redirect"] = $this->safeNotificationLink((string)$notification->link) ?: url("/studio/dash"); }
+        if ($action === "open") { $response["redirect"] = $this->safeNotificationLink((string)$notification->link) ?: url($this->environmentBase() . "/dash"); }
         echo json_encode($response);
     }
 
@@ -618,7 +669,7 @@ class Studio extends Controller
         if ($message->status === "sent") { $this->deliverNotificationMessage($message); }
         $channelLabel = $deliveryChannels === "both" ? "notificação e e-mail" : ($deliveryChannels === "email" ? "e-mail" : "notificação");
         $this->message->success($message->status === "scheduled" ? ucfirst($channelLabel) . " agendado(a)." : ucfirst($channelLabel) . " preparado(a) para envio.")->flash();
-        echo json_encode(["redirect" => url("/studio/notifications")]);
+        echo json_encode(["redirect" => url($this->environmentBase() . "/notifications")]);
     }
 
     public function mailQueueAction(?array $data): void
@@ -694,7 +745,7 @@ class Studio extends Controller
                 echo json_encode(["message" => $category->message()->render()]);
                 return;
             }
-            echo json_encode(["redirect" => url("/studio/blog/categories")]);
+            echo json_encode(["redirect" => url($this->environmentBase() . "/blog/categories")]);
             return;
         }
 
@@ -726,7 +777,7 @@ class Studio extends Controller
                     return;
                 }
                 $target->destroy();
-                echo json_encode(["redirect" => url("/studio/pages")]);
+                echo json_encode(["redirect" => url($this->environmentBase() . "/pages")]);
                 return;
             }
             $page = $page ?: new Page();
@@ -746,7 +797,7 @@ class Studio extends Controller
                 echo json_encode(["message" => $page->message()->render()]);
                 return;
             }
-            echo json_encode(["redirect" => url("/studio/page/{$page->id}")]);
+            echo json_encode(["redirect" => url($this->environmentBase() . "/page/{$page->id}")]);
             return;
         }
         echo $this->view->render("components/pages/form", $this->viewData($page ? "Editar página" : "Nova página", "pages", $user, ["page" => $page]));
@@ -881,7 +932,7 @@ class Studio extends Controller
         $total = count($files);
         $page = max(1, (int)($data["page"] ?? 1));
         $filterQuery = http_build_query(array_filter(["q" => $search, "type" => $type, "orientation" => $orientation, "usage" => $usageFilter, "sort" => $sort !== "newest" ? $sort : "", "period" => $period !== "all" ? $period : "", "date_from" => !empty($_GET["date_from"]) ? $dateFrom : "", "date_to" => !empty($_GET["date_to"]) ? $dateTo : ""], static fn($value) => $value !== "" && $value !== null));
-        $pager = new Pager(url("/studio/media/p/") . "page" . ($filterQuery ? "?{$filterQuery}" : ""), "Página", ["Página anterior", "‹"], ["Próxima página", "›"]);
+        $pager = new Pager(url($this->environmentBase() . "/media/p/") . "page" . ($filterQuery ? "?{$filterQuery}" : ""), "Página", ["Página anterior", "‹"], ["Próxima página", "›"]);
         $pager->pager($total, 25, $page, 2);
         $visibleFiles = array_slice($files, $pager->offset(), $pager->limit());
         foreach ($visibleFiles as &$visibleFile) {
@@ -1004,8 +1055,35 @@ class Studio extends Controller
     public function users(?array $data): void
     {
         $user = $this->guard("users.manage");
+        if (!empty($data["action"])) {
+            if (!csrf_verify($data)) { $this->jsonMessage("Sessão expirada. Atualize a página.", "error"); return; }
+            $ids = array_values(array_unique(array_filter(array_map("intval", (array)($data["user_ids"] ?? [])))));
+            $action = (string)$data["action"];
+            if (!$ids || !in_array($action, ["bulk_activate", "bulk_deactivate", "bulk_delete"], true)) {
+                $this->jsonMessage("Selecione usuários e uma ação válida.", "warning"); return;
+            }
+            $changed = 0;
+            foreach ($ids as $userId) {
+                $target = (new User())->findById($userId);
+                if (!$target || (int)$target->id === 1 || (int)$target->id === (int)$user->id) continue;
+                if ($action === "bulk_delete") {
+                    if ($target->destroy()) $changed++;
+                    continue;
+                }
+                $target->status = $action === "bulk_activate" ? "confirmed" : "registered";
+                if ($target->save()) $changed++;
+            }
+            if (!$changed) { $this->jsonMessage("Nenhum usuário pôde ser alterado.", "warning"); return; }
+            \Source\Support\Audit::record("update", "users", null, [], ["action" => $action, "ids" => $ids, "changed" => $changed]);
+            echo json_encode(["reload" => true, "changed" => $changed]);
+            return;
+        }
         $search = mb_substr(trim(strip_tags((string)($_GET["q"] ?? ""))), 0, 100);
         $status = in_array($_GET["status"] ?? "", ["confirmed", "registered"], true) ? $_GET["status"] : "";
+        $roleId = filter_var($_GET["role"] ?? null, FILTER_VALIDATE_INT) ?: 0;
+        $createdFrom = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_GET['created_from'] ?? '')) ? $_GET['created_from'] : '';
+        $createdTo = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($_GET['created_to'] ?? '')) ? $_GET['created_to'] : '';
+        $sort = in_array($_GET['sort'] ?? '', ['name', 'created', 'access', 'status'], true) ? $_GET['sort'] : 'created';
         $terms = ["status<>'trash'"];
         $params = [];
         if ($search !== "") {
@@ -1017,6 +1095,9 @@ class Studio extends Controller
             $terms[] = "status=:status";
             $params[] = "status={$status}";
         }
+        if ($roleId) { $terms[] = "id IN (SELECT user_id FROM access_user_roles WHERE role_id=:role)"; $params[] = "role={$roleId}"; }
+        if ($createdFrom) { $terms[] = "created_at>=:created_from"; $params[] = "created_from={$createdFrom} 00:00:00"; }
+        if ($createdTo) { $terms[] = "created_at<=:created_to"; $params[] = "created_to={$createdTo} 23:59:59"; }
         $termsSql = implode(" AND ", $terms);
         $paramsSql = $params ? implode("&", $params) : null;
         if (($_GET["export"] ?? "") === "csv") {
@@ -1034,13 +1115,14 @@ class Studio extends Controller
             return;
         }
         $find = (new User())->find($termsSql, $paramsSql);
-        $queryString = http_build_query(array_filter(["q" => $search, "status" => $status], static fn($value) => $value !== ""));
-        $pager = new Pager(url("/studio/users/p/") . "page" . ($queryString ? "?{$queryString}" : ""), "Página", ["Anterior", "‹"], ["Próxima", "›"]);
+        $queryString = http_build_query(array_filter(["q" => $search, "status" => $status, "role" => $roleId, "created_from" => $createdFrom, "created_to" => $createdTo, "sort" => $sort], static fn($value) => $value !== "" && $value !== 0));
+        $pager = new Pager(url($this->environmentBase() . "/users/p/") . "page" . ($queryString ? "?{$queryString}" : ""), "Página", ["Anterior", "‹"], ["Próxima", "›"]);
         $pager->pager($find->count(), 12, max(1, (int)($data["page"] ?? 1)));
         $pdo = Connect::getInstance();
         $stats = $pdo->query("SELECT COUNT(*) total,SUM(status='confirmed') active,SUM(status<>'confirmed') inactive FROM users WHERE status<>'trash'")->fetch();
         $stats->admins = (int)$pdo->query("SELECT COUNT(*) FROM access_user_roles ur INNER JOIN access_roles r ON r.id=ur.role_id WHERE r.level>=50")->fetchColumn();
-        $listedUsers = $find->order("id DESC")->limit($pager->limit())->offset($pager->offset())->fetch(true) ?: [];
+        $orders = ["name" => "first_name,last_name", "created" => "created_at DESC", "status" => "status,first_name,last_name", "access" => "(SELECT MAX(COALESCE(s.updated_at,s.created_at)) FROM app_session s WHERE s.users_id=users.id) DESC"];
+        $listedUsers = $find->order($orders[$sort])->limit($pager->limit())->offset($pager->offset())->fetch(true) ?: [];
         $activityMap = [];
         $sessionRows = $pdo->query("SELECT users_id,MAX(COALESCE(updated_at,created_at)) last_access,COUNT(*) sessions FROM app_session GROUP BY users_id")->fetchAll();
         foreach ($sessionRows as $sessionRow) { $activityMap[(int)$sessionRow->users_id] = $sessionRow; }
@@ -1050,6 +1132,11 @@ class Studio extends Controller
             "activityMap" => $activityMap,
             "search" => $search,
             "statusFilter" => $status,
+            "roleFilter" => $roleId,
+            "createdFrom" => $createdFrom,
+            "createdTo" => $createdTo,
+            "sort" => $sort,
+            "roles" => $pdo->query("SELECT id,name FROM access_roles ORDER BY level DESC,name")->fetchAll() ?: [],
             "paginator" => $pager->render(),
             "page" => max(1, (int)($data["page"] ?? 1)),
             "shown" => min($pager->limit(), max(0, $find->count() - $pager->offset())),
@@ -1102,7 +1189,7 @@ class Studio extends Controller
                 }
                 if (!$targetUser->save()) { echo json_encode(["message" => $targetUser->message()->render()]); return; }
                 \Source\Support\Audit::record("update", "users", (int)$targetUser->id, $before, ["first_name" => $targetUser->first_name, "last_name" => $targetUser->last_name, "email" => $targetUser->email, "phone_cell" => $targetUser->phone_cell, "status" => $targetUser->status]);
-                echo json_encode(["redirect" => url("/studio/user/{$targetUser->id}#dados")]);
+                echo json_encode(["redirect" => url($this->environmentBase() . "/user/{$targetUser->id}#dados")]);
                 return;
             }
 
@@ -1121,7 +1208,7 @@ class Studio extends Controller
                 $address->status = "main";
                 if (strlen($address->code) !== 8 || !preg_match("/^[A-Z]{2}$/", $address->state)) { $this->jsonMessage("Informe um CEP e uma UF válidos.", "warning"); return; }
                 if (!$address->save()) { echo json_encode(["message" => $address->message()->render()]); return; }
-                echo json_encode(["redirect" => url("/studio/user/{$targetUser->id}#endereco")]);
+                echo json_encode(["redirect" => url($this->environmentBase() . "/user/{$targetUser->id}#endereco")]);
                 return;
             }
 
@@ -1142,7 +1229,7 @@ class Studio extends Controller
             if ($data["action"] === "access") {
                 if (!$targetUser) { $this->jsonMessage("Usuário não encontrado.", "warning"); return; }
                 $this->syncUserAccess((int)$targetUser->id, (int)$role->id, (array)($data["permissions"] ?? []), (int)$user->id);
-                echo json_encode(["redirect" => url("/studio/user/{$targetUser->id}")]);
+                echo json_encode(["redirect" => url($this->environmentBase() . "/user/{$targetUser->id}")]);
                 return;
             }
             $newUser = (new User())->bootstrap(
@@ -1160,7 +1247,7 @@ class Studio extends Controller
                 return;
             }
             $this->syncUserAccess((int)$newUser->id, (int)$role->id, (array)($data["permissions"] ?? []), (int)$user->id);
-            echo json_encode(["redirect" => url("/studio/user/{$newUser->id}")]);
+            echo json_encode(["redirect" => url($this->environmentBase() . "/user/{$newUser->id}")]);
             return;
         }
         $overrides = [];
@@ -1184,7 +1271,7 @@ class Studio extends Controller
             if ($data["action"] === "delete") {
                 if (!$testimonial) { $this->jsonMessage("Depoimento não encontrado.", "warning"); return; }
                 $testimonial->destroy();
-                echo json_encode(["redirect" => url("/studio/testimonials")]);
+                echo json_encode(["redirect" => url($this->environmentBase() . "/testimonials")]);
                 return;
             }
             $testimonial = $testimonial ?: new AppBrief();
@@ -1203,7 +1290,7 @@ class Studio extends Controller
             }
             if (mb_strlen($testimonial->title) < 3 || mb_strlen($testimonial->content) < 10) { $this->jsonMessage("Informe o nome e um depoimento com pelo menos 10 caracteres.", "warning"); return; }
             if (!$testimonial->save()) { echo json_encode(["message" => $testimonial->message()->render()]); return; }
-            echo json_encode(["redirect" => url("/studio/testimonials/{$testimonial->id}")]);
+            echo json_encode(["redirect" => url($this->environmentBase() . "/testimonials/{$testimonial->id}")]);
             return;
         }
         echo $this->view->render("components/testimonials/home", $this->viewData("Depoimentos", "testimonials", $user, [
@@ -1280,7 +1367,7 @@ class Studio extends Controller
                 if (!$stmt->rowCount()) { $this->jsonMessage("Compromisso não encontrado.", "warning"); return; }
                 \Source\Support\Audit::record("delete", "studio_calendar_events", $eventId);
                 $this->message->success("Compromisso excluído.")->flash();
-                echo json_encode(["redirect" => url("/studio/agenda")]); return;
+                echo json_encode(["redirect" => url($this->serviceDeskBase() . "/agenda")]); return;
             }
             $title = trim(strip_tags((string)($data["title"] ?? "")));
             $startsAt = strtotime((string)($data["starts_at"] ?? ""));
@@ -1310,7 +1397,7 @@ class Studio extends Controller
                 \Source\Support\Audit::record("create", "studio_calendar_events", $eventId, [], ["title" => $title]);
                 $this->message->success("Compromisso cadastrado.")->flash();
             }
-            echo json_encode(["redirect" => url("/studio/agenda")]); return;
+            echo json_encode(["redirect" => url($this->serviceDeskBase() . "/agenda")]); return;
         }
         $month = (string)($_GET["month"] ?? date("Y-m"));
         if (!preg_match("/^\\d{4}-(0[1-9]|1[0-2])$/", $month)) $month = date("Y-m");
@@ -1336,12 +1423,36 @@ class Studio extends Controller
         if (!empty($data["action"])) {
             if (!csrf_verify($data)) { $this->jsonMessage("Sessão expirada. Atualize a página.", "error"); return; }
             $ticketId = (int)($data["ticket_id"] ?? 0);
+            if ($data['action'] === 'template_save') {
+                $title=mb_substr(trim(strip_tags((string)($data['title']??''))),0,120);$body=trim(strip_tags((string)($data['body']??'')));
+                if(mb_strlen($title)<2||mb_strlen($body)<2){$this->jsonMessage('Informe título e conteúdo da resposta rápida.','warning');return;}
+                $stmt=$pdo->prepare('INSERT INTO studio_support_templates(title,body,created_by) VALUES(?,?,?)');$stmt->execute([$title,$body,$user->id]);
+                \Source\Support\Audit::record('create','studio_support_templates',$pdo->lastInsertId(),[],['title'=>$title]);echo json_encode(['reload'=>true]);return;
+            }
+            if ($data['action'] === 'template_delete') {
+                $templateId=(int)($data['template_id']??0);$stmt=$pdo->prepare('DELETE FROM studio_support_templates WHERE id=?');$stmt->execute([$templateId]);
+                if(!$stmt->rowCount()){$this->jsonMessage('Resposta rápida não encontrada.','warning');return;}\Source\Support\Audit::record('delete','studio_support_templates',$templateId);echo json_encode(['reload'=>true]);return;
+            }
+            if ($data["action"] === "bulk") {
+                $ticketIds = array_values(array_unique(array_filter(array_map('intval', (array)($data['ticket_ids'] ?? [])))));
+                $status = in_array($data['status'] ?? '', ["open", "in_progress", "waiting_customer", "resolved", "closed"], true) ? $data['status'] : null;
+                if (!$ticketIds || !$status) { $this->jsonMessage('Selecione chamados e um status válido.', 'warning'); return; }
+                $placeholders = implode(',', array_fill(0, count($ticketIds), '?'));
+                $stmt = $pdo->prepare("UPDATE studio_support_tickets SET status=?,resolved_at=" . (in_array($status,['resolved','closed'],true) ? 'NOW()' : 'NULL') . " WHERE id IN ({$placeholders})");
+                $stmt->execute(array_merge([$status], $ticketIds));
+                foreach ($ticketIds as $id) { $event=$pdo->prepare("INSERT INTO studio_support_ticket_events(ticket_id,user_id,event_type,new_value) VALUES(?,?,?,?)"); $event->execute([$id,$user->id,'status',$status]); }
+                echo json_encode(['reload'=>true,'affected'=>$stmt->rowCount()]); return;
+            }
             if ($data["action"] === "update" && $ticketId) {
                 $statuses = ["open", "in_progress", "waiting_customer", "resolved", "closed"];
                 $status = in_array($data["status"] ?? "", $statuses, true) ? $data["status"] : "open";
-                $stmt = $pdo->prepare("UPDATE studio_support_tickets SET status=:status, assigned_to=:assigned, resolved_at=:resolved WHERE id=:id");
-                $stmt->execute(["status" => $status, "assigned" => ($id = (int)($data["assigned_to"] ?? 0)) ?: null, "resolved" => in_array($status, ["resolved", "closed"], true) ? date("Y-m-d H:i:s") : null, "id" => $ticketId]);
-                echo json_encode(["redirect" => url("/studio/tickets")]); return;
+                $current=$pdo->prepare("SELECT status,priority,assigned_to,team,category,tags FROM studio_support_tickets WHERE id=:id");$current->execute(['id'=>$ticketId]);$before=$current->fetch();
+                if(!$before){$this->jsonMessage('Chamado não encontrado.','warning');return;}
+                $priority=in_array($data['priority']??$before->priority,['low','medium','high','urgent'],true)?($data['priority']??$before->priority):$before->priority;
+                $stmt = $pdo->prepare("UPDATE studio_support_tickets SET condominium_id=:condo,demand_id=:demand,status=:status,priority=:priority,assigned_to=:assigned,team=:team,category=:category,tags=:tags,resolved_at=:resolved WHERE id=:id");
+                $stmt->execute(["condo"=>(int)($data['condominium_id']??0)?:null,"demand"=>(int)($data['demand_id']??0)?:null,"status" => $status,"priority"=>$priority,"assigned" => ($id = (int)($data["assigned_to"] ?? $before->assigned_to)) ?: null,"team"=>mb_substr(trim(strip_tags((string)($data['team']??$before->team))),0,100),"category"=>mb_substr(trim(strip_tags((string)($data['category']??$before->category))),0,100),"tags"=>mb_substr(trim(strip_tags((string)($data['tags']??$before->tags))),0,500), "resolved" => in_array($status, ["resolved", "closed"], true) ? date("Y-m-d H:i:s") : null, "id" => $ticketId]);
+                foreach(['status','priority','assigned_to','team','category','tags'] as $field){$new=$field==='assigned_to'?(($id=(int)($data['assigned_to']??$before->$field))?:null):($field==='status'?$status:($field==='priority'?$priority:mb_substr(trim(strip_tags((string)($data[$field]??$before->$field))),0,$field==='tags'?500:100)));if((string)$before->$field!==(string)$new){$event=$pdo->prepare("INSERT INTO studio_support_ticket_events(ticket_id,user_id,event_type,old_value,new_value) VALUES(?,?,?,?,?)");$event->execute([$ticketId,$user->id,$field,(string)$before->$field,(string)$new]);}}
+                echo json_encode(["redirect" => url($this->serviceDeskBase() . "/tickets?ticket=".$ticketId)]); return;
             }
             if ($data["action"] === "reply" && $ticketId) {
                 $reply = trim(strip_tags((string)($data["message"] ?? "")));
@@ -1350,8 +1461,11 @@ class Studio extends Controller
                 if (!$exists->fetch()) { $this->jsonMessage("Chamado não encontrado.", "warning"); return; }
                 $message = $pdo->prepare("INSERT INTO studio_support_ticket_messages(ticket_id,user_id,message,is_internal) VALUES(:ticket,:user,:message,:internal)");
                 $message->execute(["ticket" => $ticketId, "user" => $user->id, "message" => $reply, "internal" => !empty($data["is_internal"]) ? 1 : 0]);
-                $pdo->prepare("UPDATE studio_support_tickets SET status=IF(status='open','in_progress',status) WHERE id=:id")->execute(["id" => $ticketId]);
-                echo json_encode(["redirect" => url("/studio/tickets?ticket=" . $ticketId)]); return;
+                $messageId=(int)$pdo->lastInsertId();
+                $timeSpent=max(0,min(86400,(int)($data['time_spent']??0)));$nextStatus=!empty($data['resolve_after'])?'resolved':null;
+                $pdo->prepare("UPDATE studio_support_tickets SET status=".($nextStatus?"'resolved'":"IF(status='open','in_progress',status)").",first_response_at=COALESCE(first_response_at,NOW()),work_seconds=work_seconds+:seconds,resolved_at=".($nextStatus?'NOW()':'resolved_at')." WHERE id=:id")->execute(["seconds"=>$timeSpent,"id" => $ticketId]);
+                $files=$_FILES['attachments']??null;if($files&&!empty($files['tmp_name'])&&is_array($files['tmp_name'])){foreach($files['tmp_name'] as $index=>$temporary){if(!$temporary)continue;$file=['name'=>$files['name'][$index]??'arquivo','type'=>$files['type'][$index]??'','tmp_name'=>$temporary,'error'=>$files['error'][$index]??UPLOAD_ERR_NO_FILE,'size'=>$files['size'][$index]??0];$upload=new Upload();$path=$upload->file($file,'ticket-'.$ticketId.'-'.bin2hex(random_bytes(4)));if(!$path){$this->jsonMessage('Um dos anexos não é válido.','warning');return;}$attachment=$pdo->prepare("INSERT INTO studio_support_ticket_attachments(ticket_id,message_id,user_id,file_path,original_name,mime_type,file_size) VALUES(?,?,?,?,?,?,?)");$attachment->execute([$ticketId,$messageId,$user->id,$path,mb_substr(basename((string)$file['name']),0,255),$file['type']?:null,(int)$file['size']]);}}
+                echo json_encode(["redirect" => url($this->serviceDeskBase() . "/tickets?ticket=" . $ticketId)]); return;
             }
             $subject = trim(strip_tags((string)($data["subject"] ?? "")));
             $message = trim(strip_tags((string)($data["message"] ?? "")));
@@ -1367,8 +1481,8 @@ class Studio extends Controller
             if (!(new User())->findById($requesterId)) { $this->jsonMessage("Selecione um solicitante válido.", "warning"); return; }
             try {
                 $pdo->beginTransaction();
-                $stmt = $pdo->prepare("INSERT INTO studio_support_tickets(protocol,subject,message,area,priority,requester_id,assigned_to,created_by,due_at) VALUES(:protocol,:subject,:message,:area,:priority,:requester,:assigned,:creator,:due_at)");
-                $stmt->execute(["protocol" => $protocol, "subject" => $subject, "message" => $message, "area" => in_array($data["area"] ?? "", $areas, true) ? $data["area"] : "general", "priority" => $priority, "requester" => $requesterId, "assigned" => $assignedTo, "creator" => $user->id, "due_at" => $dueAt]);
+                $stmt = $pdo->prepare("INSERT INTO studio_support_tickets(condominium_id,demand_id,protocol,subject,message,area,priority,requester_id,assigned_to,created_by,due_at) VALUES(:condo,:demand,:protocol,:subject,:message,:area,:priority,:requester,:assigned,:creator,:due_at)");
+                $stmt->execute(["condo"=>(int)($data['condominium_id']??0)?:null,"demand"=>(int)($data['demand_id']??0)?:null,"protocol" => $protocol, "subject" => $subject, "message" => $message, "area" => in_array($data["area"] ?? "", $areas, true) ? $data["area"] : "general", "priority" => $priority, "requester" => $requesterId, "assigned" => $assignedTo, "creator" => $user->id, "due_at" => $dueAt]);
                 $newTicketId = (int)$pdo->lastInsertId();
                 $pdo->commit();
             } catch (\Throwable $exception) {
@@ -1380,25 +1494,31 @@ class Studio extends Controller
             catch (\Throwable $exception) { \Source\Support\AppLogger::exception($exception, "tickets", ["event_type" => "ticket_notification_failed", "ticket_id" => $newTicketId]); }
             \Source\Support\Audit::record("create", "studio_support_tickets", $newTicketId, [], ["protocol" => $protocol, "subject" => $subject, "priority" => $priority, "due_at" => $dueAt]);
             $this->message->success("Chamado {$protocol} cadastrado.")->flash();
-            echo json_encode(["redirect" => url("/studio/tickets")]); return;
+            echo json_encode(["redirect" => url($this->serviceDeskBase() . "/tickets")]); return;
         }
         $status = (string)($_GET["status"] ?? "");
         $search = trim(strip_tags((string)($_GET["q"] ?? "")));
+        $priorityFilter=in_array($_GET['priority']??'', ['low','medium','high','urgent'],true)?$_GET['priority']:'';
+        $assignedFilter=(string)($_GET['assigned_to']??'');$dueFilter=in_array($_GET['due']??'', ['today','overdue'],true)?$_GET['due']:'';
         $terms = []; $params = [];
         if (in_array($status, ["open", "in_progress", "waiting_customer", "resolved", "closed"], true)) { $terms[] = "t.status=:status"; $params["status"] = $status; }
-        if ($search !== "") { $terms[] = "(t.subject LIKE :q OR t.protocol LIKE :q OR CONCAT(r.first_name,' ',r.last_name) LIKE :q)"; $params["q"] = "%{$search}%"; }
-        $query = "SELECT t.*, CONCAT(r.first_name,' ',r.last_name) requester_name, CONCAT(a.first_name,' ',a.last_name) assigned_name FROM studio_support_tickets t LEFT JOIN users r ON r.id=t.requester_id LEFT JOIN users a ON a.id=t.assigned_to" . ($terms ? " WHERE " . implode(" AND ", $terms) : "") . " ORDER BY FIELD(t.status,'open','in_progress','waiting_customer','resolved','closed'), FIELD(t.priority,'urgent','high','medium','low'), t.created_at DESC LIMIT 100";
+        if ($search !== "") { $terms[] = "(t.subject LIKE :q OR t.protocol LIKE :q OR t.requester_name LIKE :q OR t.requester_email LIKE :q OR CONCAT(r.first_name,' ',r.last_name) LIKE :q)"; $params["q"] = "%{$search}%"; }
+        if($priorityFilter){$terms[]='t.priority=:priority';$params['priority']=$priorityFilter;}
+        if($assignedFilter==='unassigned'){$terms[]='t.assigned_to IS NULL';}elseif(ctype_digit($assignedFilter)&&((int)$assignedFilter)>0){$terms[]='t.assigned_to=:assigned_filter';$params['assigned_filter']=(int)$assignedFilter;}
+        if($dueFilter==='today'){$terms[]='DATE(t.due_at)=CURDATE()';}elseif($dueFilter==='overdue'){$terms[]="t.due_at<NOW() AND t.status NOT IN ('resolved','closed')";}
+        $query = "SELECT t.*,c.name condominium_name,d.protocol demand_protocol, COALESCE(NULLIF(TRIM(CONCAT(r.first_name,' ',r.last_name)),''),t.requester_name,'Solicitante') requester_name, CONCAT(a.first_name,' ',a.last_name) assigned_name FROM studio_support_tickets t LEFT JOIN users r ON r.id=t.requester_id LEFT JOIN users a ON a.id=t.assigned_to LEFT JOIN operation_condominiums c ON c.id=t.condominium_id LEFT JOIN operation_demands d ON d.id=t.demand_id" . ($terms ? " WHERE " . implode(" AND ", $terms) : "") . " ORDER BY FIELD(t.status,'open','in_progress','waiting_customer','resolved','closed'), FIELD(t.priority,'urgent','high','medium','low'), t.created_at DESC LIMIT 100";
         $stmt = $pdo->prepare($query); $stmt->execute($params);
         $counts = $pdo->query("SELECT status,COUNT(*) total FROM studio_support_tickets GROUP BY status")->fetchAll() ?: [];
         $statusCounts = array_fill_keys(["open","in_progress","waiting_customer","resolved","closed"], 0); foreach ($counts as $row) $statusCounts[$row->status] = (int)$row->total;
         $ticketId = (int)($_GET["ticket"] ?? 0);
-        $selectedTicket = null; $messages = [];
+        $selectedTicket = null; $messages = []; $events=[]; $attachments=[];
         if ($ticketId) {
-            $selected = $pdo->prepare("SELECT t.*,CONCAT(r.first_name,' ',r.last_name) requester_name,CONCAT(a.first_name,' ',a.last_name) assigned_name FROM studio_support_tickets t LEFT JOIN users r ON r.id=t.requester_id LEFT JOIN users a ON a.id=t.assigned_to WHERE t.id=:id");
+            $selected = $pdo->prepare("SELECT t.*,c.name condominium_name,d.protocol demand_protocol,COALESCE(NULLIF(TRIM(CONCAT(r.first_name,' ',r.last_name)),''),t.requester_name,'Solicitante') requester_name,CONCAT(a.first_name,' ',a.last_name) assigned_name FROM studio_support_tickets t LEFT JOIN users r ON r.id=t.requester_id LEFT JOIN users a ON a.id=t.assigned_to LEFT JOIN operation_condominiums c ON c.id=t.condominium_id LEFT JOIN operation_demands d ON d.id=t.demand_id WHERE t.id=:id");
             $selected->execute(["id" => $ticketId]); $selectedTicket = $selected->fetch() ?: null;
-            if ($selectedTicket) { $history = $pdo->prepare("SELECT m.*,CONCAT(u.first_name,' ',u.last_name) user_name FROM studio_support_ticket_messages m JOIN users u ON u.id=m.user_id WHERE m.ticket_id=:ticket ORDER BY m.created_at"); $history->execute(["ticket" => $ticketId]); $messages = $history->fetchAll() ?: []; }
+            if ($selectedTicket) { $history = $pdo->prepare("SELECT m.*,CONCAT(u.first_name,' ',u.last_name) user_name FROM studio_support_ticket_messages m JOIN users u ON u.id=m.user_id WHERE m.ticket_id=:ticket ORDER BY m.created_at"); $history->execute(["ticket" => $ticketId]); $messages = $history->fetchAll() ?: []; $eventStmt=$pdo->prepare("SELECT e.*,CONCAT(u.first_name,' ',u.last_name) user_name FROM studio_support_ticket_events e LEFT JOIN users u ON u.id=e.user_id WHERE e.ticket_id=:ticket ORDER BY e.created_at");$eventStmt->execute(['ticket'=>$ticketId]);$events=$eventStmt->fetchAll()?:[];$attachmentStmt=$pdo->prepare("SELECT * FROM studio_support_ticket_attachments WHERE ticket_id=:ticket ORDER BY created_at");$attachmentStmt->execute(['ticket'=>$ticketId]);$attachments=$attachmentStmt->fetchAll()?:[]; }
         }
-        echo $this->view->render("components/tickets/home", $this->viewData("Chamados", "tickets", $user, ["tickets" => $stmt->fetchAll() ?: [], "users" => (new User())->find("status != :status", "status=trash")->order("first_name,last_name")->fetch(true) ?: [], "status" => $status, "search" => $search, "counts" => $statusCounts, "selectedTicket" => $selectedTicket, "messages" => $messages, "settings" => Settings::dados()]));
+        $templates=$pdo->query("SELECT * FROM studio_support_templates WHERE active=1 ORDER BY title")->fetchAll()?:[];
+        echo $this->view->render("components/tickets/home", $this->viewData("Chamados", "tickets", $user, ["tickets" => $stmt->fetchAll() ?: [], "users" => (new User())->find("status != :status", "status=trash")->order("first_name,last_name")->fetch(true) ?: [], "condominiums"=>$pdo->query("SELECT id,name FROM operation_condominiums WHERE status<>'inactive' ORDER BY name")->fetchAll()?:[],"demands"=>$pdo->query("SELECT id,protocol,title FROM operation_demands WHERE status NOT IN ('completed','cancelled') ORDER BY id DESC")->fetchAll()?:[], "status" => $status, "search" => $search,"priorityFilter"=>$priorityFilter,"assignedFilter"=>$assignedFilter,"dueFilter"=>$dueFilter, "counts" => $statusCounts, "selectedTicket" => $selectedTicket, "messages" => $messages,"events"=>$events,"attachments"=>$attachments,"templates"=>$templates, "settings" => Settings::dados()]));
     }
 
     private function ticketSlaHours(string $priority): int
@@ -1423,12 +1543,12 @@ class Studio extends Controller
                 $notification->title = "Novo chamado {$protocol}";
                 $notification->body = "{$priorityLabel}: {$subject}. SLA até " . date_fmt($dueAt, "d/m H:i");
                 $notification->severity = in_array($priority, ["urgent", "high"], true) ? "warning" : "info";
-                $notification->link = url("/studio/tickets?ticket={$ticketId}");
+                $notification->link = url($this->serviceDeskBase() . "/tickets?ticket={$ticketId}");
                 $notification->view = 0;
                 $notification->save();
             }
             if (is_email((string)$recipient->email)) {
-                $body = "<p>Olá, " . htmlspecialchars($recipient->first_name, ENT_QUOTES, "UTF-8") . ".</p><p>Foi aberto o chamado <strong>" . htmlspecialchars($protocol, ENT_QUOTES, "UTF-8") . "</strong>: " . htmlspecialchars($subject, ENT_QUOTES, "UTF-8") . ".</p><p>Prioridade: <strong>{$priorityLabel}</strong>. Prazo de atendimento: <strong>" . date_fmt($dueAt, "d/m/Y H:i") . "</strong>.</p><p><a href=\"" . htmlspecialchars(url("/studio/tickets?ticket={$ticketId}"), ENT_QUOTES, "UTF-8") . "\">Abrir chamado no MovesOS</a></p>";
+                $body = "<p>Olá, " . htmlspecialchars($recipient->first_name, ENT_QUOTES, "UTF-8") . ".</p><p>Foi aberto o chamado <strong>" . htmlspecialchars($protocol, ENT_QUOTES, "UTF-8") . "</strong>: " . htmlspecialchars($subject, ENT_QUOTES, "UTF-8") . ".</p><p>Prioridade: <strong>{$priorityLabel}</strong>. Prazo de atendimento: <strong>" . date_fmt($dueAt, "d/m/Y H:i") . "</strong>.</p><p><a href=\"" . htmlspecialchars(url($this->serviceDeskBase() . "/tickets?ticket={$ticketId}"), ENT_QUOTES, "UTF-8") . "\">Abrir chamado no MovesOS</a></p>";
                 (new Email())->bootstrap("[{$protocol}] Novo chamado: {$subject}", $body, $recipient->email, $recipient->fullName())->queue(CONF_MAIL_SENDER["address"], CONF_MAIL_SENDER["name"], date("Y-m-d H:i:s"), null, $recipient->id);
             }
         }
@@ -1451,12 +1571,12 @@ class Studio extends Controller
                 $notification->title = "Novo compromisso na agenda";
                 $notification->body = "{$typeLabel}: {$title} em " . date_fmt($startsAt, "d/m/Y H:i");
                 $notification->severity = $type === "deadline" ? "warning" : "info";
-                $notification->link = url("/studio/agenda?month=" . date("Y-m", strtotime($startsAt)));
+                $notification->link = url($this->serviceDeskBase() . "/agenda?month=" . date("Y-m", strtotime($startsAt)));
                 $notification->view = 0;
                 $notification->save();
             }
             if (is_email((string)$recipient->email)) {
-                $body = "<p>Olá, " . htmlspecialchars($recipient->first_name, ENT_QUOTES, "UTF-8") . ".</p><p>Há um novo compromisso na agenda: <strong>" . htmlspecialchars($title, ENT_QUOTES, "UTF-8") . "</strong>.</p><p>Tipo: <strong>{$typeLabel}</strong>. Data: <strong>" . date_fmt($startsAt, "d/m/Y H:i") . "</strong>.</p><p><a href=\"" . htmlspecialchars(url("/studio/agenda?month=" . date("Y-m", strtotime($startsAt))), ENT_QUOTES, "UTF-8") . "\">Abrir agenda no MovesOS</a></p>";
+                $body = "<p>Olá, " . htmlspecialchars($recipient->first_name, ENT_QUOTES, "UTF-8") . ".</p><p>Há um novo compromisso na agenda: <strong>" . htmlspecialchars($title, ENT_QUOTES, "UTF-8") . "</strong>.</p><p>Tipo: <strong>{$typeLabel}</strong>. Data: <strong>" . date_fmt($startsAt, "d/m/Y H:i") . "</strong>.</p><p><a href=\"" . htmlspecialchars(url($this->serviceDeskBase() . "/agenda?month=" . date("Y-m", strtotime($startsAt))), ENT_QUOTES, "UTF-8") . "\">Abrir agenda no MovesOS</a></p>";
                 (new Email())->bootstrap("Novo compromisso: {$title}", $body, $recipient->email, $recipient->fullName())->queue(CONF_MAIL_SENDER["address"], CONF_MAIL_SENDER["name"], date("Y-m-d H:i:s"), null, $recipient->id);
             }
         }
@@ -1491,7 +1611,7 @@ class Studio extends Controller
             if ($data["action"] === "delete") {
                 if (!$category || $category->articles()->count()) { $this->jsonMessage("A categoria possui matérias ou não foi encontrada.", "warning"); return; }
                 $category->destroy();
-                echo json_encode(["redirect" => url("/studio/support")]); return;
+                echo json_encode(["redirect" => url($this->serviceDeskBase() . "/support")]); return;
             }
             $title = trim(strip_tags($data["title"] ?? ""));
             if (mb_strlen($title) < 3) { $this->jsonMessage("Informe um nome válido para a categoria.", "warning"); return; }
@@ -1503,7 +1623,7 @@ class Studio extends Controller
             $category->position = max(1, (int)($data["position"] ?? 1));
             $category->status = ($data["status"] ?? "active") === "inactive" ? "inactive" : "active";
             if (!$category->save()) { echo json_encode(["message" => $category->message()->render()]); return; }
-            echo json_encode(["redirect" => url("/studio/support")]); return;
+            echo json_encode(["redirect" => url($this->serviceDeskBase() . "/support")]); return;
         }
         echo $this->view->render("components/support/category", $this->viewData($category ? "Editar categoria" : "Nova categoria", "support", $user, ["category" => $category]));
     }
@@ -1520,7 +1640,7 @@ class Studio extends Controller
                 $cover = $article->cover ? dirname(__DIR__, 3) . "/" . CONF_UPLOAD_DIR . "/" . $article->cover : null;
                 $article->destroy();
                 if ($cover) (new Upload())->remove($cover);
-                echo json_encode(["redirect" => url("/studio/support")]); return;
+                echo json_encode(["redirect" => url($this->serviceDeskBase() . "/support")]); return;
             }
             $title = trim(strip_tags($data["title"] ?? ""));
             $summary = trim(strip_tags($data["summary"] ?? ""));
@@ -1543,7 +1663,7 @@ class Studio extends Controller
                 if ($uploaded) $article->cover = $uploaded;
             }
             if (!$article->save()) { echo json_encode(["message" => $article->message()->render()]); return; }
-            echo json_encode(["redirect" => url("/studio/support/article/{$article->id}")]); return;
+            echo json_encode(["redirect" => url($this->serviceDeskBase() . "/support/article/{$article->id}")]); return;
         }
         echo $this->view->render("components/support/article", $this->viewData($article ? "Editar matéria" : "Nova matéria", "support", $user, [
             "article" => $article, "categories" => (new SupportCategory())->find("status = :status", "status=active")->order("position, title")->fetch(true) ?: []
@@ -1580,7 +1700,7 @@ class Studio extends Controller
             }
             if ($data["action"] === "delete") {
                 (new AppSlides())->findById((int)($data["slide_id"] ?? 0))?->destroy();
-                echo json_encode(["redirect" => url("/studio/slides")]);
+                echo json_encode(["redirect" => url($this->environmentBase() . "/slides")]);
                 return;
             }
             $slide = $slide ?: new AppSlides();
@@ -1601,7 +1721,7 @@ class Studio extends Controller
                 echo json_encode(["message" => $slide->message()->render()]);
                 return;
             }
-            echo json_encode(["redirect" => url("/studio/slide/{$slide->id}")]);
+            echo json_encode(["redirect" => url($this->environmentBase() . "/slide/{$slide->id}")]);
             return;
         }
         echo $this->view->render("components/slides/form", $this->viewData($slide ? "Editar destaque" : "Novo destaque", "slides", $user, ["slide" => $slide]));
@@ -1714,14 +1834,39 @@ class Studio extends Controller
     {
         $user = $this->guardDeveloper();
         if (!csrf_verify($data)) { $this->jsonMessage('Sessão expirada. Atualize a página.', 'error'); return; }
-        $id = (int)($data['id'] ?? 0);
         $action = $data['action'] ?? '';
         $status = ['resolve' => 'resolved', 'ignore' => 'ignored', 'reopen' => 'open'][$action] ?? null;
-        if (!$id || !$status) { $this->jsonMessage('Ação de log inválida.', 'warning'); return; }
-        $stmt = Connect::getInstance()->prepare("UPDATE app_log SET status=:status,resolved_by=:user,resolved_at=IF(:status='open',NULL,NOW()),updated_at=NOW() WHERE id=:id");
-        $stmt->execute(['status' => $status, 'user' => $status === 'open' ? null : $user->id, 'id' => $id]);
-        \Source\Support\Audit::record('update', 'app_log_status', $id, [], ['status' => $status]);
-        echo json_encode(['reload' => true]);
+        $ids = array_values(array_unique(array_filter(array_map('intval', (array)($data['log_ids'] ?? [])))));
+        $routeId = (int)($data['id'] ?? 0);
+        if ($routeId) $ids[] = $routeId;
+        $ids = array_values(array_unique($ids));
+        if (!$ids || (!$status && $action !== 'delete')) { $this->jsonMessage('Selecione ao menos um log e uma ação válida.', 'warning'); return; }
+
+        $pdo = Connect::getInstance();
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        try {
+            $pdo->beginTransaction();
+            if ($action === 'delete') {
+                // Logs ainda abertos não podem ser apagados: preservamos incidentes sem tratativa.
+                $stmt = $pdo->prepare("DELETE FROM app_log WHERE id IN ({$placeholders}) AND status IN ('resolved','ignored')");
+                $stmt->execute($ids);
+            } elseif ($status === 'open') {
+                $stmt = $pdo->prepare("UPDATE app_log SET status='open',resolved_by=NULL,resolved_at=NULL,updated_at=NOW() WHERE id IN ({$placeholders})");
+                $stmt->execute($ids);
+            } else {
+                $stmt = $pdo->prepare("UPDATE app_log SET status=?,resolved_by=?,resolved_at=NOW(),updated_at=NOW() WHERE id IN ({$placeholders})");
+                $stmt->execute(array_merge([$status, (int)$user->id], $ids));
+            }
+            $affected = $stmt->rowCount();
+            if (!$affected) { $pdo->rollBack(); $this->jsonMessage($action === 'delete' ? 'Somente logs resolvidos ou ignorados podem ser excluídos.' : 'Nenhum log foi alterado.', 'warning'); return; }
+            $pdo->commit();
+            foreach ($ids as $id) \Source\Support\Audit::record($action === 'delete' ? 'delete' : 'update', 'app_log_status', $id, [], ['status' => $status, 'batch' => count($ids) > 1]);
+            echo json_encode(['reload' => true, 'affected' => $affected]);
+        } catch (\Throwable $exception) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            \Source\Support\AppLogger::exception($exception, 'logs', ['event_type' => 'log_action_failed', 'action' => $action]);
+            $this->jsonMessage('Não foi possível atualizar os logs.', 'error');
+        }
     }
 
     public function settings(?array $data): void
@@ -1840,9 +1985,11 @@ class Studio extends Controller
         $user = Auth::user();
         if (!$user || !AccessControl::can("studio.access", $user)) {
             Auth::logout();
-            redirect("/studio/login");
+            redirect($this->environmentBase() . "/login");
         }
-        if ($permission && !AccessControl::can($permission, $user)) { redirect("/studio/ops/403"); }
+        if ($permission && !AccessControl::can($permission, $user)) {
+            redirect($this->environmentBase() . "/ops/403");
+        }
         return $user;
     }
 
@@ -1920,9 +2067,32 @@ class Studio extends Controller
         return array_merge(["head" => $this->seo->render(
             $title . " - MovesOS",
             CONF_SITE_DESC,
-            url("/studio"),
+            url($this->environmentBase()),
             themeStudio("/assets/images/favicon.png", "default")
-        ), "title" => $title, "app" => $app, "user" => $user, "currentVersion" => $currentVersion], $data);
+        ), "title" => $title, "app" => $app, "user" => $user, "currentVersion" => $currentVersion, "adminBase" => $this->environmentBase()], $data);
+    }
+
+    private function isHelpDeskRequest(): bool
+    {
+        $path = (string)(parse_url($_SERVER["REQUEST_URI"] ?? "", PHP_URL_PATH) ?? "");
+        return (bool)preg_match("~/helpdesk(?:/|$)~", $path);
+    }
+
+    private function isOperationRequest(): bool
+    {
+        $path = (string)(parse_url($_SERVER["REQUEST_URI"] ?? "", PHP_URL_PATH) ?? "");
+        return (bool)preg_match("~/operation(?:/|$)~", $path);
+    }
+
+    private function environmentBase(): string
+    {
+        if ($this->isHelpDeskRequest()) return "/helpdesk";
+        return $this->isOperationRequest() ? "/operation" : "/studio";
+    }
+
+    private function serviceDeskBase(): string
+    {
+        return $this->isOperationRequest() ? "/operation" : "/helpdesk";
     }
 
     private function ensureVersionStorage(): void
@@ -1981,7 +2151,7 @@ class Studio extends Controller
 
     private function safeNotificationLink(string $link): ?string
     {
-        if ($link === "") { return url("/studio/dash"); }
+        if ($link === "") { return url($this->environmentBase() . "/dash"); }
         if (str_starts_with($link, "/") && !str_starts_with($link, "//")) { return $link; }
         $scheme = strtolower((string)parse_url($link, PHP_URL_SCHEME));
         $host = strtolower((string)parse_url($link, PHP_URL_HOST));

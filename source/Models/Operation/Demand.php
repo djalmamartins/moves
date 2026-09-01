@@ -1,0 +1,1 @@
+<?php namespace Source\Models\Operation; use Source\Core\Model; final class Demand extends Model { public function __construct(){parent::__construct('operation_demands',['id'],['protocol','condominium_id','title','created_by']);} }

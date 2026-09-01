@@ -1,0 +1,3 @@
+# Atualiza indicadores, saúde dos condomínios e registra mudanças operacionais.
+# Instale no crontab do usuário do servidor web, ajustando o caminho do PHP se necessário.
+*/5 * * * * cd /Applications/XAMPP/xamppfiles/htdocs/erp && /Applications/XAMPP/xamppfiles/bin/php service/jobs/operation-tick.php >> storage/logs/operation-cron.log 2>&1
