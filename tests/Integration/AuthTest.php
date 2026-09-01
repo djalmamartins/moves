@@ -6,6 +6,8 @@ namespace MovesOSTests\Integration;
 
 use MovesOSTests\TestCase;
 use Source\Models\Auth;
+use Source\Models\User;
+use Source\Support\PasswordReset;
 
 final class AuthTest extends TestCase
 {
@@ -52,15 +54,25 @@ final class AuthTest extends TestCase
             'email' => 'recovery@test.local',
             'document' => '52998224725'
         ]);
-        $this->pdo->prepare('UPDATE users SET forget=? WHERE id=?')->execute(['codigo-seguro', $userId]);
+        $token = PasswordReset::issue((new User())->findById($userId), '127.0.0.1');
         $auth = new Auth();
 
         self::assertFalse($auth->reset('recovery@test.local', 'codigo-invalido', 'Nova@123', 'Nova@123'));
-        self::assertFalse($auth->reset('recovery@test.local', 'codigo-seguro', 'Nova@123', 'Diferente@123'));
-        self::assertTrue($auth->reset('recovery@test.local', 'codigo-seguro', 'Nova@123', 'Nova@123'));
+        self::assertFalse($auth->reset('recovery@test.local', $token, 'Nova@123', 'Diferente@123'));
+        self::assertTrue($auth->reset('recovery@test.local', $token, 'Nova@123', 'Nova@123'));
+        self::assertFalse($auth->reset('recovery@test.local', $token, 'Outra@123', 'Outra@123'));
 
         $user = $this->pdo->query("SELECT password,forget FROM users WHERE id={$userId}")->fetch();
         self::assertTrue(passwd_verify('Nova@123', $user->password));
         self::assertEmpty($user->forget);
+    }
+
+    public function testAccountConfirmationKeepsLegacyActivationCodeIsolated(): void
+    {
+        $userId = $this->createUser(['email' => 'confirmation@test.local', 'document' => '52998224725']);
+        $this->pdo->prepare('UPDATE users SET forget=? WHERE id=?')->execute(['activation-code', $userId]);
+
+        self::assertTrue((new Auth())->confirm('confirmation@test.local', 'activation-code', 'Nova@123', 'Nova@123'));
+        self::assertEmpty($this->pdo->query("SELECT forget FROM users WHERE id={$userId}")->fetchColumn());
     }
 }

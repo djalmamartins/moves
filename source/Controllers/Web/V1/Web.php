@@ -253,7 +253,7 @@ class Web extends Controller
             list($code, $email) = explode(":", $data["code"]);
             $auth = new Auth();
 
-            if ($auth->reset($email, $code, $data["password"], $data["password_re"])) {
+            if ($auth->confirm($email, $code, $data["password"], $data["password_re"])) {
                 $user = (new User())->findByEmail($email);
                 if ($user && $user->status != "confirmed") {
                     $user->status = "confirmed";

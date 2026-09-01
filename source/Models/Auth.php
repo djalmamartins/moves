@@ -10,6 +10,7 @@ use Source\Models\Corporation\AppCorporations;
 use Source\Models\Session\AppLog;
 use Source\Support\Email;
 use Source\Support\AppLogger;
+use Source\Support\PasswordReset;
 
 /**
  * ERP | Class Auth
@@ -170,28 +171,26 @@ class Auth extends Model
 
         if (is_numeric ($email)){
             $user = (new User())->findByDocument($email);
-            if (!$user) {
-                $this->message->warning("O CPF ou CNPJ informado não está cadastrado.");
-                return false;
-            }
-        }elseif(is_email($email)) {
+            if (!$user) return true;
+        } elseif (is_email($email)) {
             $user = (new User())->findByEmail($email);
 
-            if (!$user) {
-                $this->message->warning("O e-mail informado não está cadastrado.");
-                return false;
-            }
+            if (!$user) return true;
+        } else {
+            return true;
         }
 
-        if(!empty($user)){
-            $user->forget = md5(uniqid(rand(), true));
-            $user->save();
+        try {
+            $token = PasswordReset::issue($user, $_SERVER['REMOTE_ADDR'] ?? null);
+        } catch (\RuntimeException $exception) {
+            $this->message->warning($exception->getMessage());
+            return false;
         }
 
         $view = new View(moves_container_path('mail', CONF_VIEW_MAIL));
         $message = $view->render("forget", [
             "first_name" => $user->first_name,
-            "forget_link" => url("/forget/{$user->forget}:{$user->email}")
+            "forget_link" => url("/forget/{$token}:{$user->email}")
         ]);
         (new Email())->bootstrap(
             "Recupere sua senha no " . CONF_SITE_NAME,
@@ -212,18 +211,6 @@ class Auth extends Model
      */
     public function reset(string $email, string $code, string $password, string $passwordRe): bool
     {
-        $user = (new User())->findByEmail($email);
-
-        if (!$user) {
-            $this->message->warning("A conta para recuperação não foi encontrada.");
-            return false;
-        }
-
-        if (empty($user->forget) || $user->forget != $code) {
-            $this->message->error("O código de verificação não é válido.");
-            return false;
-        }
-
         if (!is_passwd($password)) {
             $min = CONF_PASSWD_MIN_LEN;
             $max = CONF_PASSWD_MAX_LEN;
@@ -236,13 +223,27 @@ class Auth extends Model
             return false;
         }
 
-        $user->password = $password;
-        $user->forget = null;
-        if (!$user->save()) {
-            $this->message->error("Não foi possível atualizar sua senha. Tente novamente.");
+        if (!PasswordReset::consume($email, $code, $password)) {
+            $this->message->error("O código de verificação expirou, foi revogado ou já foi utilizado.");
             return false;
         }
         return true;
+    }
+
+    public function confirm(string $email, string $code, string $password, string $passwordRe): bool
+    {
+        $user = (new User())->findByEmail($email);
+        if (!$user || empty($user->forget) || !hash_equals((string)$user->forget, $code)) {
+            $this->message->error("O código de confirmação não é válido.");
+            return false;
+        }
+        if (!is_passwd($password) || $password !== $passwordRe) {
+            $this->message->warning("Confira a senha e sua confirmação.");
+            return false;
+        }
+        $user->password = $password;
+        $user->forget = null;
+        return $user->save();
     }
 
 }

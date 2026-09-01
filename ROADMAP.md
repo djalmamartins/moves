@@ -11,7 +11,7 @@ O roadmap é organizado por dependência técnica. Novas funcionalidades permane
 
 ## FASE 1 — Segurança e testes de fumaça
 
-- SEC-002: recuperação segura.
+- SEC-002: recuperação segura — em revisão na branch `codex/SEC-002-password-recovery`.
 - TST-001: rotas autenticadas — em revisão na branch `codex/TST-001-auth-smoke`.
 - LEG-001: models inválidos que podem causar fatal — integrada pelo PR #70.
 - Saída: autenticação/ACL cobertas e inventário executável.

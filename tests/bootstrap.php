@@ -55,6 +55,13 @@ $schema = [
         CONSTRAINT fk_test_uo_user FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
         CONSTRAINT fk_test_uo_permission FOREIGN KEY(permission_id) REFERENCES access_permissions(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+    "CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, user_id INT UNSIGNED NOT NULL,
+        token_hash CHAR(64) NOT NULL UNIQUE, expires_at DATETIME NOT NULL, used_at DATETIME NULL,
+        revoked_at DATETIME NULL, request_ip VARCHAR(45) NULL, created_at DATETIME NOT NULL,
+        INDEX idx_test_reset_user_created(user_id,created_at), INDEX idx_test_reset_ip_created(request_ip,created_at),
+        CONSTRAINT fk_test_reset_user FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
     "CREATE TABLE IF NOT EXISTS system_audit_logs (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, users_id INT UNSIGNED NULL,
         action VARCHAR(30) NOT NULL, entity VARCHAR(100) NOT NULL, entity_id VARCHAR(50) NULL,
