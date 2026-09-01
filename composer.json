@@ -65,6 +65,7 @@
     "migrate:content": "@php service/commands/migrate-legacy-content.php",
     "migrate:images": "@php service/commands/migrate-legacy-content.php --images-only",
     "test": "@php tests/run.php --colors=always",
+    "test:smoke": "@php service/commands/authenticated-smoke.php",
     "test:unit": "@php tests/run.php --testsuite unit --colors=always",
     "test:integration": "@php tests/run.php --testsuite integration --colors=always"
   }

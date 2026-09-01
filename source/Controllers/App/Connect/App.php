@@ -35,8 +35,6 @@ class App extends Controller
         (new Access())->report();
         (new Online())->report();
 
-        redirect("/app/dash/home");
-
     }
 
     /**

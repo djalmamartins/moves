@@ -38,7 +38,7 @@ Fonte: `AUDITORIA-GERAL.md`. Status inicial: `ABERTO`. Nenhuma tarefa abaixo foi
 - Arquivos: `tests/Integration`, configuração de teste.
 - Dependências: SEC-001.
 - Critério de aceite: todas as rotas de menu retornam 2xx/redirect esperado sem usar ID 1.
-- Status: ABERTO
+- Status: EM REVISÃO — matriz HTTP com 24 rotas autenticadas e usuário ID 2 aprovada na branch `codex/TST-001-auth-smoke`.
 
 ### TST-002 — E2E de CRUDs críticos
 - Módulo: Qualidade
