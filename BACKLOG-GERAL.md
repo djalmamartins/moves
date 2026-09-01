@@ -20,7 +20,7 @@ Fonte: `AUDITORIA-GERAL.md`. Status inicial: `ABERTO`. Nenhuma tarefa abaixo foi
 - Arquivos: `source/Support/Access.php`, model Settings, migration de baseline.
 - Dependências: EST-001.
 - Critério de aceite: IDs 1 e 2 acessam apenas ambientes autorizados; ausência de configuração falha de modo documentado; testes cobrem o caso.
-- Status: EM REVISÃO — implementado na branch `codex/SEC-001-settings-acl`; testes automatizados e migration descartável aprovados.
+- Status: CONCLUÍDO — integrado pelo PR #71 após testes e CI verde.
 
 ## P1 — essencial
 
@@ -30,7 +30,7 @@ Fonte: `AUDITORIA-GERAL.md`. Status inicial: `ABERTO`. Nenhuma tarefa abaixo foi
 - Arquivos: `source/Models/Auth.php`, banco, templates de e-mail.
 - Dependências: EST-001.
 - Critério de aceite: expiração, revogação, rate limit e testes completos.
-- Status: ABERTO
+- Status: EM REVISÃO — tokens hashados, expiração, revogação, uso único e rate limit implementados na branch `codex/SEC-002-password-recovery`.
 
 ### TST-001 — Smoke tests autenticados
 - Módulo: Qualidade
@@ -38,7 +38,7 @@ Fonte: `AUDITORIA-GERAL.md`. Status inicial: `ABERTO`. Nenhuma tarefa abaixo foi
 - Arquivos: `tests/Integration`, configuração de teste.
 - Dependências: SEC-001.
 - Critério de aceite: todas as rotas de menu retornam 2xx/redirect esperado sem usar ID 1.
-- Status: EM REVISÃO — matriz HTTP com 24 rotas autenticadas e usuário ID 2 aprovada na branch `codex/TST-001-auth-smoke`.
+- Status: CONCLUÍDO — integrado pelo PR #72 após 24 rotas autenticadas e CI verde.
 
 ### TST-002 — E2E de CRUDs críticos
 - Módulo: Qualidade
