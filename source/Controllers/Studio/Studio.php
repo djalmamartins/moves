@@ -32,6 +32,7 @@ use Source\Support\Email;
 use Source\Support\Proposal\ProposalMailer;
 use Source\Support\Proposal\ProposalPdf;
 use Source\Core\Connect;
+use Source\Services\ServiceDesk\AgendaService;
 
 class Studio extends Controller
 {
@@ -1327,63 +1328,25 @@ class Studio extends Controller
     {
         $user = $this->guard("support.manage");
         $pdo = Connect::getInstance();
+        $agenda = new AgendaService($pdo);
         if (!empty($data["action"])) {
             if (!csrf_verify($data)) { $this->jsonMessage("Sessão expirada. Atualize a página.", "error"); return; }
             if ($data["action"] === "delete") {
                 $eventId = (int)($data["event_id"] ?? 0);
                 if (!$eventId) { $this->jsonMessage("Compromisso inválido.", "warning"); return; }
-                $stmt = $pdo->prepare("DELETE FROM studio_calendar_events WHERE id=:id");
-                $stmt->execute(["id" => $eventId]);
-                if (!$stmt->rowCount()) { $this->jsonMessage("Compromisso não encontrado.", "warning"); return; }
-                \Source\Support\Audit::record("delete", "studio_calendar_events", $eventId);
+                if (!$agenda->delete($eventId)) { $this->jsonMessage("Compromisso não encontrado.", "warning"); return; }
                 $this->message->success("Compromisso excluído.")->flash();
                 echo json_encode(["redirect" => url($this->serviceDeskBase() . "/agenda")]); return;
             }
-            $title = trim(strip_tags((string)($data["title"] ?? "")));
-            $startsAt = strtotime((string)($data["starts_at"] ?? ""));
-            $endsAt = !empty($data["ends_at"]) ? strtotime((string)$data["ends_at"]) : null;
-            $types = ["meeting", "task", "deadline", "support"];
-            $statuses = ["scheduled", "completed", "cancelled"];
-            if (mb_strlen($title) < 3 || !$startsAt || ($endsAt && $endsAt < $startsAt)) { $this->jsonMessage("Informe título e período válidos.", "warning"); return; }
-            $eventId = (int)($data["event_id"] ?? 0);
-            $assignedTo = ($id = (int)($data["assigned_to"] ?? 0)) ?: null;
-            $startsAtSql = date("Y-m-d H:i:s", $startsAt);
-            $eventType = in_array($data["type"] ?? "", $types, true) ? $data["type"] : "meeting";
-            $eventStatus = in_array($data["status"] ?? "scheduled", $statuses, true) ? $data["status"] : "scheduled";
-            $payload = ["title" => $title, "description" => trim(strip_tags((string)($data["description"] ?? ""))), "starts" => $startsAtSql, "ends" => $endsAt ? date("Y-m-d H:i:s", $endsAt) : null, "type" => $eventType, "status" => $eventStatus, "assigned" => $assignedTo];
-            if ($eventId) {
-                $exists = $pdo->prepare("SELECT id FROM studio_calendar_events WHERE id=:id");
-                $exists->execute(["id" => $eventId]);
-                if (!$exists->fetchColumn()) { $this->jsonMessage("Compromisso não encontrado.", "warning"); return; }
-                $stmt = $pdo->prepare("UPDATE studio_calendar_events SET title=:title,description=:description,starts_at=:starts,ends_at=:ends,type=:type,status=:status,assigned_to=:assigned WHERE id=:id");
-                $stmt->execute($payload + ["id" => $eventId]);
-                \Source\Support\Audit::record("update", "studio_calendar_events", $eventId, [], ["title" => $title]);
-                $this->message->success("Compromisso atualizado.")->flash();
-            } else {
-                $stmt = $pdo->prepare("INSERT INTO studio_calendar_events(title,description,starts_at,ends_at,type,status,assigned_to,created_by) VALUES(:title,:description,:starts,:ends,:type,:status,:assigned,:creator)");
-                $stmt->execute($payload + ["creator" => $user->id]);
-                $eventId = (int)$pdo->lastInsertId();
-                $this->notifyAgendaEvent($eventId, $title, $startsAtSql, $eventType, $assignedTo, $user);
-                \Source\Support\Audit::record("create", "studio_calendar_events", $eventId, [], ["title" => $title]);
-                $this->message->success("Compromisso cadastrado.")->flash();
-            }
+            $creating = empty($data['event_id']);
+            try { $eventId = $agenda->save($data, (int)$user->id); }
+            catch (\InvalidArgumentException $exception) { $this->jsonMessage($exception->getMessage(), 'warning'); return; }
+            if ($creating) $this->notifyAgendaEvent($eventId, (string)$data['title'], date('Y-m-d H:i:s', strtotime((string)$data['starts_at'])), (string)($data['type'] ?? 'meeting'), (int)($data['assigned_to'] ?? 0) ?: null, $user);
+            $this->message->success($creating ? "Compromisso cadastrado." : "Compromisso atualizado.")->flash();
             echo json_encode(["redirect" => url($this->serviceDeskBase() . "/agenda")]); return;
         }
-        $month = (string)($_GET["month"] ?? date("Y-m"));
-        if (!preg_match("/^\\d{4}-(0[1-9]|1[0-2])$/", $month)) $month = date("Y-m");
-        $from = $month . "-01 00:00:00";
-        $to = date("Y-m-d H:i:s", strtotime($from . " +1 month"));
-        $eventType = in_array($_GET["type"] ?? "", ["meeting", "task", "deadline", "support"], true) ? $_GET["type"] : "";
-        $eventStatus = in_array($_GET["status"] ?? "", ["scheduled", "completed", "cancelled"], true) ? $_GET["status"] : "";
-        $assignedFilter = filter_var($_GET["assigned_to"] ?? null, FILTER_VALIDATE_INT) ?: null;
-        $terms = ["e.starts_at >= :from", "e.starts_at < :to"];
-        $params = ["from" => $from, "to" => $to];
-        if ($eventType) { $terms[] = "e.type=:type"; $params["type"] = $eventType; }
-        if ($eventStatus) { $terms[] = "e.status=:status"; $params["status"] = $eventStatus; }
-        if ($assignedFilter) { $terms[] = "e.assigned_to=:assigned"; $params["assigned"] = $assignedFilter; }
-        $events = $pdo->prepare("SELECT e.*, CONCAT(u.first_name,' ',u.last_name) assigned_name FROM studio_calendar_events e LEFT JOIN users u ON u.id=e.assigned_to WHERE " . implode(" AND ", $terms) . " ORDER BY e.starts_at");
-        $events->execute($params);
-        echo $this->view->render("components/agenda/home", $this->viewData("Agenda", "agenda", $user, ["month" => $month, "events" => $events->fetchAll() ?: [], "users" => (new User())->find("status != :status", "status=trash")->order("first_name,last_name")->fetch(true) ?: [], "typeFilter" => $eventType, "statusFilter" => $eventStatus, "assignedFilter" => $assignedFilter]));
+        $calendar = $agenda->events($_GET);
+        echo $this->view->render("components/agenda/home", $this->viewData("Agenda", "agenda", $user, ["month" => $calendar['month'], "events" => $calendar['events'], "users" => (new User())->find("status != :status", "status=trash")->order("first_name,last_name")->fetch(true) ?: [], "typeFilter" => $calendar['type'], "statusFilter" => $calendar['status'], "assignedFilter" => $calendar['assigned']]));
     }
 
     public function tickets(?array $data): void

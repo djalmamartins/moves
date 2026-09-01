@@ -1,0 +1,50 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MovesOSTests\Integration;
+
+use MovesOSTests\TestCase;
+use ReflectionClass;
+use Source\Services\ServiceDesk\AgendaService;
+
+final class ServiceDeskBoundaryTest extends TestCase
+{
+    public function testAgendaServiceIsViewFreeAndSharedByEnvironmentControllers(): void
+    {
+        $ownerId = $this->createUser(['email' => 'owner-agenda@test.local']);
+        $service = new AgendaService($this->pdo);
+        $eventId = $service->save([
+            'title' => 'Agenda compartilhada', 'description' => 'Criada sem controller.',
+            'starts_at' => '2026-09-12T09:00', 'ends_at' => '2026-09-12T10:00',
+            'type' => 'meeting', 'status' => 'scheduled', 'assigned_to' => (string)$ownerId,
+            'participants' => [(string)$ownerId],
+        ], $ownerId);
+
+        self::assertGreaterThan(0, $eventId);
+        self::assertSame(1, (int)$this->pdo->query("SELECT COUNT(*) FROM operation_calendar_participants WHERE event_id={$eventId}")->fetchColumn());
+        $service->save([
+            'event_id' => (string)$eventId, 'title' => 'Agenda compartilhada atualizada',
+            'starts_at' => '2026-09-12T09:00', 'ends_at' => '2026-09-12T10:30',
+            'type' => 'meeting', 'status' => 'completed', 'assigned_to' => (string)$ownerId,
+        ], $ownerId);
+        $calendar = $service->events(['month' => '2026-09', 'status' => 'completed']);
+        self::assertCount(1, $calendar['events']);
+        self::assertSame('Agenda compartilhada atualizada', $calendar['events'][0]->title);
+        self::assertTrue($service->delete($eventId));
+        self::assertFalse($service->delete($eventId));
+
+        $reflection = new ReflectionClass(AgendaService::class);
+        self::assertFalse($reflection->hasProperty('view'));
+        self::assertStringNotContainsString('Source\\Core\\View', file_get_contents($reflection->getFileName()));
+    }
+
+    public function testAgendaServiceRejectsInvalidPeriod(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (new AgendaService($this->pdo))->save([
+            'title' => 'Período inválido', 'starts_at' => '2026-09-12T10:00',
+            'ends_at' => '2026-09-12T09:00',
+        ], 1);
+    }
+}

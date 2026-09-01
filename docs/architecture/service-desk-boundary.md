@@ -9,6 +9,7 @@ Estado da extração:
 
 - `AgendaService`: criação, edição, exclusão, participantes e filtros mensais.
 - Operation: já consome `AgendaService` com `operation.agenda.manage`.
-- Studio: migração para o mesmo serviço pendente.
+- Studio e Operation: consomem o mesmo `AgendaService`, mantendo respectivamente
+  `support.manage` e `operation.agenda.manage` nos controllers.
 - Chamados: extração do workflow pendente; o adaptador Operation ainda é
   transitório e não deve receber novas funções.
