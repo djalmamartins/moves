@@ -25,7 +25,7 @@ final class Access
                 WHERE p.slug=:permission LIMIT 1");
             $stmt->execute(["user" => $user->id, "permission" => $permission]);
             $access = $stmt->fetch();
-            if (!$access) { return self::$cache[$key] = self::legacy($permission, (int)$user->level); }
+            if (!$access) { return self::$cache[$key] = false; }
             if ($access->role_slug === "developer") { return self::$cache[$key] = true; }
             if (!self::moduleEnabled($permission)) { return self::$cache[$key] = false; }
             if ($access->effect === "deny") { return self::$cache[$key] = false; }
@@ -33,7 +33,7 @@ final class Access
             return self::$cache[$key] = (bool)$access->role_allowed;
         } catch (\Throwable $exception) {
             AppLogger::exception($exception, 'authorization', ['event_type' => 'permission_check_failed', 'permission' => $permission, 'users_id' => $user->id]);
-            return self::$cache[$key] = self::legacy($permission, (int)$user->level);
+            return self::$cache[$key] = false;
         }
     }
 
@@ -51,13 +51,6 @@ final class Access
     {
         if ($userId === null) { self::$cache = []; return; }
         foreach (array_keys(self::$cache) as $key) { if (str_starts_with($key, $userId . ":")) unset(self::$cache[$key]); }
-    }
-
-    private static function legacy(string $permission, int $level): bool
-    {
-        if ($permission === "erp.access") { return $level >= 2; }
-        if ($permission === "studio.access") { return $level >= 5; }
-        return $level >= 5;
     }
 
     private static function moduleEnabled(string $permission): bool

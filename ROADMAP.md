@@ -4,8 +4,8 @@ O roadmap é organizado por dependência técnica. Novas funcionalidades permane
 
 ## FASE 0 — Estabilização crítica
 
-- EST-001: baseline e migrations — em revisão na branch `codex/EST-001-migrations`.
-- SEC-001: settings e ACL.
+- EST-001: baseline e migrations — integrada pelo PR #69.
+- SEC-001: settings e ACL — em revisão na branch `codex/SEC-001-settings-acl`.
 - Garantir backup/clone e preservar usuário ID 1.
 - Saída: deploy repetível, `db:status` limpo e acesso do ID 2 previsível.
 
@@ -13,7 +13,7 @@ O roadmap é organizado por dependência técnica. Novas funcionalidades permane
 
 - SEC-002: recuperação segura.
 - TST-001: rotas autenticadas.
-- LEG-001: models inválidos que podem causar fatal.
+- LEG-001: models inválidos que podem causar fatal — integrada pelo PR #70.
 - Saída: autenticação/ACL cobertas e inventário executável.
 
 ## FASE 2 — Limites arquiteturais

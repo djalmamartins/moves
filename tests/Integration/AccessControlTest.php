@@ -49,6 +49,15 @@ final class AccessControlTest extends TestCase
         self::assertFalse(Access::can('studio.access', $user));
     }
 
+    public function testMissingAclConfigurationFailsClosedEvenForLegacyHighLevelUser(): void
+    {
+        $userId = $this->createUser(['level' => 10]);
+        $user = (new User())->findById($userId);
+
+        self::assertFalse(Access::can('studio.access', $user));
+        self::assertFalse(Access::can('settings.manage', $user));
+    }
+
     private function prepareAccess(string $roleSlug, string $permissionSlug, bool $roleAllowed): array
     {
         $userId = $this->createUser(['level' => $roleSlug === 'developer' ? 10 : 2]);
@@ -65,4 +74,3 @@ final class AccessControlTest extends TestCase
         return [(new User())->findById($userId), $permissionId];
     }
 }
-

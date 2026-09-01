@@ -11,7 +11,7 @@ Fonte: `AUDITORIA-GERAL.md`. Status inicial: `ABERTO`. Nenhuma tarefa abaixo foi
 - Arquivos: `storage/database/migrations/*`, `service/commands/database-migrate.php`.
 - Dependências: clone e backup verificado de `moves_db`.
 - Critério de aceite: banco vazio e clone atual chegam ao mesmo schema; `db:status` retorna zero pendências; execução repetida é segura.
-- Status: EM REVISÃO — implementado na branch `codex/EST-001-migrations`; validação em banco vazio e clone descartável concluída.
+- Status: CONCLUÍDO — integrado pelo PR #69; validação em banco vazio e clone descartável concluída.
 
 ### SEC-001 — Bootstrap de settings e ACL
 
@@ -20,7 +20,7 @@ Fonte: `AUDITORIA-GERAL.md`. Status inicial: `ABERTO`. Nenhuma tarefa abaixo foi
 - Arquivos: `source/Support/Access.php`, model Settings, migration de baseline.
 - Dependências: EST-001.
 - Critério de aceite: IDs 1 e 2 acessam apenas ambientes autorizados; ausência de configuração falha de modo documentado; testes cobrem o caso.
-- Status: ABERTO
+- Status: EM REVISÃO — implementado na branch `codex/SEC-001-settings-acl`; testes automatizados e migration descartável aprovados.
 
 ## P1 — essencial
 
