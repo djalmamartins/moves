@@ -5,7 +5,8 @@ namespace Source\Models\Banking;
 use Source\Core\Model;
 
 /**
- * ERP | Class Banking
+ * @deprecated Sem tabela de domínio. Use Source\Models\Erp\AppWallet para
+ *             carteiras ou Source\Models\Banking\AppBankInter para a API.
  *
  * @author Djalma Martins
  * @package Source\Models\Banking
@@ -17,6 +18,8 @@ class Banking extends Model
      */
     public function __construct()
     {
-        parent::__construct("app_banking", [id], ["", "", ""]);
+        throw new \LogicException(
+            'Banking foi removido: use AppWallet para carteiras ou AppBankInter para integração bancária.'
+        );
     }
 }

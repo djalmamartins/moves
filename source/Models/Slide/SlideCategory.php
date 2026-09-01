@@ -5,7 +5,7 @@ namespace Source\Models\Slide;
 use Source\Core\Model;
 
 /**
- * Class SlideCategory
+ * @deprecated Use CategorySlide. Mantido temporariamente como alias compatível.
  * @package Source\Models
  */
 class SlideCategory extends Model
@@ -15,7 +15,7 @@ class SlideCategory extends Model
      */
     public function __construct()
     {
-        parent::__construct("slide_categories", ["id"], ["title", "description"]);
+        parent::__construct("categories_slide", ["id"], ["title", "description"]);
     }
 
     /**

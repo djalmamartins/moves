@@ -10,7 +10,7 @@ use Source\Models\User;
 
 
 /**
- * Class AppSlide
+ * @deprecated Use AppSlides. Mantido temporariamente como alias compatível.
  * @package Source\Models\Slide
  */
 class AppSlide extends Model
@@ -21,7 +21,7 @@ class AppSlide extends Model
      */
     public function __construct()
     {
-        parent::__construct("slide", ["id"], ["title", "cover", "content"]);
+        parent::__construct("slides", ["id"], ["title", "uri", "content"]);
     }
 
     /**

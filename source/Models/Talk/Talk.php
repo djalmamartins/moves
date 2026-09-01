@@ -5,7 +5,7 @@ namespace Source\Models\Talk;
 use Source\Core\Model;
 
 /**
- * ERP | Class Talk
+ * @deprecated O módulo Talk nunca recebeu tabela ou fluxo funcional.
  *
  * @author Djalma Martins
  * @package Source\Models\Talk
@@ -17,6 +17,6 @@ class Talk extends Model
      */
     public function __construct()
     {
-        parent::__construct("talk", ["id"], ["title", "cover", "content", "place"]);
+        throw new \LogicException('Talk foi removido: não existe tabela ou fluxo funcional associado.');
     }
 }
