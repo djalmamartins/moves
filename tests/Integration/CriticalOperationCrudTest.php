@@ -31,6 +31,7 @@ final class CriticalOperationCrudTest extends TestCase
         $roleId = (int)$this->pdo->lastInsertId();
         $permissions = [
             'operation.access' => 'Acessar Operacional',
+            'operation.tickets.manage' => 'Gerenciar chamados operacionais',
             'operation.demands.view' => 'Visualizar demandas',
             'operation.visits.manage' => 'Gerenciar visitas',
             'operation.agenda.manage' => 'Gerenciar agenda',
