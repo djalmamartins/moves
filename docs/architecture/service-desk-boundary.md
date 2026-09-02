@@ -13,5 +13,7 @@ Estado da extração:
   `support.manage` e `operation.agenda.manage` nos controllers.
 - `TicketService`: criação, edição, respostas, ações em lote, respostas rápidas
   e filtros extraídos sem dependência de views.
-- Chamados: migração dos controllers consumidores para `TicketService` pendente;
-  o adaptador Operation ainda é transitório e não deve receber novas funções.
+- Chamados: Studio e Operation consomem `TicketService`; o Operation possui
+  controller, ACL, rotas e views próprios, sem herdar ações HTTP do Studio.
+- Upload e entrega de notificações continuam nas bordas HTTP de cada ambiente;
+  persistência, transições, respostas e consultas pertencem ao serviço.

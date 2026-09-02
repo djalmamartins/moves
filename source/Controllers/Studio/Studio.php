@@ -33,6 +33,7 @@ use Source\Support\Proposal\ProposalMailer;
 use Source\Support\Proposal\ProposalPdf;
 use Source\Core\Connect;
 use Source\Services\ServiceDesk\AgendaService;
+use Source\Services\ServiceDesk\TicketService;
 
 class Studio extends Controller
 {
@@ -1353,50 +1354,31 @@ class Studio extends Controller
     {
         $user = $this->guard("support.manage");
         $pdo = Connect::getInstance();
+        $ticketService = new TicketService($pdo);
         if (!empty($data["action"])) {
             if (!csrf_verify($data)) { $this->jsonMessage("Sessão expirada. Atualize a página.", "error"); return; }
             $ticketId = (int)($data["ticket_id"] ?? 0);
             if ($data['action'] === 'template_save') {
                 $title=mb_substr(trim(strip_tags((string)($data['title']??''))),0,120);$body=trim(strip_tags((string)($data['body']??'')));
                 if(mb_strlen($title)<2||mb_strlen($body)<2){$this->jsonMessage('Informe título e conteúdo da resposta rápida.','warning');return;}
-                $stmt=$pdo->prepare('INSERT INTO studio_support_templates(title,body,created_by) VALUES(?,?,?)');$stmt->execute([$title,$body,$user->id]);
-                \Source\Support\Audit::record('create','studio_support_templates',$pdo->lastInsertId(),[],['title'=>$title]);echo json_encode(['reload'=>true]);return;
+                $ticketService->template($title,$body,(int)$user->id);echo json_encode(['reload'=>true]);return;
             }
             if ($data['action'] === 'template_delete') {
-                $templateId=(int)($data['template_id']??0);$stmt=$pdo->prepare('DELETE FROM studio_support_templates WHERE id=?');$stmt->execute([$templateId]);
-                if(!$stmt->rowCount()){$this->jsonMessage('Resposta rápida não encontrada.','warning');return;}\Source\Support\Audit::record('delete','studio_support_templates',$templateId);echo json_encode(['reload'=>true]);return;
+                $templateId=(int)($data['template_id']??0);if(!$ticketService->deleteTemplate($templateId)){$this->jsonMessage('Resposta rápida não encontrada.','warning');return;}echo json_encode(['reload'=>true]);return;
             }
             if ($data["action"] === "bulk") {
                 $ticketIds = array_values(array_unique(array_filter(array_map('intval', (array)($data['ticket_ids'] ?? [])))));
                 $status = in_array($data['status'] ?? '', ["open", "in_progress", "waiting_customer", "resolved", "closed"], true) ? $data['status'] : null;
                 if (!$ticketIds || !$status) { $this->jsonMessage('Selecione chamados e um status válido.', 'warning'); return; }
-                $placeholders = implode(',', array_fill(0, count($ticketIds), '?'));
-                $stmt = $pdo->prepare("UPDATE studio_support_tickets SET status=?,resolved_at=" . (in_array($status,['resolved','closed'],true) ? 'NOW()' : 'NULL') . " WHERE id IN ({$placeholders})");
-                $stmt->execute(array_merge([$status], $ticketIds));
-                foreach ($ticketIds as $id) { $event=$pdo->prepare("INSERT INTO studio_support_ticket_events(ticket_id,user_id,event_type,new_value) VALUES(?,?,?,?)"); $event->execute([$id,$user->id,'status',$status]); }
-                echo json_encode(['reload'=>true,'affected'=>$stmt->rowCount()]); return;
+                $affected=$ticketService->bulk($ticketIds,$status,(int)$user->id);
+                echo json_encode(['reload'=>true,'affected'=>$affected]); return;
             }
             if ($data["action"] === "update" && $ticketId) {
-                $statuses = ["open", "in_progress", "waiting_customer", "resolved", "closed"];
-                $status = in_array($data["status"] ?? "", $statuses, true) ? $data["status"] : "open";
-                $current=$pdo->prepare("SELECT status,priority,assigned_to,team,category,tags FROM studio_support_tickets WHERE id=:id");$current->execute(['id'=>$ticketId]);$before=$current->fetch();
-                if(!$before){$this->jsonMessage('Chamado não encontrado.','warning');return;}
-                $priority=in_array($data['priority']??$before->priority,['low','medium','high','urgent'],true)?($data['priority']??$before->priority):$before->priority;
-                $stmt = $pdo->prepare("UPDATE studio_support_tickets SET condominium_id=:condo,demand_id=:demand,status=:status,priority=:priority,assigned_to=:assigned,team=:team,category=:category,tags=:tags,resolved_at=:resolved WHERE id=:id");
-                $stmt->execute(["condo"=>(int)($data['condominium_id']??0)?:null,"demand"=>(int)($data['demand_id']??0)?:null,"status" => $status,"priority"=>$priority,"assigned" => ($id = (int)($data["assigned_to"] ?? $before->assigned_to)) ?: null,"team"=>mb_substr(trim(strip_tags((string)($data['team']??$before->team))),0,100),"category"=>mb_substr(trim(strip_tags((string)($data['category']??$before->category))),0,100),"tags"=>mb_substr(trim(strip_tags((string)($data['tags']??$before->tags))),0,500), "resolved" => in_array($status, ["resolved", "closed"], true) ? date("Y-m-d H:i:s") : null, "id" => $ticketId]);
-                foreach(['status','priority','assigned_to','team','category','tags'] as $field){$new=$field==='assigned_to'?(($id=(int)($data['assigned_to']??$before->$field))?:null):($field==='status'?$status:($field==='priority'?$priority:mb_substr(trim(strip_tags((string)($data[$field]??$before->$field))),0,$field==='tags'?500:100)));if((string)$before->$field!==(string)$new){$event=$pdo->prepare("INSERT INTO studio_support_ticket_events(ticket_id,user_id,event_type,old_value,new_value) VALUES(?,?,?,?,?)");$event->execute([$ticketId,$user->id,$field,(string)$before->$field,(string)$new]);}}
+                if(!$ticketService->update($ticketId,$data,(int)$user->id)){$this->jsonMessage('Chamado não encontrado.','warning');return;}
                 echo json_encode(["redirect" => url($this->serviceDeskBase() . "/tickets?ticket=".$ticketId)]); return;
             }
             if ($data["action"] === "reply" && $ticketId) {
-                $reply = trim(strip_tags((string)($data["message"] ?? "")));
-                if (mb_strlen($reply) < 2) { $this->jsonMessage("Escreva uma resposta antes de enviar.", "warning"); return; }
-                $exists = $pdo->prepare("SELECT id FROM studio_support_tickets WHERE id=:id"); $exists->execute(["id" => $ticketId]);
-                if (!$exists->fetch()) { $this->jsonMessage("Chamado não encontrado.", "warning"); return; }
-                $message = $pdo->prepare("INSERT INTO studio_support_ticket_messages(ticket_id,user_id,message,is_internal) VALUES(:ticket,:user,:message,:internal)");
-                $message->execute(["ticket" => $ticketId, "user" => $user->id, "message" => $reply, "internal" => !empty($data["is_internal"]) ? 1 : 0]);
-                $messageId=(int)$pdo->lastInsertId();
-                $timeSpent=max(0,min(86400,(int)($data['time_spent']??0)));$nextStatus=!empty($data['resolve_after'])?'resolved':null;
-                $pdo->prepare("UPDATE studio_support_tickets SET status=".($nextStatus?"'resolved'":"IF(status='open','in_progress',status)").",first_response_at=COALESCE(first_response_at,NOW()),work_seconds=work_seconds+:seconds,resolved_at=".($nextStatus?'NOW()':'resolved_at')." WHERE id=:id")->execute(["seconds"=>$timeSpent,"id" => $ticketId]);
+                try{$messageId=$ticketService->reply($ticketId,(string)($data['message']??''),!empty($data['is_internal']),(int)$user->id,(int)($data['time_spent']??0),!empty($data['resolve_after']));}catch(\InvalidArgumentException $exception){$this->jsonMessage($exception->getMessage(),'warning');return;}
                 $files=$_FILES['attachments']??null;if($files&&!empty($files['tmp_name'])&&is_array($files['tmp_name'])){foreach($files['tmp_name'] as $index=>$temporary){if(!$temporary)continue;$file=['name'=>$files['name'][$index]??'arquivo','type'=>$files['type'][$index]??'','tmp_name'=>$temporary,'error'=>$files['error'][$index]??UPLOAD_ERR_NO_FILE,'size'=>$files['size'][$index]??0];$upload=new Upload();$path=$upload->file($file,'ticket-'.$ticketId.'-'.bin2hex(random_bytes(4)));if(!$path){$this->jsonMessage('Um dos anexos não é válido.','warning');return;}$attachment=$pdo->prepare("INSERT INTO studio_support_ticket_attachments(ticket_id,message_id,user_id,file_path,original_name,mime_type,file_size) VALUES(?,?,?,?,?,?,?)");$attachment->execute([$ticketId,$messageId,$user->id,$path,mb_substr(basename((string)$file['name']),0,255),$file['type']?:null,(int)$file['size']]);}}
                 echo json_encode(["redirect" => url($this->serviceDeskBase() . "/tickets?ticket=" . $ticketId)]); return;
             }
@@ -1413,19 +1395,13 @@ class Studio extends Controller
             $requesterId = ($id = (int)($data["requester_id"] ?? 0)) ?: $user->id;
             if (!(new User())->findById($requesterId)) { $this->jsonMessage("Selecione um solicitante válido.", "warning"); return; }
             try {
-                $pdo->beginTransaction();
-                $stmt = $pdo->prepare("INSERT INTO studio_support_tickets(condominium_id,demand_id,protocol,subject,message,area,priority,requester_id,assigned_to,created_by,due_at) VALUES(:condo,:demand,:protocol,:subject,:message,:area,:priority,:requester,:assigned,:creator,:due_at)");
-                $stmt->execute(["condo"=>(int)($data['condominium_id']??0)?:null,"demand"=>(int)($data['demand_id']??0)?:null,"protocol" => $protocol, "subject" => $subject, "message" => $message, "area" => in_array($data["area"] ?? "", $areas, true) ? $data["area"] : "general", "priority" => $priority, "requester" => $requesterId, "assigned" => $assignedTo, "creator" => $user->id, "due_at" => $dueAt]);
-                $newTicketId = (int)$pdo->lastInsertId();
-                $pdo->commit();
+                $ticket=$ticketService->create($data,(int)$user->id);$newTicketId=(int)$ticket->id;$protocol=$ticket->protocol;$priority=$ticket->priority;$dueAt=$ticket->due_at;$assignedTo=$ticket->assigned_to;$requesterId=(int)$ticket->requester_id;
             } catch (\Throwable $exception) {
-                if ($pdo->inTransaction()) $pdo->rollBack();
                 \Source\Support\AppLogger::exception($exception, "tickets", ["event_type" => "ticket_create_failed", "users_id" => $user->id]);
                 $this->jsonMessage("Não foi possível cadastrar o chamado. Tente novamente.", "error"); return;
             }
             try { $this->notifyTicketOpened($newTicketId, $protocol, $subject, $priority, $dueAt, $assignedTo, $requesterId); }
             catch (\Throwable $exception) { \Source\Support\AppLogger::exception($exception, "tickets", ["event_type" => "ticket_notification_failed", "ticket_id" => $newTicketId]); }
-            \Source\Support\Audit::record("create", "studio_support_tickets", $newTicketId, [], ["protocol" => $protocol, "subject" => $subject, "priority" => $priority, "due_at" => $dueAt]);
             $this->message->success("Chamado {$protocol} cadastrado.")->flash();
             echo json_encode(["redirect" => url($this->serviceDeskBase() . "/tickets")]); return;
         }
