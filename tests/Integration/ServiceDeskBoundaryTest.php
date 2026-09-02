@@ -69,5 +69,7 @@ final class ServiceDeskBoundaryTest extends TestCase
         self::assertStringContainsString('new TicketService(', $operationSource);
         self::assertStringContainsString('new TicketService(', $studioSource);
         self::assertStringNotContainsString('extends \\Source\\Controllers\\Studio\\Studio', $operationSource);
+        $operationLayout=file_get_contents(dirname(__DIR__,2).'/container/apps/operation/default/layouts/studio.php');
+        self::assertStringContainsString("'/operation/tickets','Chamados','headset-outline','operation.tickets.manage'",$operationLayout);
     }
 }
