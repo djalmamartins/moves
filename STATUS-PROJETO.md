@@ -34,7 +34,7 @@ Conclusão estimada ponderada: **58%**
 - TST-001 integrada pelo PR #72.
 - SEC-002 integrada pelo PR #73.
 - BASE-001 e ARC-001 integradas pelas PRs #75 e #76.
-- TST-002 integrada pela PR #77; ARC-002 em desenvolvimento com Agenda compartilhada e workflow de Chamados extraído para serviço independente de views.
+- TST-002 integrada pela PR #77; ARC-002 pronta para revisão na PR #88, com Agenda e Chamados compartilhados por serviços e ACL própria em Studio, Help Desk e Operation.
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
 - Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
@@ -48,6 +48,7 @@ Conclusão estimada ponderada: **58%**
 - BASE-001: 4 testes focados/13 asserções do workflow de visitas aprovados; sintaxe PHP de controllers, views, models e jobs aprovada.
 - ARC-001: 9 testes focados/45 asserções aprovados; Operation não herda Studio nem exige `studio.access`.
 - TST-002: 2 cenários/42 asserções cobrem Usuários, Agenda, Chamados, Condomínios, Demandas e Visitas, incluindo CSRF, filtros, paginação e exclusão/encerramento.
+- ARC-002: suíte global aprovada; regressão focada valida serviços sem views, consumidores explícitos e ausência de herança Studio no controlador operacional.
 - Schema atual: fingerprint compatível em verificação somente leitura.
 - PHPUnit global: a execução agregada ainda é interrompida por testes legados de controllers que encerram o processo; validações focadas permanecem obrigatórias até a correção do runner.
 
@@ -58,10 +59,10 @@ Conclusão estimada ponderada: **58%**
 
 ## Próximas 10 tarefas
 
-1. Concluir ARC-002 — extrair Agenda e Chamados do controller Studio.
+1. Revisar e integrar ARC-002 — PR #88.
 2. ERP-001 — escolher geração ERP.
 3. APP-001 — definir o portal de moradores.
-4. ARC-002 — extrair Help Desk.
+4. AST-001 — pipeline de assets.
 5. ERP-001 — escolher geração ERP.
 6. APP-001 — definir o portal de moradores.
 7. AST-001 — pipeline de assets.
@@ -76,7 +77,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próxima tarefa recomendada
 
-**Concluir ARC-002 removendo o adaptador transitório de Chamados e aplicando ACL própria por ambiente.**
+**Revisar e integrar ARC-002 pela PR #88; depois iniciar ERP-001.**
 
 ## Fontes oficiais
 

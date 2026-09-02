@@ -7,6 +7,7 @@ namespace MovesOSTests\Integration;
 use MovesOSTests\TestCase;
 use ReflectionClass;
 use Source\Controllers\Operation\ServiceDesk;
+use Source\Controllers\Studio\Studio;
 use Source\Services\ServiceDesk\AgendaService;
 use Source\Services\ServiceDesk\TicketService;
 
@@ -64,5 +65,9 @@ final class ServiceDeskBoundaryTest extends TestCase
         self::assertTrue($service->deleteTemplate($templateId));
         $reflection=new ReflectionClass(TicketService::class);self::assertFalse($reflection->hasProperty('view'));self::assertStringNotContainsString('Source\\Core\\View',file_get_contents($reflection->getFileName()));
         self::assertSame('Source\\Core\\Controller',(new ReflectionClass(ServiceDesk::class))->getParentClass()->getName());
+        $operationSource=file_get_contents((new ReflectionClass(ServiceDesk::class))->getFileName());$studioSource=file_get_contents((new ReflectionClass(Studio::class))->getFileName());
+        self::assertStringContainsString('new TicketService(', $operationSource);
+        self::assertStringContainsString('new TicketService(', $studioSource);
+        self::assertStringNotContainsString('extends \\Source\\Controllers\\Studio\\Studio', $operationSource);
     }
 }

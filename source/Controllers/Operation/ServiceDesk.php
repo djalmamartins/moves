@@ -8,6 +8,7 @@ use Source\Models\Auth;
 use Source\Models\User;
 use Source\Services\ServiceDesk\TicketService;
 use Source\Support\Access;
+use Source\Support\Upload;
 
 /** Controlador HTTP exclusivo da fila de chamados do ambiente operacional. */
 final class ServiceDesk extends Controller
@@ -29,7 +30,7 @@ final class ServiceDesk extends Controller
                 if($action==='template_delete'){if(!$service->deleteTemplate((int)($data['template_id']??0)))throw new \InvalidArgumentException('Resposta rápida não encontrada.');echo json_encode(['reload'=>true]);return;}
                 if($action==='bulk'){$affected=$service->bulk((array)($data['ticket_ids']??[]),(string)($data['status']??''),(int)$user->id);echo json_encode(['reload'=>true,'affected'=>$affected]);return;}
                 if($action==='update'){if(!$ticketId||!$service->update($ticketId,$data,(int)$user->id))throw new \InvalidArgumentException('Chamado não encontrado.');echo json_encode(['redirect'=>url('/operation/tickets?ticket='.$ticketId)]);return;}
-                if($action==='reply'){$service->reply($ticketId,(string)($data['message']??''),!empty($data['is_internal']),(int)$user->id,(int)($data['time_spent']??0),!empty($data['resolve_after']));echo json_encode(['redirect'=>url('/operation/tickets?ticket='.$ticketId)]);return;}
+                if($action==='reply'){$messageId=$service->reply($ticketId,(string)($data['message']??''),!empty($data['is_internal']),(int)$user->id,(int)($data['time_spent']??0),!empty($data['resolve_after']));$this->storeAttachments($pdo,$ticketId,$messageId,(int)$user->id);echo json_encode(['redirect'=>url('/operation/tickets?ticket='.$ticketId)]);return;}
                 $requesterId=(int)($data['requester_id']??0)?:(int)$user->id;if(!(new User())->findById($requesterId))throw new \InvalidArgumentException('Selecione um solicitante válido.');$data['requester_id']=$requesterId;$ticket=$service->create($data,(int)$user->id);$this->message->success("Chamado {$ticket->protocol} cadastrado.")->flash();echo json_encode(['redirect'=>url('/operation/tickets')]);return;
             } catch (\InvalidArgumentException $exception) { http_response_code(422); $this->json($exception->getMessage(),'warning'); return; }
         }
@@ -41,4 +42,10 @@ final class ServiceDesk extends Controller
 
     private function user(){ $user=Auth::user();if(!$user||!Access::can('operation.access',$user))redirect('/operation/login');if(!Access::can('operation.tickets.manage',$user))redirect('/operation/ops/403');return $user; }
     private function json(string $message,string $type):void { echo json_encode(['message'=>$this->message->{$type}($message)->render()]); }
+
+    private function storeAttachments(\PDO $pdo,int $ticketId,int $messageId,int $userId):void
+    {
+        $files=$_FILES['attachments']??null;if(!$files||empty($files['tmp_name'])||!is_array($files['tmp_name']))return;
+        foreach($files['tmp_name'] as $index=>$temporary){if(!$temporary)continue;$file=['name'=>$files['name'][$index]??'arquivo','type'=>$files['type'][$index]??'','tmp_name'=>$temporary,'error'=>$files['error'][$index]??UPLOAD_ERR_NO_FILE,'size'=>$files['size'][$index]??0];$upload=new Upload();$path=$upload->file($file,'ticket-'.$ticketId.'-'.bin2hex(random_bytes(4)));if(!$path)throw new \InvalidArgumentException('Um dos anexos não é válido.');$stmt=$pdo->prepare('INSERT INTO studio_support_ticket_attachments(ticket_id,message_id,user_id,file_path,original_name,mime_type,file_size) VALUES(?,?,?,?,?,?,?)');$stmt->execute([$ticketId,$messageId,$userId,$path,mb_substr(basename((string)$file['name']),0,255),$file['type']?:null,(int)$file['size']]);}
+    }
 }
