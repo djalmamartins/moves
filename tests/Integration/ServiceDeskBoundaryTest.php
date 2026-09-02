@@ -7,6 +7,7 @@ namespace MovesOSTests\Integration;
 use MovesOSTests\TestCase;
 use ReflectionClass;
 use Source\Services\ServiceDesk\AgendaService;
+use Source\Services\ServiceDesk\TicketService;
 
 final class ServiceDeskBoundaryTest extends TestCase
 {
@@ -46,5 +47,20 @@ final class ServiceDeskBoundaryTest extends TestCase
             'title' => 'Período inválido', 'starts_at' => '2026-09-12T10:00',
             'ends_at' => '2026-09-12T09:00',
         ], 1);
+    }
+
+    public function testTicketServiceCoversWorkflowWithoutViews(): void
+    {
+        $userId=$this->createUser(['email'=>'ticket-service@test.local']);$service=new TicketService($this->pdo);
+        $ticket=$service->create(['subject'=>'Falha no portão social','message'=>'O motor parou durante o fechamento.','area'=>'technical','priority'=>'urgent','requester_id'=>$userId,'assigned_to'=>$userId],$userId);
+        self::assertSame(12,strlen($ticket->protocol));self::assertSame('urgent',$ticket->priority);
+        self::assertTrue($service->update($ticket->id,['status'=>'in_progress','priority'=>'high','assigned_to'=>$userId,'team'=>'Manutenção','category'=>'Portaria','tags'=>'portão'],$userId));
+        $messageId=$service->reply($ticket->id,'Equipe técnica acionada.',true,$userId,900);self::assertGreaterThan(0,$messageId);
+        $templateId=$service->template('Acionamento técnico','Equipe técnica foi acionada.',$userId);self::assertGreaterThan(0,$templateId);
+        self::assertCount(1,$service->queue(['q'=>'portão social','priority'=>'high']));
+        self::assertSame(1,$service->bulk([$ticket->id],'closed',$userId));
+        self::assertSame('closed',$this->pdo->query("SELECT status FROM studio_support_tickets WHERE id={$ticket->id}")->fetchColumn());
+        self::assertTrue($service->deleteTemplate($templateId));
+        $reflection=new ReflectionClass(TicketService::class);self::assertFalse($reflection->hasProperty('view'));self::assertStringNotContainsString('Source\\Core\\View',file_get_contents($reflection->getFileName()));
     }
 }

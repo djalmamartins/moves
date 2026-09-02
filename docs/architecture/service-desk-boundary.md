@@ -11,5 +11,7 @@ Estado da extração:
 - Operation: já consome `AgendaService` com `operation.agenda.manage`.
 - Studio e Operation: consomem o mesmo `AgendaService`, mantendo respectivamente
   `support.manage` e `operation.agenda.manage` nos controllers.
-- Chamados: extração do workflow pendente; o adaptador Operation ainda é
-  transitório e não deve receber novas funções.
+- `TicketService`: criação, edição, respostas, ações em lote, respostas rápidas
+  e filtros extraídos sem dependência de views.
+- Chamados: migração dos controllers consumidores para `TicketService` pendente;
+  o adaptador Operation ainda é transitório e não deve receber novas funções.

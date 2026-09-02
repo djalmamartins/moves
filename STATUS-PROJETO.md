@@ -34,7 +34,7 @@ Conclusão estimada ponderada: **58%**
 - TST-001 integrada pelo PR #72.
 - SEC-002 integrada pelo PR #73.
 - BASE-001 e ARC-001 integradas pelas PRs #75 e #76.
-- TST-002 integrada pela PR #77; ARC-002 em desenvolvimento com Studio e Operation consumindo a mesma Agenda independente de views.
+- TST-002 integrada pela PR #77; ARC-002 em desenvolvimento com Agenda compartilhada e workflow de Chamados extraído para serviço independente de views.
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
 - Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
