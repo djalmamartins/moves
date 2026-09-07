@@ -45,7 +45,7 @@ Fonte: `AUDITORIA-GERAL.md`. Status inicial: `ABERTO`. Nenhuma tarefa abaixo foi
 - Descrição: criar/editar/filtrar/paginar/excluir com ID 2 em Usuários, Agenda, Chamados, Demandas, Visitas e Condomínios.
 - Dependências: TST-001.
 - Critério de aceite: banco e interface verificados, incluindo CSRF e mensagens.
-- Status: ABERTO
+- Status: CONCLUÍDO — integrado pelo PR #77.
 
 ### ARC-001 — Separar Operation do Studio
 - Módulo: Arquitetura
@@ -88,7 +88,7 @@ Fonte: `AUDITORIA-GERAL.md`. Status inicial: `ABERTO`. Nenhuma tarefa abaixo foi
 - Descrição: E2E de agenda inteligente, check-in, checklist, evidência, ocorrência, assinatura, checkout e PDF.
 - Dependências: TST-002.
 - Critério de aceite: cenário real com ID 2 e dados descartáveis em DB de teste.
-- Status: ABERTO
+- Status: EM REVISÃO — fluxo validado com usuário ID 2 em banco descartável; 5 testes e 25 asserções cobrem ciclo, geofence, checklist, evidência, ocorrência, assinatura, checkout, sincronização e geração de PDF.
 
 ### OPR-002 — Editor completo de checklist
 - Módulo: Operation

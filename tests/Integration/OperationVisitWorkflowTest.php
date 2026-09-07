@@ -11,14 +11,22 @@ use Source\Models\User;
 
 final class OperationVisitWorkflowTest extends TestCase
 {
+    private ?string $signaturePath = null;
+
+    protected function tearDown(): void
+    {
+        if ($this->signaturePath && is_file($this->signaturePath)) {
+            unlink($this->signaturePath);
+        }
+        $_FILES = [];
+        parent::tearDown();
+    }
+
     public function testVisitLifecyclePersistsChecklistOccurrenceAndHistoryWithUserTwo(): void
     {
         $ownerId = $this->createUser([
-            'first_name' => 'Proprietário',
-            'last_name' => 'Principal',
-            'email' => 'owner-operation@test.local',
-            'document' => '52998224725',
-            'level' => 10,
+            'first_name' => 'Proprietário', 'last_name' => 'Principal',
+            'email' => 'owner-operation@test.local', 'document' => '52998224725', 'level' => 10,
         ]);
         self::assertSame(1, $ownerId);
         $operatorId = $this->createUser(['first_name' => 'Mariana', 'last_name' => 'Oliveira', 'level' => 5]);
@@ -85,4 +93,60 @@ final class OperationVisitWorkflowTest extends TestCase
         self::assertSame(1,(int)$this->pdo->query("SELECT COUNT(*) FROM operation_visit_sync_queue WHERE id='{$syncId}'")->fetchColumn());
         self::assertSame(1,(int)$this->pdo->query("SELECT attempts FROM operation_visit_sync_queue WHERE id='{$syncId}'")->fetchColumn());
     }
+
+    public function testEvidenceSignatureCheckoutAndPdfArtifactsRemainLinkedToUserTwo(): void
+    {
+        $ownerId = $this->createUser([
+            'first_name' => 'Proprietário', 'last_name' => 'Principal',
+            'email' => 'owner-visit-flow@test.local', 'document' => '52998224725', 'level' => 10,
+        ]);
+        self::assertSame(1, $ownerId);
+        $operatorId = $this->createUser([
+            'first_name' => 'Mariana', 'last_name' => 'Operadora',
+            'email' => 'operator-visit-flow@test.local', 'document' => '11144477735', 'level' => 2,
+        ]);
+        self::assertSame(2, $operatorId);
+        $this->pdo->prepare("INSERT INTO operation_condominiums(name,address,city,state,latitude,longitude,geofence_radius,status,created_by) VALUES(?,?,?,?,?,?,?,'active',?)")
+            ->execute(['Condomínio Fluxo Real', 'Rua Teste, 100', 'Belo Horizonte', 'MG', -19.9245000, -43.9352000, 100, $operatorId]);
+        $condominiumId = (int)$this->pdo->lastInsertId();
+        $this->pdo->prepare("INSERT INTO operation_visits(condominium_id,title,objective,visit_type,scheduled_at,status,assigned_to,signature_required,created_by) VALUES(?,?,?,'management',NOW(),'scheduled',?,1,?)")
+            ->execute([$condominiumId, 'Visita ponta a ponta', 'Validar o fluxo operacional', $operatorId, $operatorId]);
+        $visitId = (int)$this->pdo->lastInsertId();
+        $this->pdo->prepare("INSERT INTO operation_visit_items(visit_id,title,area,category,priority,result,comment_required_on_failure) VALUES(?,?,'Portaria','Segurança','critical','pending',1)")
+            ->execute([$visitId, 'Portão fechando corretamente?']);
+        $itemId = (int)$this->pdo->lastInsertId();
+
+        $this->pdo->prepare('INSERT INTO operation_visit_evidence(visit_id,visit_item_id,file_path,original_name,mime_type,file_size,caption,created_by) VALUES(?,?,?,?,?,?,?,?)')
+            ->execute([$visitId, $itemId, 'files/operation/evidence-test.pdf', 'evidencia.pdf', 'application/pdf', 512, 'Evidência do motor', $operatorId]);
+
+        $relativeSignature = 'storage/operation/signatures/visit-' . $visitId . '-test.png';
+        $this->signaturePath = dirname(__DIR__, 2) . '/' . $relativeSignature;
+        if (!is_dir(dirname($this->signaturePath))) {
+            mkdir(dirname($this->signaturePath), 0775, true);
+        }
+        file_put_contents($this->signaturePath, str_repeat("\0", 128));
+        $this->pdo->prepare("UPDATE operation_visit_items SET result='nonconforming',notes='Motor exige manutenção',checked_by=?,checked_at=NOW() WHERE id=?")
+            ->execute([$operatorId, $itemId]);
+        $this->pdo->prepare("UPDATE operation_visits SET status='completed',started_at=DATE_SUB(NOW(),INTERVAL 30 MINUTE),completed_at=NOW(),summary=?,checkout_latitude=?,checkout_longitude=?,checkout_accuracy=7,checkout_device='PHPUnit device',signature_name=?,signature_path=? WHERE id=?")
+            ->execute(['Visita concluída com encaminhamento.', -19.9245000, -43.9352000, 'Síndico Teste', $relativeSignature, $visitId]);
+        $this->pdo->prepare("INSERT INTO operation_visit_events(visit_id,event_type,summary,user_id) VALUES(?,'evidence','Evidência adicionada',?),(?,'finish','Visita finalizada',?)")
+            ->execute([$visitId, $operatorId, $visitId, $operatorId]);
+
+        $visit = $this->pdo->query("SELECT * FROM operation_visits WHERE id={$visitId}")->fetch();
+        self::assertSame('completed', $visit->status);
+        self::assertSame('Síndico Teste', $visit->signature_name);
+        self::assertNotEmpty($visit->completed_at);
+        self::assertNotEmpty($visit->checkout_latitude);
+        self::assertFileExists($this->signaturePath);
+        self::assertSame(1, (int)$this->pdo->query("SELECT COUNT(*) FROM operation_visit_evidence WHERE visit_id={$visitId}")->fetchColumn());
+
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->loadHtml('<h1>Relatório da visita ' . $visitId . '</h1><p>' . htmlspecialchars($visit->summary) . '</p>', 'UTF-8');
+        $dompdf->render();
+        $pdf = $dompdf->output();
+        self::assertStringStartsWith('%PDF-', $pdf);
+        self::assertStringContainsString('$route->get("/visitas/{id}/relatorio", "Operation:visitReport")', (string)file_get_contents(dirname(__DIR__, 2) . '/container/apps/operation/default/default.php'));
+        self::assertSame(1, (int)$this->pdo->query('SELECT COUNT(*) FROM users WHERE id=1')->fetchColumn());
+    }
+
 }

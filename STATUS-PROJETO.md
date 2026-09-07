@@ -38,7 +38,7 @@ Conclusão estimada ponderada: **58%**
 - ERP-001 em desenvolvimento para oficializar `Erp/Connect` e congelar `Erp/V1`.
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
-- Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
+- OPR-001 em revisão: workflow de visitas validado ponta a ponta em banco automatizado isolado com usuário ID 2, sem alterar o usuário principal.
 
 ## Validação atual
 
@@ -46,7 +46,8 @@ Conclusão estimada ponderada: **58%**
 - SEC-001: integrada após CI verde; migration validada com IDs descartáveis 1 e 2.
 - TST-001: integrada após 24 rotas autenticadas retornarem HTTP 200.
 - SEC-002: integrada após CI verde no PR #73.
-- BASE-001: 4 testes focados/13 asserções do workflow de visitas aprovados; sintaxe PHP de controllers, views, models e jobs aprovada.
+- BASE-001: fundação do workflow operacional integrada; a cobertura evoluiu em OPR-001 para 5 testes e 25 asserções.
+- OPR-001: agenda/vínculos, geofence, checklist, ocorrência, evidência, assinatura, checkout, idempotência offline e artefato PDF validados em banco descartável com ID 2.
 - ARC-001: 9 testes focados/45 asserções aprovados; Operation não herda Studio nem exige `studio.access`.
 - TST-002: 2 cenários/42 asserções cobrem Usuários, Agenda, Chamados, Condomínios, Demandas e Visitas, incluindo CSRF, filtros, paginação e exclusão/encerramento.
 - ARC-002: suíte global aprovada; regressão focada valida serviços sem views, consumidores explícitos e ausência de herança Studio no controlador operacional.
