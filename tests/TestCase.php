@@ -55,7 +55,7 @@ abstract class TestCase extends PHPUnitTestCase
                 $this->pdo->exec("TRUNCATE TABLE {$table}");
             }
         }
-        foreach (['password_reset_tokens','studio_support_ticket_attachments','studio_support_ticket_events','studio_support_templates','studio_support_ticket_messages','studio_support_tickets','studio_calendar_events','movesos_versions','notifications','notification_messages','notifications_categories','mail_queue','support_articles','support_categories','faq_questions','faq_channels','posts','pages','categories','access_user_overrides','access_user_roles','access_role_permissions','access_permissions','access_roles','system_audit_logs','app_log','users'] as $table) {
+        foreach (['erp_payments','erp_bank_transactions','erp_financial_entries','app_wallets','app_condominium','password_reset_tokens','studio_support_ticket_attachments','studio_support_ticket_events','studio_support_templates','studio_support_ticket_messages','studio_support_tickets','studio_calendar_events','movesos_versions','notifications','notification_messages','notifications_categories','mail_queue','support_articles','support_categories','faq_questions','faq_channels','posts','pages','categories','access_user_overrides','access_user_roles','access_role_permissions','access_permissions','access_roles','system_audit_logs','app_log','users'] as $table) {
             $this->pdo->exec("TRUNCATE TABLE {$table}");
         }
         $this->pdo->exec('SET FOREIGN_KEY_CHECKS=1');

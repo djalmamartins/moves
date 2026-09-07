@@ -31,6 +31,16 @@ ou telas conectadas. A tela de listagem de cobranças ainda exibe linhas estáti
 5. Migrar dados legados apenas em tarefa explícita, com backup e reconciliação;
    nenhum DDL/DML deve ser aplicado diretamente em `moves_db`.
 
+## Implementado no primeiro corte
+
+- `FinancialService` cria lançamentos canônicos por condomínio.
+- Pagamentos parciais e integrais atualizam `paid_amount` e o status de modo
+  atômico, recusando pagamentos acima do saldo.
+- Conciliação bloqueia a transação bancária, gera o pagamento e registra
+  `matched_entry_id` na mesma transação de banco.
+- Totais de receber, pagar, recebido e pago são calculados por condomínio.
+- Testes usam exclusivamente o banco descartável e o escopo de condomínio ID 2.
+
 ## Regras mínimas de consistência
 
 - Escopo obrigatório por `condominium_id` em toda consulta e mutação.
