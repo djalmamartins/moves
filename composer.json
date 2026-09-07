@@ -22,11 +22,7 @@
       "source/Boot/Config.php",
       "source/Boot/Helpers.php",
       "source/Boot/Connection.php",
-      "source/Boot/Settings.php",
-      "source/Services/Minify/Web.php",
-      "source/Services/Minify/App.php",
-      "source/Services/Minify/Erp.php",
-      "source/Services/Minify/Studio.php"
+      "source/Boot/Settings.php"
     ]
   },
   "autoload-dev": {
@@ -53,7 +49,9 @@
     "phpunit/phpunit": "^11.5"
   },
   "scripts": {
-    "build:studio": "@php service/commands/build-studio-assets.php",
+    "assets:build": "@php service/commands/build-assets.php all",
+    "assets:check": "@php service/commands/build-assets.php all --check",
+    "build:studio": "@php service/commands/build-assets.php studio",
     "operation:tick": "@php service/jobs/operation-tick.php",
     "db:status": "@php service/commands/database-migrate.php status",
     "db:migrate": "@php service/commands/database-migrate.php apply",

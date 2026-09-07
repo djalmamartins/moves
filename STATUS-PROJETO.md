@@ -1,7 +1,7 @@
 # STATUS GERAL
 
 Versão atual: `VERSION_STUDIO` do ambiente / base `7857bac`
-Branch ativa: `codex/ERP-001-official-generation`
+Branch ativa: `codex/AST-001-assets-pipeline`
 Última auditoria: 01/09/2026
 
 ## Progresso geral
@@ -35,7 +35,7 @@ Conclusão estimada ponderada: **58%**
 - SEC-002 integrada pelo PR #73.
 - BASE-001 e ARC-001 integradas pelas PRs #75 e #76.
 - TST-002 integrada pela PR #77; ARC-002 integrada pela PR #88 com Agenda e Chamados compartilhados por serviços e ACL própria em Studio, Help Desk e Operation.
-- ERP-001 em desenvolvimento para oficializar `Erp/Connect` e congelar `Erp/V1`.
+- ERP-001 integrada; ERP-002, ERP-003 e APP-001 aguardam revisão; AST-001 em implementação.
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
 - Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
@@ -50,6 +50,7 @@ Conclusão estimada ponderada: **58%**
 - ARC-001: 9 testes focados/45 asserções aprovados; Operation não herda Studio nem exige `studio.access`.
 - TST-002: 2 cenários/42 asserções cobrem Usuários, Agenda, Chamados, Condomínios, Demandas e Visitas, incluindo CSRF, filtros, paginação e exclusão/encerramento.
 - ARC-002: suíte global aprovada; regressão focada valida serviços sem views, consumidores explícitos e ausência de herança Studio no controlador operacional.
+- AST-001: build único dos quatro temas, modo CI e repetição determinística aprovados em 2 testes/8 asserções.
 - Schema atual: fingerprint compatível em verificação somente leitura.
 - PHPUnit global: a execução agregada ainda é interrompida por testes legados de controllers que encerram o processo; validações focadas permanecem obrigatórias até a correção do runner.
 
@@ -60,9 +61,9 @@ Conclusão estimada ponderada: **58%**
 
 ## Próximas 10 tarefas
 
-1. Concluir ERP-001 — oficializar `Erp/Connect`.
-2. ERP-002 — concluir financeiro.
-3. APP-001 — definir o portal de moradores.
+1. Revisar e integrar as PRs #90, #91 e #92.
+2. AST-001 — validar pipeline único de assets na CI.
+3. EDT-001 — consolidar Organic Editor.
 4. AST-001 — pipeline de assets.
 5. ERP-001 — escolher geração ERP.
 6. APP-001 — definir o portal de moradores.
@@ -78,7 +79,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próxima tarefa recomendada
 
-**Concluir ERP-001 documentando a árvore oficial e as lacunas de rotas Connect.**
+**Validar o pipeline único de assets na CI e preparar a AST-001 para revisão.**
 
 ## Fontes oficiais
 
