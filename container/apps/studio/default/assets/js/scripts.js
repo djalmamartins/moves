@@ -137,6 +137,9 @@ $(function () {
                 }
             },
             success: function (response) {
+                if (response.redirect || response.reload) {
+                    form.get(0)?.dispatchEvent(new CustomEvent("moves:form-saved", {detail: response}));
+                }
                 //redirect
                 if (response.redirect) {
                     window.location.href = response.redirect;
