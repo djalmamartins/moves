@@ -1,0 +1,17 @@
+const root = document.documentElement;
+const toast = document.querySelector('[data-toast]');
+const say = message => { toast.textContent = message; toast.classList.add('show'); clearTimeout(say.timer); say.timer = setTimeout(() => toast.classList.remove('show'), 2600); };
+document.querySelector('[data-theme]').addEventListener('click', event => { const dark = root.dataset.theme !== 'dark'; root.dataset.theme = dark ? 'dark' : 'light'; event.currentTarget.setAttribute('aria-pressed', String(dark)); event.currentTarget.setAttribute('aria-label', dark ? 'Ativar tema claro' : 'Ativar tema escuro'); });
+document.querySelectorAll('[data-menu]').forEach(button => button.addEventListener('click', () => { const open = document.body.classList.toggle('menu-open'); document.querySelector('.menu').setAttribute('aria-expanded', String(open)); }));
+document.querySelector('[data-dialog-open]').addEventListener('click', () => document.querySelector('[data-dialog]').showModal());
+document.querySelector('[data-dialog]').addEventListener('close', event => { if (event.target.returnValue === 'default') say('Compromisso adicionado à agenda.'); });
+document.querySelectorAll('[data-day]').forEach(button => button.addEventListener('click', () => say(Number(button.dataset.day) > 0 ? 'Agenda do próximo dia.' : 'Agenda do dia anterior.')));
+document.querySelector('[data-today]').addEventListener('click', () => say('Você já está visualizando hoje.'));
+const tasks = {pending:['Comprar propostas de portão','Cobrar orçamento SPDA','Revisar contrato de limpeza','Preparar relatório mensal','Verificar documentos'],waiting:['Retorno da administradora','Laudo do fornecedor','Aprovação do conselho'],done:['Planejamento do dia','Contato com portaria']};
+const renderTasks = type => { const list=document.querySelector('[data-task-list]'); list.innerHTML=tasks[type].map((item,index)=>`<label class="task"><input type="checkbox" value="${item}"><span><strong>${item}</strong><small>${index%2?'Residencial Central':'Condomínio Solar'}</small></span><em>${20+index*5} min</em></label>`).join(''); };
+document.querySelectorAll('[data-task-tab]').forEach(tab => tab.addEventListener('click', () => { document.querySelectorAll('[data-task-tab]').forEach(item=>item.setAttribute('aria-selected','false')); tab.setAttribute('aria-selected','true'); renderTasks(tab.dataset.taskTab); }));
+document.querySelector('[data-schedule]').addEventListener('click', () => { const count=document.querySelectorAll('[data-task-list] input:checked').length; say(count ? `${count} tarefa(s) selecionada(s) para agendar.` : 'Selecione ao menos uma tarefa.'); });
+document.querySelectorAll('[data-event]').forEach(event => event.addEventListener('click', () => { document.querySelector('[data-detail-title]').textContent=event.dataset.event; document.querySelector('.detail').hidden=false; }));
+document.querySelector('[data-close]').addEventListener('click', () => document.querySelector('.detail').hidden=true);
+document.querySelector('[data-start]').addEventListener('click', event => { event.currentTarget.textContent='✓ Visita em andamento'; event.currentTarget.disabled=true; say('Visita iniciada às 09:00.'); });
+renderTasks('pending');

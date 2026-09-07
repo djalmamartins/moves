@@ -14,6 +14,12 @@ Este diretório é o ambiente isolado de validação visual da primeira entrega.
 
 Abra `default/foundations.html` diretamente no navegador para revisar os tokens em temas claro e escuro.
 
+## Fluxos em validação
+
+- `default/meu-dia.html`: dashboard diário operacional responsivo. Permite
+  alternar tema, navegar entre dias, selecionar tarefas, abrir compromissos,
+  iniciar uma visita e experimentar o formulário de agendamento sem backend.
+
 ## Regra de adoção
 
 Esta entrega permanece restrita a `/prototype`. A integração com layouts de produção só pode ocorrer depois do gate de revisão visual e funcional da Epic #78.
