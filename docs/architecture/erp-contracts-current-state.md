@@ -56,3 +56,5 @@ de conectar a interface.
 - Aprovação integral ativa o contrato e rejeição preserva nota e data da decisão.
 - Rotas `/erp/contracts` e `/erp/contracts/{id}` usam exclusivamente
   `Erp/Connect`, com criação, documentos, submissão e decisão protegidos por CSRF.
+- A submissão aceita somente usuários ativos existentes; a própria atribuição da
+  etapa concede o escopo de decisão, sempre combinado ao condomínio da sessão.

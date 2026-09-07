@@ -20,7 +20,7 @@ final class ContractApprovalService
 
     public function submit(int $condominiumId, int $contractId, array $approverIds): void
     {
-        $approverIds=array_values(array_filter(array_map('intval',$approverIds),fn($id)=>$id>0));if(!$approverIds)throw new \InvalidArgumentException('Informe ao menos um aprovador.');$this->pdo->beginTransaction();try{$contract=$this->contract($condominiumId,$contractId,true);if($contract->status!=='draft')throw new \InvalidArgumentException('Somente contratos em rascunho podem ser enviados.');$stmt=$this->pdo->prepare("INSERT INTO erp_approval_steps(entity_type,entity_id,condominium_id,sequence_no,approver_id,status) VALUES('contract',:entity,:condo,:sequence,:approver,'pending')");foreach($approverIds as $index=>$approver)$stmt->execute(['entity'=>$contractId,'condo'=>$condominiumId,'sequence'=>$index+1,'approver'=>$approver]);$this->pdo->prepare("UPDATE erp_contracts SET status='pending_approval' WHERE id=:id AND condominium_id=:condo")->execute(['id'=>$contractId,'condo'=>$condominiumId]);$this->pdo->commit();}catch(\Throwable $e){if($this->pdo->inTransaction())$this->pdo->rollBack();throw$e;}
+        $approverIds=array_values(array_unique(array_filter(array_map('intval',$approverIds),fn($id)=>$id>0)));if(!$approverIds)throw new \InvalidArgumentException('Informe ao menos um aprovador.');$this->validateApprovers($approverIds);$this->pdo->beginTransaction();try{$contract=$this->contract($condominiumId,$contractId,true);if($contract->status!=='draft')throw new \InvalidArgumentException('Somente contratos em rascunho podem ser enviados.');$stmt=$this->pdo->prepare("INSERT INTO erp_approval_steps(entity_type,entity_id,condominium_id,sequence_no,approver_id,status) VALUES('contract',:entity,:condo,:sequence,:approver,'pending')");foreach($approverIds as $index=>$approver)$stmt->execute(['entity'=>$contractId,'condo'=>$condominiumId,'sequence'=>$index+1,'approver'=>$approver]);$this->pdo->prepare("UPDATE erp_contracts SET status='pending_approval' WHERE id=:id AND condominium_id=:condo")->execute(['id'=>$contractId,'condo'=>$condominiumId]);$this->pdo->commit();}catch(\Throwable $e){if($this->pdo->inTransaction())$this->pdo->rollBack();throw$e;}
     }
 
     public function decide(int $condominiumId, int $contractId, int $approverId, string $decision, string $note=''): void
@@ -46,6 +46,16 @@ final class ContractApprovalService
     public function approvalSteps(int $condominiumId, int $contractId): array
     {
         $this->contract($condominiumId,$contractId);$stmt=$this->pdo->prepare("SELECT * FROM erp_approval_steps WHERE condominium_id=:condo AND entity_type='contract' AND entity_id=:entity ORDER BY sequence_no");$stmt->execute(['condo'=>$condominiumId,'entity'=>$contractId]);return$stmt->fetchAll()?:[];
+    }
+
+    public function approvers(): array
+    {
+        return $this->pdo->query("SELECT id,first_name,last_name FROM users WHERE status='confirmed' ORDER BY first_name,last_name LIMIT 200")->fetchAll()?:[];
+    }
+
+    private function validateApprovers(array $approverIds): void
+    {
+        $marks=implode(',',array_fill(0,count($approverIds),'?'));$stmt=$this->pdo->prepare("SELECT COUNT(*) FROM users WHERE status='confirmed' AND id IN ({$marks})");$stmt->execute($approverIds);if((int)$stmt->fetchColumn()!==count($approverIds))throw new \InvalidArgumentException('Um ou mais aprovadores estão inativos ou não existem.');
     }
 
     private function date(string $date): string { $parsed=\DateTimeImmutable::createFromFormat('!Y-m-d',$date);if(!$parsed||$parsed->format('Y-m-d')!==$date)throw new \InvalidArgumentException('Data inválida.');return$date; }
