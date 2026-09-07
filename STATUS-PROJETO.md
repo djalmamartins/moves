@@ -35,7 +35,7 @@ Conclusão estimada ponderada: **58%**
 - SEC-002 integrada pelo PR #73.
 - BASE-001 e ARC-001 integradas pelas PRs #75 e #76.
 - TST-002 integrada pela PR #77; ARC-002 integrada pela PR #88 com Agenda e Chamados compartilhados por serviços e ACL própria em Studio, Help Desk e Operation.
-- ERP-001 integrada pela PR #89; ERP-002 em implementação na PR #90, com CRUD, pagamentos, conciliação, totais e dashboard canônicos.
+- ERP-001 integrada pela PR #89; ERP-002 aguarda revisão na PR #90, com CRUD, pagamentos, conciliação, totais e dashboard canônicos.
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
 - Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
@@ -61,7 +61,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próximas 10 tarefas
 
-1. ERP-002 — validar interface financeira autenticada e preparar a PR #90 para revisão.
+1. ERP-002 — revisar e integrar a PR #90.
 2. ERP-003 — contratos, documentos e aprovações.
 3. APP-001 — definir o portal de moradores.
 4. AST-001 — pipeline de assets.
@@ -79,7 +79,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próxima tarefa recomendada
 
-**Validar manualmente a interface financeira autenticada e preparar a PR #90 para revisão.**
+**Revisar e integrar a PR #90; depois iniciar a ERP-003.**
 
 ## Fontes oficiais
 
