@@ -34,6 +34,8 @@ ou telas conectadas. A tela de listagem de cobranças ainda exibe linhas estáti
 ## Implementado no primeiro corte
 
 - `FinancialService` cria lançamentos canônicos por condomínio.
+- Consulta, filtros, edição sem pagamentos e cancelamento são sempre limitados
+  ao condomínio ativo.
 - Pagamentos parciais e integrais atualizam `paid_amount` e o status de modo
   atômico, recusando pagamentos acima do saldo.
 - Conciliação bloqueia a transação bancária, gera o pagamento e registra

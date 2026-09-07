@@ -22,6 +22,17 @@ final class FinancialService
         $this->pdo->beginTransaction();try{$id=$this->applyPayment($condominiumId,$entryId,$this->money($amount),$data,$userId);$this->pdo->commit();return$id;}catch(\Throwable $e){if($this->pdo->inTransaction())$this->pdo->rollBack();throw$e;}
     }
 
+    public function updateEntry(int $condominiumId,int $entryId,array $data): bool
+    {
+        $description=mb_substr(trim(strip_tags((string)($data['description']??''))),0,220);$type=(string)($data['type']??'');$amount=$this->money((string)($data['amount']??''));$competency=$this->date((string)($data['competency']??''));$due=$this->date((string)($data['due_at']??''));if(mb_strlen($description)<3||!in_array($type,['receivable','payable'],true)||$amount<=0)throw new \InvalidArgumentException('Informe tipo, descrição, competência, vencimento e valor válidos.');
+        $stmt=$this->pdo->prepare("UPDATE erp_financial_entries SET unit_id=:unit,supplier_id=:supplier,wallet_id=:wallet,category_id=:category,type=:type,description=:description,document_number=:document,competency=:competency,due_at=:due,amount=:amount WHERE id=:id AND condominium_id=:condo AND paid_amount=0 AND status NOT IN ('paid','cancelled')");$stmt->execute(['unit'=>(int)($data['unit_id']??0)?:null,'supplier'=>(int)($data['supplier_id']??0)?:null,'wallet'=>(int)($data['wallet_id']??0)?:null,'category'=>(int)($data['category_id']??0)?:null,'type'=>$type,'description'=>$description,'document'=>mb_substr(trim((string)($data['document_number']??'')),0,80)?:null,'competency'=>$competency,'due'=>$due,'amount'=>$this->decimal($amount),'id'=>$entryId,'condo'=>$condominiumId]);return(bool)$stmt->rowCount();
+    }
+
+    public function entries(int $condominiumId,array $filters=[]): array
+    {
+        $terms=['condominium_id=:condo'];$params=['condo'=>$condominiumId];$type=(string)($filters['type']??'');$status=(string)($filters['status']??'');$search=trim(strip_tags((string)($filters['q']??'')));if(in_array($type,['receivable','payable'],true)){$terms[]='type=:type';$params['type']=$type;}if(in_array($status,['draft','pending_approval','approved','open','partial','paid','overdue','cancelled'],true)){$terms[]='status=:status';$params['status']=$status;}if($search!==''){$terms[]='(description LIKE :q OR document_number LIKE :q)';$params['q']="%{$search}%";}$stmt=$this->pdo->prepare('SELECT * FROM erp_financial_entries WHERE '.implode(' AND ',$terms).' ORDER BY due_at,id DESC LIMIT 200');$stmt->execute($params);return$stmt->fetchAll()?:[];
+    }
+
     public function cancel(int $condominiumId,int $entryId): bool
     {
         $stmt=$this->pdo->prepare("UPDATE erp_financial_entries SET status='cancelled' WHERE id=:id AND condominium_id=:condo AND paid_amount=0 AND status NOT IN ('paid','cancelled')");$stmt->execute(['id'=>$entryId,'condo'=>$condominiumId]);return(bool)$stmt->rowCount();

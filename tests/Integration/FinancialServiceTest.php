@@ -26,6 +26,11 @@ final class FinancialServiceTest extends TestCase
         $this->seedScope();$service=new FinancialService($this->pdo);$entry=$service->createEntry(['condominium_id'=>2,'type'=>'payable','description'=>'Conta de energia','competency'=>'2026-09-01','due_at'=>'2026-09-20','amount'=>'20.00'],2);try{$service->pay(2,$entry,'20.01',[],2);self::fail('Pagamento excedente deveria falhar.');}catch(\InvalidArgumentException){}self::assertSame('0.00',$this->entry($entry)->paid_amount);$service->pay(2,$entry,'20.00',[],2);self::assertFalse($service->cancel(2,$entry));
     }
 
+    public function testEntryCrudIsFilteredAndScopedByCondominium(): void
+    {
+        $this->seedScope();$service=new FinancialService($this->pdo);$entry=$service->createEntry(['condominium_id'=>2,'type'=>'payable','description'=>'Água setembro','document_number'=>'AG-09','competency'=>'2026-09-01','due_at'=>'2026-09-12','amount'=>'45.00'],2);self::assertCount(1,$service->entries(2,['type'=>'payable','q'=>'AG-09']));self::assertCount(0,$service->entries(3));self::assertTrue($service->updateEntry(2,$entry,['type'=>'payable','description'=>'Água setembro ajustada','document_number'=>'AG-09','competency'=>'2026-09-01','due_at'=>'2026-09-13','amount'=>'47.50']));self::assertSame('47.50',$this->entry($entry)->amount);self::assertTrue($service->cancel(2,$entry));self::assertSame('cancelled',$this->entry($entry)->status);
+    }
+
     private function seedScope():void { $this->pdo->exec("INSERT INTO app_condominium(id,condominium_name,status) VALUES(2,'Condomínio Teste','active') ON DUPLICATE KEY UPDATE condominium_name=VALUES(condominium_name)");$this->pdo->exec("INSERT INTO app_wallets(id,condominium_id,wallet,balance,status) VALUES(2,2,'Conta teste',0,'active') ON DUPLICATE KEY UPDATE wallet=VALUES(wallet)"); }
     private function entry(int $id):object { return$this->pdo->query("SELECT * FROM erp_financial_entries WHERE id={$id}")->fetch(); }
 }
