@@ -47,3 +47,10 @@ de conectar a interface.
 3. Cobrir isolamento, ordem, aprovação integral e rejeição.
 4. Registrar rotas e telas em `Erp/Connect`.
 5. Validar a interface autenticada e preparar a PR para revisão.
+
+## Primeiro corte implementado
+
+- Migration idempotente rastreia contratos, documentos e etapas ordenadas.
+- Serviço cria contratos e documentos sempre no escopo do condomínio.
+- Envio e decisão são transacionais; a ordem dos aprovadores é obrigatória.
+- Aprovação integral ativa o contrato e rejeição preserva nota e data da decisão.
