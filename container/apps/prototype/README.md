@@ -8,12 +8,15 @@ Este diretório é o ambiente isolado de validação visual da primeira entrega.
 - Fonte de verdade: `default/assets/tokens.css`.
 - Catálogo de foundations: `default/foundations.html`.
 - Catálogo navegável de componentes e estados: `default/components.html`.
+- Dashboard Geral responsivo: `default/dashboard.html`.
 - Componentes consomem aliases semânticos (`--ms-color-primary`, `--ms-color-surface`, `--ms-color-text`) em vez da paleta bruta.
 - Escala espacial baseada em 4 px.
 - Tema escuro é aplicado por `html[data-theme="dark"]`.
 - Movimento reduzido respeita `prefers-reduced-motion`.
 
 Abra `default/foundations.html` para revisar os tokens ou `default/components.html` para testar componentes, estados, navegação por teclado, modal e feedback em temas claro e escuro.
+
+O `default/dashboard.html` demonstra a visão consolidada da carteira, filtro de escopo, KPIs, próxima visita, saúde, módulos, pendências e agenda. Seus controles atualizam o contexto e fornecem feedback sem depender do backend.
 
 ## Regra de adoção
 
