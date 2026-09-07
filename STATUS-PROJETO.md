@@ -50,7 +50,7 @@ Conclusão estimada ponderada: **58%**
 - ARC-001: 9 testes focados/45 asserções aprovados; Operation não herda Studio nem exige `studio.access`.
 - TST-002: 2 cenários/42 asserções cobrem Usuários, Agenda, Chamados, Condomínios, Demandas e Visitas, incluindo CSRF, filtros, paginação e exclusão/encerramento.
 - ARC-002: suíte global aprovada; regressão focada valida serviços sem views, consumidores explícitos e ausência de herança Studio no controlador operacional.
-- ERP-002: 7 testes focados/29 asserções e suíte PHPUnit global aprovados; dashboard financeiro não consulta mais `app_invoices`.
+- ERP-002: 8 testes focados/35 asserções e suíte PHPUnit global aprovados; dashboard financeiro não consulta mais `app_invoices` e a conciliação valida escopo e natureza da transação.
 - Schema atual: fingerprint compatível em verificação somente leitura.
 - PHPUnit global: a execução agregada ainda é interrompida por testes legados de controllers que encerram o processo; validações focadas permanecem obrigatórias até a correção do runner.
 
@@ -61,7 +61,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próximas 10 tarefas
 
-1. ERP-002 — concluir interface de conciliação e revisão da PR #90.
+1. ERP-002 — validar interface financeira autenticada e preparar a PR #90 para revisão.
 2. ERP-003 — contratos, documentos e aprovações.
 3. APP-001 — definir o portal de moradores.
 4. AST-001 — pipeline de assets.
@@ -79,7 +79,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próxima tarefa recomendada
 
-**Concluir a interface de conciliação bancária da ERP-002 e preparar a PR #90 para revisão.**
+**Validar manualmente a interface financeira autenticada e preparar a PR #90 para revisão.**
 
 ## Fontes oficiais
 

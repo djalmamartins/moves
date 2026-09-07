@@ -40,7 +40,22 @@ final class FinancialService
 
     public function reconcile(int $condominiumId,int $transactionId,int $entryId,int $userId): int
     {
-        $this->pdo->beginTransaction();try{$stmt=$this->pdo->prepare("SELECT * FROM erp_bank_transactions WHERE id=:id AND condominium_id=:condo AND reconciliation_status='pending' FOR UPDATE");$stmt->execute(['id'=>$transactionId,'condo'=>$condominiumId]);$transaction=$stmt->fetch();if(!$transaction)throw new \InvalidArgumentException('Transação bancária indisponível para conciliação.');$payment=$this->applyPayment($condominiumId,$entryId,$this->money(ltrim((string)$transaction->amount,'-')),['wallet_id'=>$transaction->wallet_id,'paid_at'=>$transaction->occurred_at,'method'=>'bank_reconciliation','reference'=>$transaction->external_id],$userId);$this->pdo->prepare("UPDATE erp_bank_transactions SET reconciliation_status='matched',matched_entry_id=:entry WHERE id=:id")->execute(['entry'=>$entryId,'id'=>$transactionId]);$this->pdo->commit();return$payment;}catch(\Throwable $e){if($this->pdo->inTransaction())$this->pdo->rollBack();throw$e;}
+        $this->pdo->beginTransaction();try{$stmt=$this->pdo->prepare("SELECT * FROM erp_bank_transactions WHERE id=:id AND condominium_id=:condo AND reconciliation_status='pending' FOR UPDATE");$stmt->execute(['id'=>$transactionId,'condo'=>$condominiumId]);$transaction=$stmt->fetch();if(!$transaction)throw new \InvalidArgumentException('Transação bancária indisponível para conciliação.');$entry=$this->entryForUpdate($condominiumId,$entryId);$expectedType=((float)$transaction->amount)<0?'payable':'receivable';if($entry->type!==$expectedType)throw new \InvalidArgumentException('A natureza da transação não corresponde ao lançamento.');$payment=$this->applyPayment($condominiumId,$entryId,$this->money(ltrim((string)$transaction->amount,'-')),['wallet_id'=>$transaction->wallet_id,'paid_at'=>$transaction->occurred_at,'method'=>'bank_reconciliation','reference'=>$transaction->external_id],$userId);$this->pdo->prepare("UPDATE erp_bank_transactions SET reconciliation_status='matched',matched_entry_id=:entry WHERE id=:id AND condominium_id=:condo")->execute(['entry'=>$entryId,'id'=>$transactionId,'condo'=>$condominiumId]);$this->pdo->commit();return$payment;}catch(\Throwable $e){if($this->pdo->inTransaction())$this->pdo->rollBack();throw$e;}
+    }
+
+    public function bankTransactions(int $condominiumId, string $status = 'pending'): array
+    {
+        $status = in_array($status, ['pending','matched','ignored'], true) ? $status : 'pending';
+        $stmt = $this->pdo->prepare('SELECT * FROM erp_bank_transactions WHERE condominium_id=:condo AND reconciliation_status=:status ORDER BY occurred_at DESC,id DESC LIMIT 200');
+        $stmt->execute(['condo' => $condominiumId, 'status' => $status]);
+        return $stmt->fetchAll() ?: [];
+    }
+
+    public function ignoreTransaction(int $condominiumId, int $transactionId): bool
+    {
+        $stmt = $this->pdo->prepare("UPDATE erp_bank_transactions SET reconciliation_status='ignored' WHERE id=:id AND condominium_id=:condo AND reconciliation_status='pending'");
+        $stmt->execute(['id' => $transactionId, 'condo' => $condominiumId]);
+        return (bool)$stmt->rowCount();
     }
 
     public function totals(int $condominiumId): array
@@ -66,6 +81,15 @@ final class FinancialService
     private function applyPayment(int $condominiumId,int $entryId,int $amount,array $data,int $userId): int
     {
         if($amount<=0)throw new \InvalidArgumentException('O pagamento deve ser maior que zero.');$stmt=$this->pdo->prepare("SELECT * FROM erp_financial_entries WHERE id=:id AND condominium_id=:condo AND status NOT IN ('cancelled','paid') FOR UPDATE");$stmt->execute(['id'=>$entryId,'condo'=>$condominiumId]);$entry=$stmt->fetch();if(!$entry)throw new \InvalidArgumentException('Lançamento não encontrado ou já encerrado.');$remaining=$this->money((string)$entry->amount)-$this->money((string)$entry->paid_amount);if($amount>$remaining)throw new \InvalidArgumentException('Pagamento maior que o saldo do lançamento.');$stmt=$this->pdo->prepare('INSERT INTO erp_payments(entry_id,wallet_id,amount,paid_at,method,reference,created_by) VALUES(:entry,:wallet,:amount,:paid,:method,:reference,:user)');$stmt->execute(['entry'=>$entryId,'wallet'=>(int)($data['wallet_id']??0)?:null,'amount'=>$this->decimal($amount),'paid'=>$data['paid_at']??date('Y-m-d H:i:s'),'method'=>mb_substr((string)($data['method']??'transfer'),0,30),'reference'=>mb_substr((string)($data['reference']??''),0,120)?:null,'user'=>$userId]);$paymentId=(int)$this->pdo->lastInsertId();$newPaid=$this->money((string)$entry->paid_amount)+$amount;$status=$newPaid===$this->money((string)$entry->amount)?'paid':'partial';$this->pdo->prepare('UPDATE erp_financial_entries SET paid_amount=:paid,status=:status WHERE id=:id')->execute(['paid'=>$this->decimal($newPaid),'status'=>$status,'id'=>$entryId]);return$paymentId;
+    }
+
+    private function entryForUpdate(int $condominiumId, int $entryId): object
+    {
+        $stmt=$this->pdo->prepare("SELECT * FROM erp_financial_entries WHERE id=:id AND condominium_id=:condo AND status NOT IN ('cancelled','paid') FOR UPDATE");
+        $stmt->execute(['id'=>$entryId,'condo'=>$condominiumId]);
+        $entry=$stmt->fetch();
+        if(!$entry)throw new \InvalidArgumentException('Lançamento não encontrado ou já encerrado.');
+        return $entry;
     }
 
     private function date(string $date): string { $parsed=\DateTimeImmutable::createFromFormat('!Y-m-d',$date);if(!$parsed||$parsed->format('Y-m-d')!==$date)throw new \InvalidArgumentException('Data financeira inválida.');return$date; }

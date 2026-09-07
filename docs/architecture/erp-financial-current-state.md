@@ -46,6 +46,8 @@ ou telas conectadas. A tela de listagem de cobranças ainda exibe linhas estáti
   e renderizam dados canônicos, sem as linhas demonstrativas da tela antiga.
 - A rota `/erp/finance/home` agora usa totais e pendências do núcleo canônico;
   o dashboard deixou de depender do legado durante a execução.
+- A tela de lançamentos lista movimentações bancárias pendentes, restringe as
+  opções pela natureza débito/crédito e permite conciliar ou ignorar com CSRF.
 
 ## Regras mínimas de consistência
 
