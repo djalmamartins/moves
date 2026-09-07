@@ -160,7 +160,7 @@ Fonte: `AUDITORIA-GERAL.md`. Status inicial: `ABERTO`. Nenhuma tarefa abaixo foi
 - Descrição: esclarecer papéis de `app_log`, audit e report tables.
 - Dependências: EST-001.
 - Critério de aceite: retenção, busca e incidentes documentados/testados.
-- Status: ABERTO
+- Status: EM REVISÃO — responsabilidades, busca, resposta a incidentes e retenção documentadas; limpeza centralizada, transacional e segura para incidentes abertos.
 
 ### DOC-001 — Catálogo de tabelas e relações
 - Módulo: Documentação

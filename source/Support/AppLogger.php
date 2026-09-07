@@ -161,9 +161,6 @@ final class AppLogger
                     ], 'logger');
                 }
             }
-            if (random_int(1, 100) === 1) {
-                $pdo->exec("DELETE FROM app_log WHERE (status IN ('resolved','ignored') AND last_seen_at < DATE_SUB(NOW(), INTERVAL 90 DAY)) OR last_seen_at < DATE_SUB(NOW(), INTERVAL 180 DAY)");
-            }
         } catch (Throwable $failure) {
             self::fallback($level, $message, array_merge($context, ['logger_failure' => $failure->getMessage(), 'incident_id' => $incident]), $channel);
         } finally {

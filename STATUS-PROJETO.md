@@ -39,6 +39,7 @@ Conclusão estimada ponderada: **58%**
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
 - Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
+- OBS-001 em revisão: política única diferencia incidentes, auditoria, métricas e presença; retenção possui simulação padrão e aplicação explícita.
 
 ## Validação atual
 
@@ -51,6 +52,7 @@ Conclusão estimada ponderada: **58%**
 - TST-002: 2 cenários/42 asserções cobrem Usuários, Agenda, Chamados, Condomínios, Demandas e Visitas, incluindo CSRF, filtros, paginação e exclusão/encerramento.
 - ARC-002: suíte global aprovada; regressão focada valida serviços sem views, consumidores explícitos e ausência de herança Studio no controlador operacional.
 - Schema atual: fingerprint compatível em verificação somente leitura.
+- OBS-001: 2 testes/11 asserções de retenção e 21 testes/251 asserções unitárias aprovados; incidentes abertos são preservados automaticamente.
 - PHPUnit global: a execução agregada ainda é interrompida por testes legados de controllers que encerram o processo; validações focadas permanecem obrigatórias até a correção do runner.
 
 ## Bloqueado
