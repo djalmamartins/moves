@@ -42,6 +42,8 @@ ou telas conectadas. A tela de listagem de cobranças ainda exibe linhas estáti
   `matched_entry_id` na mesma transação de banco.
 - Totais de receber, pagar, recebido e pago são calculados por condomínio.
 - Testes usam exclusivamente o banco descartável e o escopo de condomínio ID 2.
+- Rotas `/erp/finance/entries`, `/income` e `/expenses` usam o controller Connect
+  e renderizam dados canônicos, sem as linhas demonstrativas da tela antiga.
 
 ## Regras mínimas de consistência
 
