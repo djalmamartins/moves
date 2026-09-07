@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Meu Dia — MOVES Operacional</title>
+    <link rel="stylesheet" href="assets/tokens.css">
+    <link rel="stylesheet" href="assets/meu-dia.css">
+</head>
+<body>
+<a class="skip" href="#conteudo">Ir para o conteúdo</a>
+<div class="shell">
+    <aside class="sidebar" id="sidebar" aria-label="Navegação principal">
+        <a class="brand" href="meu-dia.html" aria-label="CONNECT Condomínios — Meu Dia"><span class="brand-mark" aria-hidden="true">◆</span><span>CONNECT<small>CONDOMÍNIOS</small></span></a>
+        <label class="search"><span aria-hidden="true">⌕</span><span class="sr-only">Buscar no sistema</span><input type="search" placeholder="Buscar no sistema..."></label>
+        <nav><a href="#">⌂ <span>Controle de Operações</span></a><a class="active" href="#conteudo" aria-current="page">▣ <span>Meu Dia</span></a><a href="#agenda">□ <span>Agenda</span></a><a href="#tarefas">△ <span>Demandas</span><b>28</b></a><a href="#visita">▤ <span>Visitas</span><b class="violet">18</b></a><a href="#">♡ <span>Chamados</span><b>41</b></a><a href="#">▧ <span>Condomínios</span></a><a href="#">⚙ <span>Configurações</span></a></nav>
+        <div class="profile"><span class="avatar" aria-hidden="true">JS</span><span><strong>João da Silva</strong><small>Gerente de Operações</small></span><button type="button" aria-label="Abrir perfil">›</button></div>
+    </aside>
+    <main id="conteudo">
+        <header class="topbar"><button class="menu" type="button" data-menu aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">☰</button><div><h1>Meu Dia</h1><p>Terça-feira, 26 de agosto de 2026</p></div><div class="top-actions"><button type="button" data-today>Hoje</button><button type="button" data-day="-1" aria-label="Dia anterior">‹</button><button type="button" data-day="1" aria-label="Próximo dia">›</button><button type="button" data-theme aria-pressed="false" aria-label="Ativar tema escuro">◐</button><button class="primary" type="button" data-dialog-open>＋ Agendar tempo</button></div></header>
+        <section class="kpis" aria-label="Resumo do dia"><article><span>Compromissos</span><strong>8</strong><small>6h 30min</small></article><article><span>Tarefas agendadas</span><strong>6</strong><small>3h 20min</small></article><article><span>Para agendar</span><strong>7</strong><small>4h 10min</small></article><article><span>Aguardando terceiros</span><strong>14</strong><small>Aguardando retorno</small></article><article><span>Visitas esta semana</span><strong>14</strong><small>25 condomínios</small></article></section>
+        <div class="workspace">
+            <section class="card calendar" id="agenda"><div class="tabs" role="tablist"><button role="tab" aria-selected="true">Dia</button><button role="tab">Semana</button><button role="tab">Agenda</button></div><header><strong data-date>Terça-feira, 26 de agosto</strong><span>☀ 22°C</span></header><div class="timeline"><div class="hours" aria-hidden="true">08:00<br>09:00<br>10:00<br>11:00<br>12:00<br>13:00<br>14:00<br>15:00<br>16:00<br>17:00</div><div class="events"><button class="event amber" data-event="Planejamento do dia"><small>08:00 – 08:45</small><strong>Planejamento do dia</strong><span>Trabalho interno</span></button><button class="event violet" data-event="Visita de Gestão — Condomínio Solar"><small>09:00 – 10:30</small><strong>Visita de Gestão — Condomínio Solar</strong><span>Visita semanal do síndico</span></button><button class="event green" data-event="Ligar para Elevadores Alfa"><small>10:45 – 11:15</small><strong>Ligar para Elevadores Alfa</strong><span>Cobrar orçamento</span></button><button class="event blue" data-event="Preparar proposta de reforma"><small>13:30 – 14:15</small><strong>Preparar proposta de reforma</strong><span>Edifício Itália</span></button><button class="event violet" data-event="Visita — Residencial Park"><small>14:30 – 16:00</small><strong>Visita — Residencial Park</strong><span>Visita semanal</span></button></div></div></section>
+            <section class="card tasks" id="tarefas"><div class="tabs" role="tablist"><button role="tab" aria-selected="true" data-task-tab="pending">Para agendar (7)</button><button role="tab" aria-selected="false" data-task-tab="waiting">Aguardando (14)</button><button role="tab" aria-selected="false" data-task-tab="done">Concluídas</button></div><div data-task-list></div><button class="outline" type="button" data-schedule>▣ Agendar selecionados</button><div class="day-summary"><strong>Resumo do dia</strong><span><i>70%</i> do dia planejado</span></div></section>
+            <aside class="card detail" id="visita"><button class="close" type="button" aria-label="Fechar detalhes" data-close>×</button><small class="badge">Visita de Gestão</small><h2 data-detail-title>Visita semanal – Condomínio Solar</h2><p><strong>Terça-feira, 26/08/2026</strong> · 09:00 – 10:30</p><p>⌖ Rua das Flores, 123 – Belo Horizonte / MG</p><div class="tabs"><button aria-selected="true">Pauta da visita</button><button>Registro</button><button>Histórico</button></div><h3>O que você precisa acompanhar hoje</h3><ul><li>Chamados abertos <b>3</b></li><li>Serviços para conferir <b>2</b></li><li>Documentos e vencimentos <b>1</b></li><li>Fornecedores no local <b>1</b></li><li>Assuntos do síndico / conselho <b>2</b></li></ul><button class="primary full" type="button" data-start>▷ Iniciar visita</button><button class="outline full" type="button">＋ Adicionar assunto</button></aside>
+        </div>
+    </main>
+</div>
+<dialog data-dialog><form method="dialog"><header><div><small>NOVO COMPROMISSO</small><h2>Agendar tempo</h2></div><button aria-label="Fechar">×</button></header><label>Título<input name="title" required value="Reunião com síndico"></label><div class="fields"><label>Início<input type="time" value="11:30" required></label><label>Duração<select><option>30 minutos</option><option>45 minutos</option><option>1 hora</option></select></label></div><menu><button value="cancel">Cancelar</button><button class="primary" value="default">Agendar</button></menu></form></dialog>
+<div class="toast" role="status" aria-live="polite" data-toast></div><button class="backdrop" data-menu aria-label="Fechar menu"></button>
+<script src="assets/meu-dia.js"></script>
+</body>
+</html>
