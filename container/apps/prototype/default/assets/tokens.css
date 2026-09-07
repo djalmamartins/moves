@@ -1,0 +1,138 @@
+@charset "UTF-8";
+
+/**
+ * MOVES Design Tokens — DS-001
+ *
+ * Esta é a fonte oficial de decisões visuais do protótipo. Componentes devem
+ * consumir os aliases semânticos (--ms-color-*) em vez de valores literais.
+ */
+:root {
+    color-scheme: light;
+
+    /* Brand */
+    --ms-color-brand-50: #fbf8ed;
+    --ms-color-brand-100: #f6efd7;
+    --ms-color-brand-200: #ecdfae;
+    --ms-color-brand-300: #dfc97d;
+    --ms-color-brand-400: #d1b24f;
+    --ms-color-brand-500: #c5a131;
+    --ms-color-brand-600: #a88925;
+    --ms-color-brand-700: #82691f;
+    --ms-color-brand-800: #5e4d1c;
+    --ms-color-brand-900: #3d3317;
+
+    /* Neutral */
+    --ms-color-neutral-0: #ffffff;
+    --ms-color-neutral-50: #fafafa;
+    --ms-color-neutral-100: #f4f4f5;
+    --ms-color-neutral-200: #e4e4e7;
+    --ms-color-neutral-300: #d4d4d8;
+    --ms-color-neutral-500: #71717a;
+    --ms-color-neutral-700: #3f3f46;
+    --ms-color-neutral-900: #18181b;
+    --ms-color-neutral-950: #09090b;
+
+    /* Feedback */
+    --ms-color-success: #18794e;
+    --ms-color-success-soft: #eaf7f0;
+    --ms-color-warning: #9a5b00;
+    --ms-color-warning-soft: #fff4dd;
+    --ms-color-danger: #c4324a;
+    --ms-color-danger-soft: #fff0f2;
+    --ms-color-info: #2563a6;
+    --ms-color-info-soft: #edf5ff;
+
+    /* Semantic aliases */
+    --ms-color-primary: var(--ms-color-brand-500);
+    --ms-color-primary-hover: var(--ms-color-brand-600);
+    --ms-color-primary-active: var(--ms-color-brand-700);
+    --ms-color-on-primary: var(--ms-color-neutral-950);
+    --ms-color-primary-soft: var(--ms-color-brand-50);
+    --ms-color-focus: var(--ms-color-brand-700);
+    --ms-color-canvas: #f7f7f6;
+    --ms-color-surface: var(--ms-color-neutral-0);
+    --ms-color-surface-subtle: var(--ms-color-neutral-50);
+    --ms-color-text: var(--ms-color-neutral-900);
+    --ms-color-text-subtle: var(--ms-color-neutral-700);
+    --ms-color-text-muted: var(--ms-color-neutral-500);
+    --ms-color-border: var(--ms-color-neutral-200);
+    --ms-color-border-strong: var(--ms-color-neutral-300);
+
+    /* Typography */
+    --ms-font-sans: Inter, Gotham, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --ms-font-size-xs: 0.75rem;
+    --ms-font-size-sm: 0.875rem;
+    --ms-font-size-md: 1rem;
+    --ms-font-size-lg: 1.125rem;
+    --ms-font-size-xl: 1.5rem;
+    --ms-font-size-2xl: 2rem;
+    --ms-line-height-tight: 1.2;
+    --ms-line-height-normal: 1.5;
+    --ms-font-weight-regular: 400;
+    --ms-font-weight-medium: 500;
+    --ms-font-weight-semibold: 600;
+    --ms-font-weight-bold: 700;
+
+    /* Spacing — escala base de 4 px */
+    --ms-space-0: 0;
+    --ms-space-1: 0.25rem;
+    --ms-space-2: 0.5rem;
+    --ms-space-3: 0.75rem;
+    --ms-space-4: 1rem;
+    --ms-space-5: 1.25rem;
+    --ms-space-6: 1.5rem;
+    --ms-space-8: 2rem;
+    --ms-space-10: 2.5rem;
+    --ms-space-12: 3rem;
+    --ms-space-16: 4rem;
+
+    /* Shape, elevation and motion */
+    --ms-radius-sm: 0.375rem;
+    --ms-radius-md: 0.625rem;
+    --ms-radius-lg: 0.875rem;
+    --ms-radius-xl: 1.25rem;
+    --ms-radius-pill: 999px;
+    --ms-shadow-sm: 0 1px 3px rgb(9 9 11 / 7%);
+    --ms-shadow-md: 0 12px 32px rgb(9 9 11 / 10%);
+    --ms-duration-fast: 120ms;
+    --ms-duration-normal: 200ms;
+    --ms-ease-standard: cubic-bezier(.2, 0, 0, 1);
+    --ms-z-sticky: 70;
+    --ms-z-sidebar: 100;
+    --ms-z-overlay: 200;
+
+    /* Layout */
+    --ms-layout-sidebar: 15.5rem;
+    --ms-layout-topbar: 4.5rem;
+    --ms-layout-content: 92.5rem;
+}
+
+html[data-theme="dark"] {
+    color-scheme: dark;
+    --ms-color-primary: var(--ms-color-brand-400);
+    --ms-color-primary-hover: var(--ms-color-brand-300);
+    --ms-color-primary-active: var(--ms-color-brand-200);
+    --ms-color-primary-soft: #302918;
+    --ms-color-focus: var(--ms-color-brand-300);
+    --ms-color-canvas: #11110f;
+    --ms-color-surface: #1b1a17;
+    --ms-color-surface-subtle: #24221d;
+    --ms-color-text: #fafaf9;
+    --ms-color-text-subtle: #e4e4e1;
+    --ms-color-text-muted: #a8a8a2;
+    --ms-color-border: #393831;
+    --ms-color-border-strong: #525047;
+    --ms-color-success-soft: #173a2b;
+    --ms-color-warning-soft: #3b2a12;
+    --ms-color-danger-soft: #421f27;
+    --ms-color-info-soft: #172e49;
+    --ms-shadow-sm: 0 1px 3px rgb(0 0 0 / 28%);
+    --ms-shadow-md: 0 12px 32px rgb(0 0 0 / 34%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --ms-duration-fast: 0ms;
+        --ms-duration-normal: 0ms;
+    }
+}

@@ -1,0 +1,45 @@
+@charset "UTF-8";
+
+* { box-sizing: border-box; }
+body {
+    min-width: 20rem;
+    margin: 0;
+    background: var(--ms-color-canvas);
+    color: var(--ms-color-text-subtle);
+    font: var(--ms-font-weight-regular) var(--ms-font-size-md)/var(--ms-line-height-normal) var(--ms-font-sans);
+}
+button { font: inherit; }
+button:focus-visible { outline: 3px solid var(--ms-color-focus); outline-offset: 3px; }
+.ms-foundations { width: min(72rem, calc(100% - 2rem)); margin: 0 auto; padding: var(--ms-space-12) 0 var(--ms-space-16); }
+.ms-foundations__header { display: flex; align-items: start; justify-content: space-between; gap: var(--ms-space-6); margin-bottom: var(--ms-space-10); }
+.ms-foundations__eyebrow { margin: 0 0 var(--ms-space-2); color: var(--ms-color-primary-active); font-size: var(--ms-font-size-xs); font-weight: var(--ms-font-weight-bold); letter-spacing: .12em; text-transform: uppercase; }
+h1, h2, h3 { color: var(--ms-color-text); line-height: var(--ms-line-height-tight); }
+h1 { margin: 0 0 var(--ms-space-3); font-size: clamp(var(--ms-font-size-xl), 5vw, var(--ms-font-size-2xl)); }
+h2 { margin: 0; font-size: var(--ms-font-size-lg); }
+p { margin: 0; }
+.ms-theme-toggle { min-height: 2.75rem; padding: var(--ms-space-2) var(--ms-space-4); border: 1px solid var(--ms-color-border); border-radius: var(--ms-radius-md); background: var(--ms-color-surface); color: var(--ms-color-text); }
+.ms-theme-toggle:hover { border-color: var(--ms-color-primary); }
+.ms-section { margin-top: var(--ms-space-6); padding: var(--ms-space-6); border: 1px solid var(--ms-color-border); border-radius: var(--ms-radius-lg); background: var(--ms-color-surface); box-shadow: var(--ms-shadow-sm); }
+.ms-section > header { margin-bottom: var(--ms-space-5); }
+.ms-section > header p { margin-top: var(--ms-space-1); color: var(--ms-color-text-muted); font-size: var(--ms-font-size-sm); }
+.ms-swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: var(--ms-space-3); }
+.ms-swatch { overflow: hidden; border: 1px solid var(--ms-color-border); border-radius: var(--ms-radius-md); }
+.ms-swatch__color { display: block; min-height: 5rem; background: var(--swatch); }
+.ms-swatch div { display: grid; padding: var(--ms-space-3); }
+.ms-swatch code { color: var(--ms-color-text-muted); font-size: var(--ms-font-size-xs); }
+.ms-token-row { display: flex; flex-wrap: wrap; align-items: end; gap: var(--ms-space-4); }
+.ms-space-token { display: grid; gap: var(--ms-space-2); color: var(--ms-color-text-muted); font-size: var(--ms-font-size-xs); }
+.ms-space-token i { display: block; width: var(--token); height: var(--token); min-width: .25rem; min-height: .25rem; background: var(--ms-color-primary); }
+.ms-action-row { display: flex; flex-wrap: wrap; gap: var(--ms-space-3); }
+.ms-button { min-height: 2.75rem; padding: var(--ms-space-2) var(--ms-space-4); border: 1px solid var(--ms-color-border-strong); border-radius: var(--ms-radius-md); background: var(--ms-color-surface); color: var(--ms-color-text); font-weight: var(--ms-font-weight-semibold); transition: background var(--ms-duration-fast) var(--ms-ease-standard); }
+.ms-button--primary { border-color: var(--ms-color-primary); background: var(--ms-color-primary); color: var(--ms-color-on-primary); }
+.ms-button--primary:hover { background: var(--ms-color-primary-hover); }
+.ms-button--danger { border-color: var(--ms-color-danger); color: var(--ms-color-danger); }
+.ms-feedback { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: var(--ms-space-3); }
+.ms-feedback article { padding: var(--ms-space-4); border-radius: var(--ms-radius-md); }
+.ms-feedback strong { display: block; }
+.ms-feedback__success { background: var(--ms-color-success-soft); color: var(--ms-color-success); }
+.ms-feedback__warning { background: var(--ms-color-warning-soft); color: var(--ms-color-warning); }
+.ms-feedback__danger { background: var(--ms-color-danger-soft); color: var(--ms-color-danger); }
+.ms-feedback__info { background: var(--ms-color-info-soft); color: var(--ms-color-info); }
+@media (max-width: 40rem) { .ms-foundations__header { flex-direction: column; } .ms-theme-toggle { width: 100%; } .ms-section { padding: var(--ms-space-4); } }
