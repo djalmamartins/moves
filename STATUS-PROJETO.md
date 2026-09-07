@@ -39,6 +39,7 @@ Conclusão estimada ponderada: **58%**
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
 - Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
+- UX-004 em revisão sobre DS-001: shell oficial do ERP disponível apenas no protótipo, com navegação, contexto, busca por teclado, tema e comportamento móvel.
 
 ## Validação atual
 
@@ -51,6 +52,7 @@ Conclusão estimada ponderada: **58%**
 - TST-002: 2 cenários/42 asserções cobrem Usuários, Agenda, Chamados, Condomínios, Demandas e Visitas, incluindo CSRF, filtros, paginação e exclusão/encerramento.
 - ARC-002: suíte global aprovada; regressão focada valida serviços sem views, consumidores explícitos e ausência de herança Studio no controlador operacional.
 - Schema atual: fingerprint compatível em verificação somente leitura.
+- UX-004: 5 testes/27 asserções dos tokens e shell aprovados; HTML e sintaxe PHP de teste validados.
 - PHPUnit global: a execução agregada ainda é interrompida por testes legados de controllers que encerram o processo; validações focadas permanecem obrigatórias até a correção do runner.
 
 ## Bloqueado
