@@ -139,7 +139,7 @@ Fonte: `AUDITORIA-GERAL.md`. Status inicial: `ABERTO`. Nenhuma tarefa abaixo foi
 - Descrição: padronizar botões, tabelas, cards, modal, drawer, formulário e feedback.
 - Dependências: AST-001.
 - Critério de aceite: documentação e exemplos usados pelos temas modernos.
-- Status: ABERTO
+- Status: EM REVISÃO — catálogo compartilhado documenta e implementa ações, dados, formulários, feedback e overlays nos temas Studio e Operation.
 
 ### UX-002 — Remover links vazios e alertas nativos
 - Módulo: UX
