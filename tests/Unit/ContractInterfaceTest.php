@@ -18,4 +18,9 @@ final class ContractInterfaceTest extends TestCase
     {
         $root=dirname(__DIR__,2).'/container/apps/erp/default/components/contracts/';$home=file_get_contents($root.'home.php');$detail=file_get_contents($root.'detail.php');self::assertStringContainsString('csrf_input()',$home);self::assertStringContainsString('csrf_input()',$detail);self::assertStringContainsString('submit',$detail);self::assertStringContainsString('approve',$detail);self::assertStringContainsString('reject',$detail);
     }
+
+    public function testControllerEnforcesDedicatedPermissions(): void
+    {
+        $controller=file_get_contents(dirname(__DIR__,2).'/source/Controllers/Erp/Connect/Contracts.php');self::assertStringContainsString("erp.contracts.manage",$controller);self::assertStringContainsString("erp.contracts.approve",$controller);
+    }
 }

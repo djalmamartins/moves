@@ -58,3 +58,6 @@ de conectar a interface.
   `Erp/Connect`, com criação, documentos, submissão e decisão protegidos por CSRF.
 - A submissão aceita somente usuários ativos existentes; a própria atribuição da
   etapa concede o escopo de decisão, sempre combinado ao condomínio da sessão.
+- A superfície exige `erp.contracts.manage`; decisões exigem adicionalmente
+  `erp.contracts.approve`. Perfis administrativos recebem ambas e gestores
+  recebem apenas gerenciamento por padrão.

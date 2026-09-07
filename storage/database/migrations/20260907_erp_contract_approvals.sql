@@ -57,3 +57,17 @@ ALTER TABLE erp_documents
 
 ALTER TABLE erp_approval_steps
   ADD UNIQUE INDEX IF NOT EXISTS uq_erp_approval_sequence (entity_type,entity_id,sequence_no);
+
+INSERT INTO access_permissions (name,slug,group_name,description) VALUES
+('Gerenciar contratos','erp.contracts.manage','ERP','Criar contratos, documentos e fluxos de aprovação'),
+('Aprovar contratos','erp.contracts.approve','ERP','Aprovar ou rejeitar etapas de contratos')
+ON DUPLICATE KEY UPDATE name=VALUES(name),group_name=VALUES(group_name),description=VALUES(description);
+
+INSERT IGNORE INTO access_role_permissions (role_id,permission_id)
+SELECT r.id,p.id FROM access_roles r CROSS JOIN access_permissions p
+WHERE r.slug IN ('developer','super_admin','client_admin')
+  AND p.slug IN ('erp.contracts.manage','erp.contracts.approve');
+
+INSERT IGNORE INTO access_role_permissions (role_id,permission_id)
+SELECT r.id,p.id FROM access_roles r CROSS JOIN access_permissions p
+WHERE r.slug='manager' AND p.slug='erp.contracts.manage';

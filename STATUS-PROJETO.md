@@ -50,7 +50,7 @@ Conclusão estimada ponderada: **58%**
 - ARC-001: 9 testes focados/45 asserções aprovados; Operation não herda Studio nem exige `studio.access`.
 - TST-002: 2 cenários/42 asserções cobrem Usuários, Agenda, Chamados, Condomínios, Demandas e Visitas, incluindo CSRF, filtros, paginação e exclusão/encerramento.
 - ARC-002: suíte global aprovada; regressão focada valida serviços sem views, consumidores explícitos e ausência de herança Studio no controlador operacional.
-- ERP-003: migration, serviço, rotas e telas Connect aprovados em 5 testes/21 asserções e na suíte global; submissão aceita somente aprovadores ativos e a decisão respeita atribuição, ordem e condomínio.
+- ERP-003: ciclo completo protegido pelas permissões `erp.contracts.manage` e `erp.contracts.approve`; 6 testes focados/23 asserções e suíte global aprovados.
 - Schema atual: fingerprint compatível em verificação somente leitura.
 - PHPUnit global: a execução agregada ainda é interrompida por testes legados de controllers que encerram o processo; validações focadas permanecem obrigatórias até a correção do runner.
 
@@ -62,7 +62,7 @@ Conclusão estimada ponderada: **58%**
 ## Próximas 10 tarefas
 
 1. Revisar e integrar ERP-002 na PR #90.
-2. ERP-003 — validar interface autenticada e preparar a PR #91 para revisão.
+2. ERP-003 — revisar e integrar a PR #91.
 3. APP-001 — definir o portal de moradores.
 4. AST-001 — pipeline de assets.
 5. ERP-001 — escolher geração ERP.
@@ -79,7 +79,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próxima tarefa recomendada
 
-**Validar a interface autenticada da ERP-003 e preparar a PR #91 para revisão.**
+**Revisar e integrar a PR #91; depois iniciar APP-001.**
 
 ## Fontes oficiais
 
