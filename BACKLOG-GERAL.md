@@ -102,7 +102,7 @@ Fonte: `AUDITORIA-GERAL.md`. Status inicial: `ABERTO`. Nenhuma tarefa abaixo foi
 - Descrição: substituir `parent::dash()` por dados e view estritamente operacionais.
 - Dependências: ARC-001.
 - Critério de aceite: dashboard sem cards/rotas CMS.
-- Status: ABERTO
+- Status: EM REVISÃO — dashboard usa somente controller, consultas, indicadores e destinos operacionais; cobertura impede regressão para rotas CMS.
 
 ### APP-001 — Definir escopo do portal de moradores
 - Módulo: Moradores

@@ -73,4 +73,22 @@ final class OperationBaselineTest extends TestCase
         self::assertStringNotContainsString("Access::can('studio.access'", $operation);
         self::assertStringNotContainsString('operation_dashboard_failed', $studio);
     }
+
+    public function testDashboardUsesOnlyOperationalDataAndDestinations(): void
+    {
+        $root = dirname(__DIR__, 2);
+        $controller = (string)file_get_contents($root . '/source/Controllers/Operation/Operation.php');
+        $dashboard = (string)file_get_contents($root . '/container/apps/operation/default/components/dash/home.php');
+
+        self::assertStringContainsString("'tasksOverdue'=>0", $controller);
+        self::assertStringContainsString("FROM operation_tasks WHERE status IN ('pending','in_progress')", $controller);
+        self::assertStringContainsString("CONCAT('/operation/visitas/',v.id) source_url", $controller);
+        self::assertStringContainsString('$nextEvent = $dayAgenda[0] ?? null;', $dashboard);
+        self::assertStringContainsString("['Tarefas atrasadas',(int)(\$tasksOverdue??0)", $dashboard);
+
+        foreach (["url('/studio", "url('/blog", "url('/pages", "url('/posts", "url('/media", 'parent::dash'] as $forbidden) {
+            self::assertStringNotContainsString($forbidden, $dashboard);
+        }
+        self::assertStringNotContainsString('parent::dash', $controller);
+    }
 }
