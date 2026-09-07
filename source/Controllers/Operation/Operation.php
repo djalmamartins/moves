@@ -81,12 +81,13 @@ class Operation extends Controller
     public function dash(): void
     {
         $user = $this->operationUser('dashboard.view');
-        $data = ['appointmentsCount'=>0,'scheduledTasksCount'=>0,'toScheduleCount'=>0,'waitingThirdPartiesCount'=>0,'weeklyVisitsCount'=>0,'dayAgenda'=>[],'pendingTasks'=>[],'currentVisit'=>null,'demandsOpen'=>0,'ticketsOpen'=>0,'quotesPending'=>0,'criticalIssues'=>0,'recentDemands'=>[],'condominiumsAttention'=>[],'recentActivity'=>[]];
+        $data = ['appointmentsCount'=>0,'scheduledTasksCount'=>0,'tasksOverdue'=>0,'toScheduleCount'=>0,'waitingThirdPartiesCount'=>0,'weeklyVisitsCount'=>0,'dayAgenda'=>[],'pendingTasks'=>[],'currentVisit'=>null,'demandsOpen'=>0,'ticketsOpen'=>0,'quotesPending'=>0,'criticalIssues'=>0,'recentDemands'=>[],'condominiumsAttention'=>[],'recentActivity'=>[]];
         try {
             $pdo=Connect::getInstance();
-            $data['dayAgenda']=$pdo->query("SELECT v.id,v.title,v.notes description,'meeting' type,v.status,v.scheduled_at starts_at,DATE_FORMAT(v.scheduled_at,'%H:%i') time,c.name condominium_name FROM operation_visits v JOIN operation_condominiums c ON c.id=v.condominium_id WHERE DATE(v.scheduled_at)=CURDATE() AND v.status<>'cancelled' ORDER BY v.scheduled_at")->fetchAll()?:[];
+            $data['dayAgenda']=$pdo->query("SELECT v.id,v.title,COALESCE(v.objective,v.notes) description,'visit' type,v.status,v.scheduled_at starts_at,DATE_FORMAT(v.scheduled_at,'%H:%i') time,c.name condominium_name,CONCAT('/operation/visitas/',v.id) source_url FROM operation_visits v JOIN operation_condominiums c ON c.id=v.condominium_id WHERE DATE(v.scheduled_at)=CURDATE() AND v.status<>'cancelled' ORDER BY v.scheduled_at")->fetchAll()?:[];
             $data['appointmentsCount']=count($data['dayAgenda']);
             $data['scheduledTasksCount']=(int)$pdo->query("SELECT COUNT(*) FROM operation_visit_items WHERE result='pending'")->fetchColumn();
+            $data['tasksOverdue']=(int)$pdo->query("SELECT COUNT(*) FROM operation_tasks WHERE status IN ('pending','in_progress') AND due_at<NOW()")->fetchColumn();
             $data['weeklyVisitsCount']=(int)$pdo->query("SELECT COUNT(*) FROM operation_visits WHERE status<>'cancelled' AND YEARWEEK(scheduled_at,1)=YEARWEEK(CURDATE(),1)")->fetchColumn();
             $data['waitingThirdPartiesCount']=(int)$pdo->query("SELECT COUNT(*) FROM operation_issues WHERE status IN ('open','in_progress','waiting')")->fetchColumn();
             $data['toScheduleCount']=(int)$pdo->query("SELECT COUNT(*) FROM operation_visits WHERE status='scheduled' AND scheduled_at>NOW()")->fetchColumn();
