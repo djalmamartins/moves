@@ -39,6 +39,7 @@ Conclusão estimada ponderada: **58%**
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
 - Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
+- UX-001 em revisão empilhada sobre AST-001: catálogo compartilhado com tokens oficiais e famílias acessíveis carregadas por Studio e Operation.
 
 ## Validação atual
 
@@ -52,6 +53,7 @@ Conclusão estimada ponderada: **58%**
 - ARC-002: suíte global aprovada; regressão focada valida serviços sem views, consumidores explícitos e ausência de herança Studio no controlador operacional.
 - AST-001: build único dos quatro temas, modo CI e repetição determinística aprovados em 2 testes/8 asserções.
 - Schema atual: fingerprint compatível em verificação somente leitura.
+- UX-001: 2 testes/13 asserções aprovados e `composer assets:check` confirmou todos os bundles determinísticos.
 - PHPUnit global: a execução agregada ainda é interrompida por testes legados de controllers que encerram o processo; validações focadas permanecem obrigatórias até a correção do runner.
 
 ## Bloqueado

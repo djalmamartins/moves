@@ -6,6 +6,7 @@
     <?= $head ?>
     <?php $studioCss=dirname(__DIR__).'/assets/studio.min.css'; $studioJs=dirname(__DIR__).'/assets/studio.min.js'; ?>
     <link rel="stylesheet" href="<?= themeStudio('/assets/studio.min.css', 'default') . '?v=' . filemtime($studioCss) ?>">
+    <link rel="stylesheet" href="<?= url('/container/shared/assets/css/moves-components.css') ?>">
     <link rel="icon" href="<?= themeStudio('/assets/images/favicon.png', 'default') ?>">
 </head>
 <body class="studio-body studio-v2" data-editor-upload="<?= url('/studio/media/editor') ?>">
