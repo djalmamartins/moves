@@ -6,13 +6,14 @@ Este diretório é o ambiente isolado de validação visual da primeira entrega.
 
 - Cor primária CONNECT: `#C5A131` (`rgb(197, 161, 49)`).
 - Fonte de verdade: `default/assets/tokens.css`.
-- Catálogo navegável: `default/foundations.html`.
+- Catálogo de foundations: `default/foundations.html`.
+- Catálogo navegável de componentes e estados: `default/components.html`.
 - Componentes consomem aliases semânticos (`--ms-color-primary`, `--ms-color-surface`, `--ms-color-text`) em vez da paleta bruta.
 - Escala espacial baseada em 4 px.
 - Tema escuro é aplicado por `html[data-theme="dark"]`.
 - Movimento reduzido respeita `prefers-reduced-motion`.
 
-Abra `default/foundations.html` diretamente no navegador para revisar os tokens em temas claro e escuro.
+Abra `default/foundations.html` para revisar os tokens ou `default/components.html` para testar componentes, estados, navegação por teclado, modal e feedback em temas claro e escuro.
 
 ## Regra de adoção
 
