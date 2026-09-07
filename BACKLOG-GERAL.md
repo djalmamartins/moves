@@ -174,7 +174,7 @@ Fonte: `AUDITORIA-GERAL.md`. Status inicial: `ABERTO`. Nenhuma tarefa abaixo foi
 - Descrição: medir e remover CSS/JS/vendor não utilizados por página.
 - Dependências: AST-001.
 - Critério de aceite: orçamento de tamanho e carregamento por superfície.
-- Status: ABERTO
+- Status: EM REVISÃO — orçamento por superfície automatizado e vendors pesados separados no PR da tarefa.
 
 ## P3 — melhoria
 

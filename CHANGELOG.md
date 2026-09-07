@@ -12,6 +12,8 @@
 
 ## Unreleased
 
+- Orçamentos de tamanho para os bundles iniciais das quatro superfícies, validados
+  durante build e CI, e remoção de Highcharts/carrossel onde não possuem consumidores.
 - Migração física das interfaces para `container/apps`, `container/web` e
   `container/mail`.
 - Centralização de schema e migrations em `storage/database`.
