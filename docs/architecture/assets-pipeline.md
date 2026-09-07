@@ -26,3 +26,21 @@ Qualquer alteração em CSS ou JavaScript fonte deve ser acompanhada por
 `composer assets:build`. Um segundo `composer assets:build` precisa informar
 todos os bundles como inalterados e `composer assets:check` precisa terminar com
 código zero e `git diff` limpo.
+
+## Orçamento de carregamento
+
+`config/asset-budgets.php` limita o tamanho não comprimido de cada bundle inicial.
+O build e a CI falham quando o limite é ultrapassado. Cada superfície carrega dois
+bundles locais (um CSS e um JavaScript); fontes e ícones externos pertencem ao
+trabalho de CSP e não entram neste orçamento.
+
+| Superfície | CSS máximo | JS máximo | Requisições locais | Dependências pesadas |
+|---|---:|---:|---:|---|
+| Web | 60 KB | 210 KB | 2 | nenhuma |
+| ERP | 170 KB | 480 KB | 2 | carrossel e gráficos |
+| Moradores | 150 KB | 270 KB | 2 | carrossel |
+| Studio | 300 KB | 180 KB | 2 | editor carregado separadamente quando necessário |
+
+Highcharts foi removido dos bundles Web e Moradores por não haver consumidores.
+O carrossel também foi removido do Web. Dependências específicas de página devem
+ser adicionadas ao componente consumidor, nunca ao bundle global.
