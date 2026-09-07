@@ -55,6 +55,7 @@
   "scripts": {
     "build:studio": "@php service/commands/build-studio-assets.php",
     "operation:tick": "@php service/jobs/operation-tick.php",
+    "observability:retention": "@php service/commands/observability-retention.php",
     "db:status": "@php service/commands/database-migrate.php status",
     "db:migrate": "@php service/commands/database-migrate.php apply",
     "db:baseline": "@php service/commands/database-migrate.php baseline",
