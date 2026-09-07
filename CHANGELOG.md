@@ -12,6 +12,8 @@
 
 ## Unreleased
 
+- Adicionado protótipo isolado do Cockpit do Condomínio, com contexto alternável,
+  indicadores, prioridades, atalhos de módulos e ações acessíveis.
 - Migração física das interfaces para `container/apps`, `container/web` e
   `container/mail`.
 - Centralização de schema e migrations em `storage/database`.

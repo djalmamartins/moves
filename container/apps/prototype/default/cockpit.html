@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cockpit do Condomínio — MOVES</title>
+  <link rel="stylesheet" href="assets/tokens.css"><link rel="stylesheet" href="assets/components.css"><link rel="stylesheet" href="assets/cockpit.css">
+</head>
+<body>
+<a class="ms-skip" href="#conteudo">Pular para o conteúdo</a>
+<div class="cockpit-shell">
+  <aside class="cockpit-nav" aria-label="Navegação do protótipo">
+    <a class="cockpit-brand" href="components.html" aria-label="MOVES — voltar ao catálogo"><span aria-hidden="true">M</span><strong>MOVES<small>ERP CONDOMINIAL</small></strong></a>
+    <nav><a class="active" href="#resumo" aria-current="page"><span aria-hidden="true">◉</span>Visão geral</a><a href="#atencao"><span aria-hidden="true">△</span>Pendências</a><a href="#financeiro"><span aria-hidden="true">$</span>Financeiro</a><a href="#modulos"><span aria-hidden="true">▦</span>Módulos</a><a href="#atividade"><span aria-hidden="true">◷</span>Histórico</a></nav>
+    <footer><a href="components.html">← Design System</a><small>Ambiente de protótipo</small></footer>
+  </aside>
+  <div class="cockpit-workspace">
+    <header class="cockpit-topbar">
+      <button class="ms-button context-button" type="button" data-context-toggle aria-expanded="false" aria-controls="context-menu"><span class="condo-mark">RH</span><span><small>CONDOMÍNIO ATUAL</small><strong data-context-name>Residencial Horizonte</strong></span><span aria-hidden="true">⌄</span></button>
+      <div class="context-menu" id="context-menu" hidden><label for="context-search">Trocar condomínio</label><input class="ms-field" id="context-search" type="search" placeholder="Buscar na carteira"><button type="button" data-context="Residencial Horizonte" data-mark="RH">Residencial Horizonte <small>84 unidades</small></button><button type="button" data-context="Condomínio Solar" data-mark="CS">Condomínio Solar <small>126 unidades</small></button><button type="button" data-context="Edifício Itália" data-mark="EI">Edifício Itália <small>64 unidades</small></button></div>
+      <div class="top-actions"><button class="ms-icon-button" type="button" data-theme-toggle aria-label="Ativar modo escuro" aria-pressed="false">◐</button><button class="ms-icon-button notification" type="button" data-feedback="Você tem 3 atualizações prioritárias." aria-label="Notificações, 3 não lidas">◎<small>3</small></button><button class="ms-button ms-button--primary" type="button" data-action="Nova tarefa">+ Nova ação</button></div>
+    </header>
+    <main id="conteudo">
+      <section class="page-head" id="resumo"><div><p class="eyebrow">COCKPIT DO CONDOMÍNIO</p><h1 data-heading>Residencial Horizonte</h1><p>Uma visão integrada para decidir, agir e acompanhar sem perder o contexto.</p></div><span class="health"><i></i>Operação saudável <strong>82/100</strong></span></section>
+      <section class="kpi-grid" aria-label="Indicadores principais">
+        <article class="ms-card kpi"><span class="tone-green" aria-hidden="true">$</span><div><small>SALDO CONSOLIDADO</small><strong>R$ 428.740</strong><em class="positive">↑ 4,2% no mês</em></div></article>
+        <article class="ms-card kpi"><span class="tone-red" aria-hidden="true">!</span><div><small>INADIMPLÊNCIA</small><strong>3,8%</strong><em class="positive">↓ 0,7 p.p.</em></div></article>
+        <article class="ms-card kpi"><span class="tone-amber" aria-hidden="true">◷</span><div><small>PENDÊNCIAS</small><strong>7</strong><em>2 vencem hoje</em></div></article>
+        <article class="ms-card kpi"><span class="tone-blue" aria-hidden="true">✓</span><div><small>CONFORMIDADE</small><strong>94%</strong><em>32 documentos ativos</em></div></article>
+      </section>
+      <div class="content-grid">
+        <section class="ms-card panel" id="atencao"><header><div><p class="eyebrow">PRIORIDADES</p><h2>O que precisa de atenção</h2></div><button class="ms-button" type="button" data-feedback="Lista completa aberta na demonstração.">Ver todas</button></header><div class="attention-list">
+          <article><span class="tone-red" aria-hidden="true">!</span><div><strong>2 documentos vencem esta semana</strong><small>Seguro predial e AVCB</small></div><button type="button" data-action="Revisar documentos">Resolver</button></article>
+          <article><span class="tone-amber" aria-hidden="true">$</span><div><strong>Folha aguardando aprovação</strong><small>R$ 48.720,00 · vence hoje</small></div><button type="button" data-action="Revisar pagamento">Revisar</button></article>
+          <article><span class="tone-blue" aria-hidden="true">⌂</span><div><strong>Vistoria da casa de bombas</strong><small>Hoje às 09:15 · Carlos Mendes</small></div><button type="button" data-action="Abrir visita">Abrir</button></article>
+        </div></section>
+        <aside class="ms-card panel account-panel" id="financeiro"><header><div><p class="eyebrow">FINANCEIRO</p><h2>Contas e fundos</h2></div></header><div class="account"><span>BB</span><div><strong>Conta principal</strong><small>Banco do Brasil · 1842-3</small></div><b>R$ 286.420</b></div><div class="account"><span>RF</span><div><strong>Fundo de reserva</strong><small>Aplicação automática</small></div><b>R$ 142.320</b></div><button class="ms-button" type="button" data-action="Abrir financeiro">Abrir financeiro →</button></aside>
+      </div>
+      <section class="modules" id="modulos"><header><div><p class="eyebrow">ACESSO CONTEXTUAL</p><h2>Módulos do condomínio</h2></div></header><div class="module-grid">
+        <button type="button" data-action="Unidades"><span>◇</span><strong>Unidades</strong><small>84 unidades · 4 blocos</small></button><button type="button" data-action="Pessoas"><span>◎</span><strong>Pessoas</strong><small>186 moradores vinculados</small></button><button type="button" data-action="Documentos"><span>▤</span><strong>Documentos</strong><small>2 vencem em breve</small></button><button type="button" data-action="Contratos"><span>≡</span><strong>Contratos</strong><small>14 contratos ativos</small></button><button type="button" data-action="Chamados"><span>♡</span><strong>Chamados</strong><small>7 abertos · 2 prioritários</small></button><button type="button" data-action="Manutenção"><span>⚙</span><strong>Manutenção</strong><small>3 serviços programados</small></button>
+      </div></section>
+      <section class="ms-card panel timeline" id="atividade"><header><div><p class="eyebrow">RASTREABILIDADE</p><h2>Atividade recente</h2></div><button class="ms-button" type="button" data-feedback="Histórico completo aberto na demonstração.">Ver histórico</button></header><ol><li><i></i><div><small>HOJE, 08:42</small><strong>Pagamento aprovado pelo síndico</strong><p>Manutenção dos elevadores · R$ 12.480,00</p></div></li><li><i></i><div><small>ONTEM, 16:20</small><strong>Documento atualizado</strong><p>Apólice do seguro predial anexada por Marina Costa.</p></div></li><li><i></i><div><small>29 AGO, 11:05</small><strong>Chamado #428 concluído</strong><p>Portão social revisado e validado pela portaria.</p></div></li></ol></section>
+    </main>
+  </div>
+</div>
+<div class="prototype-toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+<dialog class="action-dialog" aria-labelledby="action-title"><form method="dialog"><header><p class="eyebrow">AÇÃO CONTEXTUAL</p><h2 id="action-title">Nova ação</h2></header><p data-action-copy>A ação será criada para o condomínio atual.</p><label>Observação<input class="ms-field" placeholder="Descreva o próximo passo"></label><footer><button class="ms-button" value="cancel">Cancelar</button><button class="ms-button ms-button--primary" value="confirm">Confirmar demonstração</button></footer></form></dialog>
+<script src="assets/cockpit.js"></script>
+</body></html>
