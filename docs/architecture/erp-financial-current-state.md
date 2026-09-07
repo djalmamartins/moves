@@ -44,6 +44,8 @@ ou telas conectadas. A tela de listagem de cobranças ainda exibe linhas estáti
 - Testes usam exclusivamente o banco descartável e o escopo de condomínio ID 2.
 - Rotas `/erp/finance/entries`, `/income` e `/expenses` usam o controller Connect
   e renderizam dados canônicos, sem as linhas demonstrativas da tela antiga.
+- A rota `/erp/finance/home` agora usa totais e pendências do núcleo canônico;
+  o dashboard deixou de depender do legado durante a execução.
 
 ## Regras mínimas de consistência
 

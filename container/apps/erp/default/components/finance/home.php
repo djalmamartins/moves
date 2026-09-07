@@ -1,143 +1,29 @@
-<?php $this->layout("layouts/erp"); ?>
+<?php $this->layout('layouts/erp'); ?>
 <?php if (!$condo->select): ?>
-    <?php $this->insert("/pages/welcome-condo"); ?>
+    <?php $this->insert('/pages/welcome-condo'); ?>
 <?php else: ?>
-    <div class="container">
-        <?php $this->insert("components/finance/sidebar"); ?>
-
-
-        <div class="page_main">
-            <h3>Controle Mensal</h3>
-            <br>
-            <div id="control"></div>
-        </div>
-        <div class="page_main">
-            <div class="page_widget">
-                <div class="widget_balance">
-                    <div class="icon-circle orange"><span> À pagar</span></div>
-                    <br>
-                    <table id="contact-table">
-                        <thead>
-                        <tr>
-                            <th></th>
-                            <th class="sortable asc" data-column="0">Cliente <span class="sort-arrow"></span></th>
-                            <th class="sortable asc" data-column="3">Indentificador <span class="sort-arrow"></span></th>
-                            <th class="sortable asc" data-column="6">Valor <span class="sort-arrow"></span></th>
-                            <th>Ação</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php if (!empty($expense)): ?>
-                            <?php foreach ($expense as $expenseItem): ?>
-                                <?= $this->insert("pages/balance", ["invoice" => $expenseItem->data()]); ?>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="message error al-center icon-check-square-o">
-                                No momento, não existem contas a pagar.
-                            </div>
-                        <?php endif; ?>
-
-                        </tbody>
-                    </table>
-                </div>
-                <div class="widget_balance">
-                    <div class="icon-circle blue"><span> À receber</span></div>
-                    <br>
-                    <table id="contact-table">
-                        <thead>
-                        <tr>
-                            <th></th>
-                            <th class="sortable asc" data-column="0">Cliente <span class="sort-arrow"></span></th>
-                            <th class="sortable asc" data-column="3">Indentificador <span class="sort-arrow"></span></th>
-                            <th class="sortable asc" data-column="6">Valor <span class="sort-arrow"></span></th>
-                            <th>Ação</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php if (!empty($income)): ?>
-                            <?php foreach ($income as $incomeItem): ?>
-                                <?= $this->insert("pages/balance", ["invoice" => $incomeItem->data()]); ?>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="message info al-center icon-check-square-o">
-                                No momento, não existem contas a receber.
-                            </div>
-                        <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-    <?php $this->start("scripts"); ?>
-
-    <script type="text/javascript">
-        $(function () {
-            Highcharts.setOptions({
-                lang: {
-                    decimalPoint: ',',
-                    thousandsSep: '.'
-                }
-            });
-
-            var chart = Highcharts.chart('control', {
-                chart: {
-                    type: 'areaspline',
-                    spacingBottom: 0,
-                    spacingTop: 5,
-                    spacingLeft: 0,
-                    spacingRight: 0,
-                    height: (9 / 32 * 100) + '%'
-                },
-                title: null,
-                xAxis: {
-                    categories: [<?= $chart->categories; ?>],
-                    minTickInterval: 1
-                },
-                yAxis: {
-                    allowDecimals: true,
-                    title: null,
-                },
-                tooltip: {
-                    shared: true,
-                    valueDecimals: 2,
-                    valuePrefix: 'R$ '
-                },
-                credits: {
-                    enabled: false
-                },
-                plotOptions: {
-                    areaspline: {
-                        fillOpacity: 0.5
-                    }
-                },
-                series: [{
-                    name: 'Receitas',
-                    data: [<?= $chart->income;?>],
-                    color: '#00A759',
-                    lineColor: '#008745'
-                }, {
-                    name: 'A receber',
-                    data: [<?= $chart->receive;?>],
-                    color: '#0067b8',
-                    lineColor: '#0078d4'
-                }, {
-                    name: 'Despesas',
-                    data: [<?= $chart->expense;?>],
-                    color: '#B30000',
-                    lineColor: '#D90000'
-                //}, {
-                //    name: 'Inadimplência',
-                //    data: [<?php //= $chart->owing;?>//],
-                //    color: '#FFD24D',
-                //    lineColor: '#F5B946'
-                }]
-            });
-        });
-    </script>
-    <?php $this->end(); ?>
-
+<div class="container">
+    <?php $this->insert('components/finance/sidebar'); ?>
+    <main class="page_main">
+        <header><h1>Financeiro</h1><p>Visão canônica de lançamentos e pagamentos do condomínio.</p></header>
+        <section class="finance-summary">
+            <article><small>A receber</small><strong>R$ <?= number_format((float)$totals['receivable'], 2, ',', '.') ?></strong></article>
+            <article><small>Recebido</small><strong>R$ <?= number_format((float)$totals['received'], 2, ',', '.') ?></strong></article>
+            <article><small>A pagar</small><strong>R$ <?= number_format((float)$totals['payable'], 2, ',', '.') ?></strong></article>
+            <article><small>Pago</small><strong>R$ <?= number_format((float)$totals['paid'], 2, ',', '.') ?></strong></article>
+        </section>
+        <p><a class="btn btn_blue" href="<?= url('/erp/finance/entries') ?>">Gerenciar lançamentos</a></p>
+        <section class="finance-columns">
+            <?php foreach ([['Contas a pagar', $expense], ['Contas a receber', $income]] as [$title, $rows]): ?>
+                <article><h2><?= $title ?></h2>
+                    <?php if (!$rows): ?><p>Nenhum lançamento pendente.</p><?php endif; ?>
+                    <?php foreach (array_slice($rows, 0, 8) as $item): ?>
+                        <div class="finance-row"><span><strong><?= htmlspecialchars($item->description) ?></strong><small><?= date_fmt($item->due_at, 'd/m/Y') ?></small></span><b>R$ <?= number_format((float)$item->amount - (float)$item->paid_amount, 2, ',', '.') ?></b></div>
+                    <?php endforeach; ?>
+                </article>
+            <?php endforeach; ?>
+        </section>
+    </main>
+</div>
+<style>.finance-summary,.finance-columns{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}.finance-summary article,.finance-columns article{padding:16px;border:1px solid #e5e7eb;border-radius:10px;background:#fff}.finance-summary small,.finance-summary strong,.finance-row small{display:block}.finance-summary strong{margin-top:8px;font-size:1.25rem}.finance-columns{grid-template-columns:1fr 1fr}.finance-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #eee}.finance-row small{color:#777;margin-top:4px}@media(max-width:800px){.finance-summary{grid-template-columns:repeat(2,1fr)}.finance-columns{grid-template-columns:1fr}}</style>
 <?php endif; ?>

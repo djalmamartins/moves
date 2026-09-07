@@ -18,6 +18,6 @@ final class FinancialInterfaceTest extends TestCase
 
     public function testFinancialServiceAndViewDoNotUseLegacyInvoices():void
     {
-        $service=file_get_contents((new ReflectionClass(FinancialService::class))->getFileName());$view=file_get_contents(dirname(__DIR__,2).'/container/apps/erp/default/components/finance/entries.php');self::assertStringNotContainsString('app_invoices',$service);self::assertStringContainsString('erp_financial_entries',$service);self::assertStringNotContainsString('Vinicius Moura',$view);
+        $service=file_get_contents((new ReflectionClass(FinancialService::class))->getFileName());$controller=file_get_contents((new ReflectionClass(Finance::class))->getFileName());$view=file_get_contents(dirname(__DIR__,2).'/container/apps/erp/default/components/finance/entries.php');self::assertStringNotContainsString('app_invoices',$service);self::assertStringNotContainsString('app_invoices',$controller);self::assertStringContainsString('erp_financial_entries',$service);self::assertStringNotContainsString('Vinicius Moura',$view);
     }
 }

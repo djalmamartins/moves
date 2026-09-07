@@ -35,7 +35,7 @@ Conclusão estimada ponderada: **58%**
 - SEC-002 integrada pelo PR #73.
 - BASE-001 e ARC-001 integradas pelas PRs #75 e #76.
 - TST-002 integrada pela PR #77; ARC-002 integrada pela PR #88 com Agenda e Chamados compartilhados por serviços e ACL própria em Studio, Help Desk e Operation.
-- ERP-001 integrada pela PR #89; ERP-002 em discovery técnico dos fluxos financeiros canônicos.
+- ERP-001 integrada pela PR #89; ERP-002 em implementação na PR #90, com CRUD, pagamentos, conciliação, totais e dashboard canônicos.
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
 - Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
@@ -50,6 +50,7 @@ Conclusão estimada ponderada: **58%**
 - ARC-001: 9 testes focados/45 asserções aprovados; Operation não herda Studio nem exige `studio.access`.
 - TST-002: 2 cenários/42 asserções cobrem Usuários, Agenda, Chamados, Condomínios, Demandas e Visitas, incluindo CSRF, filtros, paginação e exclusão/encerramento.
 - ARC-002: suíte global aprovada; regressão focada valida serviços sem views, consumidores explícitos e ausência de herança Studio no controlador operacional.
+- ERP-002: 7 testes focados/29 asserções e suíte PHPUnit global aprovados; dashboard financeiro não consulta mais `app_invoices`.
 - Schema atual: fingerprint compatível em verificação somente leitura.
 - PHPUnit global: a execução agregada ainda é interrompida por testes legados de controllers que encerram o processo; validações focadas permanecem obrigatórias até a correção do runner.
 
@@ -60,7 +61,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próximas 10 tarefas
 
-1. ERP-002 — implementar serviço e testes do financeiro canônico.
+1. ERP-002 — concluir interface de conciliação e revisão da PR #90.
 2. ERP-003 — contratos, documentos e aprovações.
 3. APP-001 — definir o portal de moradores.
 4. AST-001 — pipeline de assets.
@@ -78,7 +79,7 @@ Conclusão estimada ponderada: **58%**
 
 ## Próxima tarefa recomendada
 
-**Implementar o núcleo transacional da ERP-002 sobre `erp_financial_entries`, `erp_payments` e `erp_bank_transactions`.**
+**Concluir a interface de conciliação bancária da ERP-002 e preparar a PR #90 para revisão.**
 
 ## Fontes oficiais
 

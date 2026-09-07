@@ -48,6 +48,21 @@ final class FinancialService
         $stmt=$this->pdo->prepare("SELECT COALESCE(SUM(CASE WHEN type='receivable' AND status<>'cancelled' THEN amount ELSE 0 END),0) receivable,COALESCE(SUM(CASE WHEN type='payable' AND status<>'cancelled' THEN amount ELSE 0 END),0) payable,COALESCE(SUM(CASE WHEN type='receivable' AND status<>'cancelled' THEN paid_amount ELSE 0 END),0) received,COALESCE(SUM(CASE WHEN type='payable' AND status<>'cancelled' THEN paid_amount ELSE 0 END),0) paid FROM erp_financial_entries WHERE condominium_id=:condo");$stmt->execute(['condo'=>$condominiumId]);return(array)$stmt->fetch();
     }
 
+    public function monthlyTotals(int $condominiumId, int $months = 12): array
+    {
+        $months = max(1, min(24, $months));
+        $start = (new \DateTimeImmutable('first day of this month'))
+            ->modify('-' . ($months - 1) . ' months')->format('Y-m-d');
+        $stmt = $this->pdo->prepare("SELECT DATE_FORMAT(due_at, '%m/%y') month,
+            COALESCE(SUM(CASE WHEN type='receivable' AND status<>'cancelled' THEN paid_amount ELSE 0 END),0) income,
+            COALESCE(SUM(CASE WHEN type='receivable' AND status NOT IN ('paid','cancelled') THEN amount-paid_amount ELSE 0 END),0) receivable,
+            COALESCE(SUM(CASE WHEN type='payable' AND status<>'cancelled' THEN paid_amount ELSE 0 END),0) expense
+            FROM erp_financial_entries WHERE condominium_id=:condo AND due_at>=:start
+            GROUP BY YEAR(due_at),MONTH(due_at) ORDER BY YEAR(due_at),MONTH(due_at)");
+        $stmt->execute(['condo' => $condominiumId, 'start' => $start]);
+        return $stmt->fetchAll() ?: [];
+    }
+
     private function applyPayment(int $condominiumId,int $entryId,int $amount,array $data,int $userId): int
     {
         if($amount<=0)throw new \InvalidArgumentException('O pagamento deve ser maior que zero.');$stmt=$this->pdo->prepare("SELECT * FROM erp_financial_entries WHERE id=:id AND condominium_id=:condo AND status NOT IN ('cancelled','paid') FOR UPDATE");$stmt->execute(['id'=>$entryId,'condo'=>$condominiumId]);$entry=$stmt->fetch();if(!$entry)throw new \InvalidArgumentException('Lançamento não encontrado ou já encerrado.');$remaining=$this->money((string)$entry->amount)-$this->money((string)$entry->paid_amount);if($amount>$remaining)throw new \InvalidArgumentException('Pagamento maior que o saldo do lançamento.');$stmt=$this->pdo->prepare('INSERT INTO erp_payments(entry_id,wallet_id,amount,paid_at,method,reference,created_by) VALUES(:entry,:wallet,:amount,:paid,:method,:reference,:user)');$stmt->execute(['entry'=>$entryId,'wallet'=>(int)($data['wallet_id']??0)?:null,'amount'=>$this->decimal($amount),'paid'=>$data['paid_at']??date('Y-m-d H:i:s'),'method'=>mb_substr((string)($data['method']??'transfer'),0,30),'reference'=>mb_substr((string)($data['reference']??''),0,120)?:null,'user'=>$userId]);$paymentId=(int)$this->pdo->lastInsertId();$newPaid=$this->money((string)$entry->paid_amount)+$amount;$status=$newPaid===$this->money((string)$entry->amount)?'paid':'partial';$this->pdo->prepare('UPDATE erp_financial_entries SET paid_amount=:paid,status=:status WHERE id=:id')->execute(['paid'=>$this->decimal($newPaid),'status'=>$status,'id'=>$entryId]);return$paymentId;
