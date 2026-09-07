@@ -39,6 +39,7 @@ Conclusão estimada ponderada: **58%**
 - GitHub Project: `MOVES — Desenvolvimento`; backlog sincronizado nas Issues #43–#68.
 - Desenvolvimento de funcionalidades permanece congelado até concluir a estabilização.
 - Operation possui workflow de visitas validado em banco automatizado isolado; os demais CRUDs aguardam TST-002.
+- DOC-001 em revisão: catálogo versionado das 92 tabelas e 43 relações do baseline, regenerável e verificável por comando.
 
 ## Validação atual
 
@@ -51,6 +52,7 @@ Conclusão estimada ponderada: **58%**
 - TST-002: 2 cenários/42 asserções cobrem Usuários, Agenda, Chamados, Condomínios, Demandas e Visitas, incluindo CSRF, filtros, paginação e exclusão/encerramento.
 - ARC-002: suíte global aprovada; regressão focada valida serviços sem views, consumidores explícitos e ausência de herança Studio no controlador operacional.
 - Schema atual: fingerprint compatível em verificação somente leitura.
+- DOC-001: `composer db:catalog-check` aprovado; 2 testes e 98 asserções garantem cobertura integral do manifest estrutural.
 - PHPUnit global: a execução agregada ainda é interrompida por testes legados de controllers que encerram o processo; validações focadas permanecem obrigatórias até a correção do runner.
 
 ## Bloqueado
