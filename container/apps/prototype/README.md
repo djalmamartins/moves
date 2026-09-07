@@ -14,6 +14,10 @@ Este diretório é o ambiente isolado de validação visual da primeira entrega.
 
 Abra `default/foundations.html` diretamente no navegador para revisar os tokens em temas claro e escuro.
 
+## Shell oficial do ERP
+
+Abra `default/shell.html` para revisar o shell isolado: navegação lateral, identificação do ambiente, seletor “Ambientes MOVES”, busca rápida por `⌘/Ctrl + K`, tema claro/escuro e menu móvel. O conteúdo é demonstrativo e não chama o backend.
+
 ## Regra de adoção
 
 Esta entrega permanece restrita a `/prototype`. A integração com layouts de produção só pode ocorrer depois do gate de revisão visual e funcional da Epic #78.
