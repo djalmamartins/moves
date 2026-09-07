@@ -15,6 +15,11 @@ Este diretório é o ambiente isolado de validação visual da primeira entrega.
 
 Abra `default/foundations.html` para revisar os tokens ou `default/components.html` para testar componentes, estados, navegação por teclado, modal e feedback em temas claro e escuro.
 
+## Fluxos em validação
+
+- `default/condominios.html`: carteira responsiva com busca, filtro de status,
+  ordenação, estados de saúde, vazio e consulta de detalhes em modal.
+
 ## Regra de adoção
 
 Esta entrega permanece restrita a `/prototype`. A integração com layouts de produção só pode ocorrer depois do gate de revisão visual e funcional da Epic #78.
