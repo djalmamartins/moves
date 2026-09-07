@@ -116,6 +116,10 @@ $route->get("/finance/home", "Finance:home");
 
 $route->get("/finance/income", "Finance:income");
 $route->post("/finance/income", "Finance:income");
+$route->get("/finance/entries", "Finance:entries");
+$route->post("/finance/entries", "Finance:entries");
+$route->get("/finance/expenses", "Finance:expenses");
+$route->post("/finance/expenses", "Finance:expenses");
 
 
 //post
