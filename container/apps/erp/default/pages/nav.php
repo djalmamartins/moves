@@ -116,7 +116,7 @@
 
         echo $nav("trending-down-outline", "Inadimplência", "#");
         echo $nav("barcode-outline", "Boletos", "#");
-        echo $nav("folder-outline", "Documentos", "#");
+        echo $nav("folder-outline", "Contratos", "contracts");
         echo $nav("chatbubbles-outline", "Chamados", "msn/home");
         echo $nav("information-circle-outline", "Ocorrências", "#");
         echo $nav("megaphone-outline", "Comunicados", "#");

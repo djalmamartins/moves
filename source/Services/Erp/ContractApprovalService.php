@@ -33,6 +33,21 @@ final class ContractApprovalService
         $stmt=$this->pdo->prepare('SELECT * FROM erp_contracts WHERE id=:id AND condominium_id=:condo'.($lock?' FOR UPDATE':''));$stmt->execute(['id'=>$contractId,'condo'=>$condominiumId]);$contract=$stmt->fetch();if(!$contract)throw new \InvalidArgumentException('Contrato não encontrado.');return$contract;
     }
 
+    public function contracts(int $condominiumId): array
+    {
+        $stmt=$this->pdo->prepare('SELECT * FROM erp_contracts WHERE condominium_id=:condo ORDER BY ends_at IS NULL,ends_at,id DESC LIMIT 200');$stmt->execute(['condo'=>$condominiumId]);return$stmt->fetchAll()?:[];
+    }
+
+    public function documents(int $condominiumId, int $contractId): array
+    {
+        $this->contract($condominiumId,$contractId);$stmt=$this->pdo->prepare("SELECT * FROM erp_documents WHERE condominium_id=:condo AND entity_type='contract' AND entity_id=:entity AND status='active' ORDER BY id DESC");$stmt->execute(['condo'=>$condominiumId,'entity'=>$contractId]);return$stmt->fetchAll()?:[];
+    }
+
+    public function approvalSteps(int $condominiumId, int $contractId): array
+    {
+        $this->contract($condominiumId,$contractId);$stmt=$this->pdo->prepare("SELECT * FROM erp_approval_steps WHERE condominium_id=:condo AND entity_type='contract' AND entity_id=:entity ORDER BY sequence_no");$stmt->execute(['condo'=>$condominiumId,'entity'=>$contractId]);return$stmt->fetchAll()?:[];
+    }
+
     private function date(string $date): string { $parsed=\DateTimeImmutable::createFromFormat('!Y-m-d',$date);if(!$parsed||$parsed->format('Y-m-d')!==$date)throw new \InvalidArgumentException('Data inválida.');return$date; }
     private function amount(mixed $value): ?string { if($value===null||$value==='')return null;$value=str_replace(',','.',trim((string)$value));if(!preg_match('/^\d+(?:\.\d{1,2})?$/',$value))throw new \InvalidArgumentException('Valor inválido.');return number_format((float)$value,2,'.',''); }
 }

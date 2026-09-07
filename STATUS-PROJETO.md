@@ -51,6 +51,7 @@ Conclusão estimada ponderada: **58%**
 - TST-002: 2 cenários/42 asserções cobrem Usuários, Agenda, Chamados, Condomínios, Demandas e Visitas, incluindo CSRF, filtros, paginação e exclusão/encerramento.
 - ARC-002: suíte global aprovada; regressão focada valida serviços sem views, consumidores explícitos e ausência de herança Studio no controlador operacional.
 - ERP-003: primeiro corte com migration idempotente e serviço transacional aprovado em 2 testes/9 asserções, além da suíte PHPUnit global.
+- ERP-003: rotas, navegação e telas Connect adicionadas para criação, documentos e decisões do contrato.
 - Schema atual: fingerprint compatível em verificação somente leitura.
 - PHPUnit global: a execução agregada ainda é interrompida por testes legados de controllers que encerram o processo; validações focadas permanecem obrigatórias até a correção do runner.
 

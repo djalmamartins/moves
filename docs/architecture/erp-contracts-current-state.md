@@ -54,3 +54,5 @@ de conectar a interface.
 - Serviço cria contratos e documentos sempre no escopo do condomínio.
 - Envio e decisão são transacionais; a ordem dos aprovadores é obrigatória.
 - Aprovação integral ativa o contrato e rejeição preserva nota e data da decisão.
+- Rotas `/erp/contracts` e `/erp/contracts/{id}` usam exclusivamente
+  `Erp/Connect`, com criação, documentos, submissão e decisão protegidos por CSRF.
