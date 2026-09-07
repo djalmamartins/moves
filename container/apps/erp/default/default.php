@@ -111,6 +111,12 @@ $route->post("/users/register/{user_id}", "Users:register");
 $route->post("/users/forget", "Users:forget");
 
 //finance
+$route->get("/contracts", "Contracts:home");
+$route->post("/contracts", "Contracts:home");
+$route->get("/contracts/{id}", "Contracts:detail");
+$route->post("/contracts/{id}", "Contracts:detail");
+
+//finance
 $route->get("/finance/dash", "Finance:dash");
 $route->get("/finance/home", "Finance:home");
 

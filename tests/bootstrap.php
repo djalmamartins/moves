@@ -191,6 +191,7 @@ foreach ([
     dirname(__DIR__) . '/storage/database/migrations/20260831_operation_integrated.sql',
     dirname(__DIR__) . '/storage/database/migrations/20260831_operation_visit_workflow.sql',
     dirname(__DIR__) . '/storage/database/migrations/20260831_operation_completion.sql',
+    dirname(__DIR__) . '/storage/database/migrations/20260907_erp_contract_approvals.sql',
 ] as $operationMigration) {
     $sql = file_get_contents($operationMigration);
     if ($sql === false) {
