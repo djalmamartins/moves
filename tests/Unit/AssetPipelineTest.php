@@ -15,6 +15,6 @@ final class AssetPipelineTest extends TestCase
 
     public function testCiChecksCommittedBundles(): void
     {
-        $workflow=file_get_contents(dirname(__DIR__,2).'/.github/workflows/ci.yml');self::assertStringContainsString('composer assets:check',$workflow);self::assertFileExists(dirname(__DIR__,2).'/service/commands/build-assets.php');
+        $root=dirname(__DIR__,2);$workflow=file_get_contents($root.'/.github/workflows/ci.yml');$command=file_get_contents($root.'/service/commands/build-assets.php');self::assertStringContainsString('composer assets:check',$workflow);self::assertFileExists($root.'/service/commands/build-assets.php');self::assertStringNotContainsString("vendor/autoload.php",$command);self::assertStringContainsString("vendor/movescode/compress",$command);
     }
 }

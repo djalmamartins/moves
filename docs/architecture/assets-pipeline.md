@@ -19,7 +19,8 @@ mais carregados pelo autoload e nenhuma requisição HTTP escreve bundles.
 As fontes descobertas por padrão glob são ordenadas lexicalmente. Dependências
 compartilhadas possuem ordem explícita. Cada bundle é produzido ao lado do alvo
 e publicado por troca atômica, evitando arquivos parciais. O modo `--check` é
-executado na CI depois da instalação das dependências.
+executado na CI depois da instalação das dependências. O comando carrega apenas
+o compressor e o builder, sem inicializar configurações ou conexão de banco.
 
 Qualquer alteração em CSS ou JavaScript fonte deve ser acompanhada por
 `composer assets:build`. Um segundo `composer assets:build` precisa informar
