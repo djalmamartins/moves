@@ -9,6 +9,11 @@ A apresentação vive em `container/`: `studio/` reúne aplicações autenticada
 `shared/` contém dependências visuais comuns.
 
 Cada theme usa `layouts`, `pages`, `components` e `assets`. A distribuição em
-`organic/` é gerada pelo Organic V2; os bundles não são editados manualmente.
+`organic/editor/` é a distribuição canônica e compartilhada do Organic
+Editor. Temas não mantêm cópias do editor: o pipeline incorpora o CSS canônico
+no bundle visual e o bootstrap do Studio importa o módulo ESM por URL pública.
+Páginas, artigos e templates usam namespaces independentes de persistência
+(`page`, `post` e `template`, seguidos do ID); após o envio válido do formulário,
+o autosave local deixa o registro salvo no servidor como fonte da verdade.
 Arquivos gerados pertencem a `storage/`. Migrations SQL permanecem em
 `database/` porque são código reproduzível e versionável.

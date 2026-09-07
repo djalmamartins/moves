@@ -27,7 +27,7 @@ final class AssetBuilder
             'web'=>['css'=>['sources'=>$sorted($web.'/css/*.css'),'target'=>$web.'/style.css'],'js'=>['sources'=>[...$commonJs,...$sorted($web.'/js/*.js')],'target'=>$web.'/scripts.js']],
             'erp'=>['css'=>['sources'=>[...$commonCss,...$sorted($erp.'/css/*.css')],'target'=>$erp.'/style.css'],'js'=>['sources'=>[...$commonJs,...$sorted($erp.'/js/*.js')],'target'=>$erp.'/scripts.js']],
             'residents'=>['css'=>['sources'=>[...$commonCss,...$sorted($residents.'/css/*.css')],'target'=>$residents.'/style.css'],'js'=>['sources'=>[...$commonJs,...$sorted($residents.'/js/*.js')],'target'=>$residents.'/scripts.js']],
-            'studio'=>['css'=>['sources'=>[$studio.'/vendor/organic-editor/organic-editor.min.css',$studio.'/css/studio-icons.css',$studio.'/css/admin.css',$studio.'/css/studio-system.css'],'target'=>$studio.'/studio.min.css'],'js'=>['sources'=>[$shared.'/scripts/jquery.min.js',$shared.'/scripts/jquery.form.js',$shared.'/scripts/jquery-ui.js',$studio.'/js/scripts.js'],'target'=>$studio.'/studio.min.js']],
+            'studio'=>['css'=>['sources'=>[$this->root.'/organic/editor/organic-editor.min.css',$studio.'/css/studio-icons.css',$studio.'/css/admin.css',$studio.'/css/studio-system.css'],'target'=>$studio.'/studio.min.css'],'js'=>['sources'=>[$shared.'/scripts/jquery.min.js',$shared.'/scripts/jquery.form.js',$shared.'/scripts/jquery-ui.js',$studio.'/js/scripts.js'],'target'=>$studio.'/studio.min.js']],
         ];
     }
 }

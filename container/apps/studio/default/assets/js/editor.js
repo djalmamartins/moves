@@ -1,6 +1,6 @@
 const editors = new Map();
-// Distribuição ESM oficial do Organic Editor mantida dentro do próprio tema.
-const editorModuleUrl = new URL("../vendor/organic-editor/organic-editor.min.js", import.meta.url).href;
+// O Organic possui uma única distribuição canônica, compartilhada pelos temas.
+const editorModuleUrl = document.body.dataset.editorModule;
 const uploadUrl = document.body.dataset.editorUpload;
 
 const uploadImage = async (file) => {
@@ -101,7 +101,14 @@ document.querySelectorAll("textarea[data-organic-editor]").forEach((textarea) =>
     }
     const wasRequired = textarea.required;
     textarea.required = false;
-    const storagePrefix = `moves-studio:${location.pathname}:${textarea.id}:`;
+    const formPath = (() => {
+        try { return new URL(textarea.form?.action || location.href, location.href).pathname; }
+        catch { return location.pathname; }
+    })();
+    const match = formPath.match(/\/studio\/(page|blog\/post|slide)(?:\/(\d+))?\/?$/);
+    const documentType = match?.[1] === "blog/post" ? "post" : match?.[1] === "slide" ? "template" : match?.[1] || "field";
+    const documentKey = textarea.dataset.editorDocument || `${documentType}:${match?.[2] || "new"}:${textarea.id}`;
+    const storagePrefix = `moves-studio:organic:${documentKey}:`;
     const storage = {
         get(key, fallback = null) {
             try { const value = localStorage.getItem(storagePrefix + key); return value === null ? fallback : JSON.parse(value); }
@@ -133,8 +140,13 @@ document.querySelectorAll("textarea[data-organic-editor]").forEach((textarea) =>
             event.stopImmediatePropagation();
             editor.focus();
             window.alert("Preencha o conteúdo antes de salvar.");
+            return;
         }
     }, true);
+    form?.addEventListener("moves:form-saved", () => {
+        // O servidor passa a ser a fonte da verdade somente após uma resposta aceita.
+        storage.remove("organic-editor-v0100:autosave");
+    });
 });
 
 window.MovesOrganicEditor = {
