@@ -167,7 +167,7 @@ Fonte: `AUDITORIA-GERAL.md`. Status inicial: `ABERTO`. Nenhuma tarefa abaixo foi
 - Descrição: registrar owner, model/service, telas e retenção para as 93 tabelas.
 - Dependências: EST-001.
 - Critério de aceite: catálogo versionado e conferido por schema.
-- Status: ABERTO
+- Status: EM REVISÃO — catálogo reproduzível cobre as 92 tabelas e 43 relações do baseline, com owner, model/serviço, uso e retenção.
 
 ### PERF-001 — Reduzir bundles e dependências externas
 - Módulo: Performance

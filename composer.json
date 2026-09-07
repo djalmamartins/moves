@@ -61,6 +61,8 @@
     "db:install": "@php service/commands/database-migrate.php install",
     "db:verify": "@php service/commands/database-migrate.php verify",
     "db:schema-export": "@php service/commands/database-schema-export.php",
+    "db:catalog": "@php service/commands/database-catalog.php",
+    "db:catalog-check": "@php service/commands/database-catalog.php --check",
     "deploy:check": "@php service/commands/deploy-check.php",
     "migrate:content": "@php service/commands/migrate-legacy-content.php",
     "migrate:images": "@php service/commands/migrate-legacy-content.php --images-only",
