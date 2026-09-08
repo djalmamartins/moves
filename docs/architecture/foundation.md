@@ -48,6 +48,10 @@ que permanecem separados do núcleo da aplicação.
 suíte inclui testes unitários e de integração, inclusive chamados, agenda,
 notificações e fila de e-mails.
 
+Os critérios de contribuição para código novo e alterações legadas estão
+propostos em [`code-standards.md`](code-standards.md), ainda sujeitos à revisão
+da Issue #4.
+
 ## Dependência legada removida
 
 `organic/router` foi removido do lock de forma controlada. Não havia uso no
