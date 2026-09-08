@@ -53,11 +53,11 @@
 
                 <div class="app_form_footer">
                     <button class="btn btn-blue icon-check-square-o">Atualizar</button>
-                    <a href="#" class="remove_link icon-error"
+                    <button type="button"  class="remove_link icon-error"
                        data-post="<?= url("/studio/faq/channel/{$channel->id}"); ?>"
                        data-action="delete"
                        data-confirm="Tem certeza que deseja excluir este canal e todas as suas perguntas e respostas?"
-                       data-plan_id="<?= $channel->id; ?>">Excluir Canal</a>
+                       data-plan_id="<?= $channel->id; ?>">Excluir Canal</button>
                 </div>
             </form>
         </div>

@@ -59,19 +59,14 @@ $(function () {
 
     //DATA SET
 
-    $("[data-post]").click(function (e) {
+    $("[data-post]").click(async function (e) {
         e.preventDefault();
 
         var clicked = $(this);
         var data = clicked.data();
         var load = $(".ajax_load");
 
-        if (data.confirm) {
-            var deleteConfirm = confirm(data.confirm);
-            if (!deleteConfirm) {
-                return;
-            }
-        }
+        if (data.confirm && !await window.MovesDialog.confirm(data.confirm)) return;
 
         $.ajax({
             url: data.post,

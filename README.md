@@ -76,6 +76,15 @@ tests/        testes unitários e de integração
 Os themes usam `layouts/`, `pages/`, `components/` e `assets/`. Bibliotecas de
 terceiros compartilhadas ficam em `container/shared/assets/vendor/`.
 
+### Diálogos e feedback acessíveis
+
+Studio e Operation carregam `container/shared/assets/js/moves-dialog.js`. Use
+`data-confirm` em formulários ou ações destrutivas e
+`MovesDialog.prompt()`/`MovesDialog.notify()` no JavaScript. O componente
+mantém e restaura o foco, fecha com Escape, contém a navegação por Tab e
+publica feedback por `aria-live`; diálogos nativos e links `href="#"` não
+devem representar ações.
+
 ## Organic V2
 
 ```bash

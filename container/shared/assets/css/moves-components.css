@@ -61,3 +61,11 @@ textarea.moves-field { min-height:104px; resize:vertical }
 html[data-theme="dark"] { --moves-surface:#182130; --moves-canvas:#101722; --moves-text:#f3f5f7; --moves-muted:#a6b0bf; --moves-line:#394659; --moves-primary-soft:#302a1a }
 @media (max-width:680px) { .moves-card__header { align-items:flex-start; flex-direction:column }.moves-button { min-height:46px }.moves-table { min-width:640px }.moves-toast { right:12px; bottom:12px; left:12px } }
 @media (prefers-reduced-motion:reduce) { .moves-skeleton { animation:none } }
+.moves-dialog-open { overflow:hidden }
+.moves-dialog-backdrop { position:fixed; inset:0; z-index:12000; display:grid; place-items:center; padding:20px; background:rgb(15 23 42 / 55%) }
+.moves-dialog { width:min(100%,480px); padding:24px; border:1px solid var(--moves-line); border-radius:var(--moves-radius-lg); background:var(--moves-surface); box-shadow:var(--moves-shadow-lg); color:var(--moves-text) }
+.moves-dialog h2 { margin:0; font-size:1.2rem }.moves-dialog p { margin:12px 0 20px; color:var(--moves-muted); line-height:1.55 }
+.moves-dialog-field { display:grid; gap:7px; margin-bottom:20px; font-weight:600 }.moves-dialog-field textarea { width:100%; padding:10px; resize:vertical; border:1px solid var(--moves-line); border-radius:var(--moves-radius-sm); font:inherit }
+.moves-dialog footer { display:flex; justify-content:flex-end; gap:10px }.moves-dialog button { min-height:42px; padding:0 18px; border:1px solid var(--moves-line); border-radius:var(--moves-radius-sm); background:var(--moves-surface); color:inherit; font-weight:700; cursor:pointer }
+.moves-dialog button[data-dialog-confirm] { border-color:var(--moves-primary); background:var(--moves-primary); color:#fff }.moves-dialog button.danger { border-color:var(--moves-danger); background:var(--moves-danger) }
+.moves-feedback { position:fixed; right:20px; bottom:20px; z-index:12010; width:min(390px,calc(100vw - 40px)); padding:14px 16px; border-radius:var(--moves-radius-md); background:var(--moves-text); color:var(--moves-surface); box-shadow:var(--moves-shadow-lg) }.moves-feedback.error { background:var(--moves-danger); color:#fff }
