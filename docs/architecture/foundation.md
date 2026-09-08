@@ -24,6 +24,10 @@ configurações persistentes e administráveis depois que a conexão já existe.
 
 ## Ambientes
 
+A proposta completa de contratos, precedência, isolamento e promoção está em
+[`environment-strategy.md`](environment-strategy.md), sujeita à revisão da
+Issue #8.
+
 - `MOVESOS_ENV=testing` usa exclusivamente `MOVESOS_TEST_DB` (o nome precisa
   terminar em `_test`).
 - Ambiente local usa o banco local por TCP, evitando diferença entre o socket
