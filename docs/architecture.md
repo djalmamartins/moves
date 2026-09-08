@@ -12,3 +12,7 @@ Cada theme usa `layouts`, `pages`, `components` e `assets`. A distribuição em
 `organic/` é gerada pelo Organic V2; os bundles não são editados manualmente.
 Arquivos gerados pertencem a `storage/`. Migrations SQL permanecem em
 `database/` porque são código reproduzível e versionável.
+
+As convenções lógicas, o glossário, os contextos delimitados e as regras para
+entidades, estados, eventos e multi-tenancy estão em
+[`architecture/domain-conventions.md`](architecture/domain-conventions.md).
