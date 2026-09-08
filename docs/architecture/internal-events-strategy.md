@@ -175,6 +175,10 @@ tenant atual. `not_found`/falha não revela existência cross-tenant.
 
 ## Observabilidade e auditoria
 
+O contrato de evidência, integridade, acesso e retenção é detalhado na
+[`trilha de auditoria`](../security/audit-trail-strategy.md), sujeita à revisão
+da Issue #12.
+
 Métricas mínimas: pending/lag por tipo e consumidor, throughput, duração,
 retry, dead letters, idade mais antiga e dedup hits. Logs usam event ID,
 correlation ID, consumidor, tentativa e resultado sem payload bruto.
