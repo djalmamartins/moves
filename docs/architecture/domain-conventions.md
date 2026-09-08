@@ -150,7 +150,8 @@ Para cada agregado ou fluxo, a Issue executável deve conter:
 - decidir formato e geração de IDs na Issue #2;
 - aplicar a proposta detalhada em
   [`identifier-strategy.md`](identifier-strategy.md) após revisão da Issue #2;
-- decidir contrato de API na Issue #3;
+- revisar o contrato proposto em [`api-strategy.md`](api-strategy.md) na
+  Issue #3;
 - formalizar eventos e consistência entre contextos nas Issues #13 e #40;
 - detalhar autenticação/autorização nas Issues #23–#39;
 - catalogar tabelas legadas que ainda misturam contextos.
