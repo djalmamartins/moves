@@ -8,6 +8,7 @@ Este diretório é o ambiente isolado de validação visual da primeira entrega.
 - Fonte de verdade: `default/assets/tokens.css`.
 - Catálogo de foundations: `default/foundations.html`.
 - Catálogo navegável de componentes e estados: `default/components.html`.
+- Prontuário da unidade: `default/prontuario-unidade.html`, com resumo cadastral, vínculos, documentos, financeiro e histórico filtrável.
 - Componentes consomem aliases semânticos (`--ms-color-primary`, `--ms-color-surface`, `--ms-color-text`) em vez da paleta bruta.
 - Escala espacial baseada em 4 px.
 - Tema escuro é aplicado por `html[data-theme="dark"]`.
