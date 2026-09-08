@@ -37,7 +37,7 @@ const installToolbar = (editor, textarea) => {
     block.addEventListener("change", () => { editor.commands.formatBlock(block.value); editor.focus(); });
     toolbar.append(block);
     [["↶", "Desfazer", "undo"], ["↷", "Refazer", "redo"], ["B", "Negrito", "bold"], ["I", "Itálico", "italic"], ["U", "Sublinhado", "underline"], ["S", "Tachado", "strikeThrough"], ["• Lista", "Lista com marcadores", "insertUnorderedList"], ["1. Lista", "Lista numerada", "insertOrderedList"], ["←", "Diminuir recuo", "outdent"], ["→", "Aumentar recuo", "indent"], ["≡", "Alinhar à esquerda", "justifyLeft"], ["≣", "Centralizar", "justifyCenter"], ["☰", "Alinhar à direita", "justifyRight"], ["☷", "Justificar", "justifyFull"], ["Tx", "Limpar formatação", "removeFormat"]].forEach(([label, title, command]) => toolbar.append(editorButton(label, title, () => editor.execCommand(command))));
-    toolbar.append(editorButton("🔗", "Inserir link", () => { editor.selection.restore(); const href = window.prompt("URL do link (https://...)"); if (href) editor.execCommand("createLink", href.trim()); }));
+    toolbar.append(editorButton("🔗", "Inserir link", async () => { editor.selection.restore(); const href = await window.MovesDialog.prompt("URL do link (https://...)"); if (href) editor.execCommand("createLink", href.trim()); }));
     const file = document.createElement("input");
     file.type = "file";
     file.accept = "image/jpeg,image/png,image/webp,image/gif";
@@ -50,7 +50,7 @@ const installToolbar = (editor, textarea) => {
         try {
             const uploaded = await uploadImage(selected);
             editor.insertContent(`<p class="organic-image-block"><img src="${uploaded.url.replaceAll('"', '&quot;')}" alt="${selected.name.replaceAll('"', '&quot;')}" class="organic-content-image"></p><p><br></p>`);
-        } catch (error) { window.alert(error.message); }
+        } catch (error) { window.MovesDialog.notify(error.message, "error"); }
         finally { button?.classList.remove("is-loading"); file.value = ""; }
     });
     const imageButton = editorButton("▧", "Enviar imagem", () => file.click());
@@ -68,18 +68,18 @@ const installToolbar = (editor, textarea) => {
         }
         picker.click();
     }));
-    toolbar.append(editorButton("▤", "Inserir tabela", () => {
-        const rowInput = window.prompt("Número de linhas:", "3");
+    toolbar.append(editorButton("▤", "Inserir tabela", async () => {
+        const rowInput = await window.MovesDialog.prompt("Número de linhas:", "3");
         if (rowInput === null) return;
         const rows = Math.min(20, Math.max(1, Number(rowInput) || 1));
-        const columnInput = window.prompt("Número de colunas:", "3");
+        const columnInput = await window.MovesDialog.prompt("Número de colunas:", "3");
         if (columnInput === null) return;
         const columns = Math.min(10, Math.max(1, Number(columnInput) || 1));
         const cells = (tag) => `<${tag}>Conteúdo</${tag}>`.repeat(columns);
         editor.insertContent(`<div class="organic-table-wrap"><table class="organic-content-table"><thead><tr>${cells("th")}</tr></thead><tbody>${`<tr>${cells("td")}</tr>`.repeat(rows)}</tbody></table></div><p><br></p>`);
     }));
     toolbar.append(editorButton("—", "Inserir linha horizontal", () => editor.execCommand("insertHorizontalRule")));
-    toolbar.append(editorButton("</>", "Editar HTML", () => { const html = window.prompt("Edite o HTML do conteúdo:", editor.getContent()); if (html !== null) editor.setExternalContent(html); }));
+    toolbar.append(editorButton("</>", "Editar HTML", async () => { const html = await window.MovesDialog.prompt("Edite o HTML do conteúdo:", editor.getContent(), {title: "Editar HTML"}); if (html !== null) editor.setExternalContent(html); }));
     toolbar.append(editorButton("⛶", "Tela cheia", () => textarea.closest(".studio-panel")?.classList.toggle("moves-organic-fullscreen")));
     editor.element.before(toolbar);
 };
@@ -132,7 +132,7 @@ document.querySelectorAll("textarea[data-organic-editor]").forEach((textarea) =>
             event.preventDefault();
             event.stopImmediatePropagation();
             editor.focus();
-            window.alert("Preencha o conteúdo antes de salvar.");
+            window.MovesDialog.notify("Preencha o conteúdo antes de salvar.", "error");
         }
     }, true);
 });

@@ -32,11 +32,11 @@
                                     <a class="icon-pencil btn btn-blue" title=""
                                        href="<?= url("/studio/events/category/{$category->id}"); ?>">Editar</a>
 
-                                    <a class="icon-trash-o btn btn-red" href="#" title=""
+                                    <button type="button" class="icon-trash-o btn btn-red"  title=""
                                        data-post="<?= url("/studio/events/category"); ?>"
                                        data-action="delete"
                                        data-confirm="Tem certeza que deseja deletar a categoria?"
-                                       data-category_id="<?= $category->id; ?>">Deletar</a>
+                                       data-category_id="<?= $category->id; ?>">Deletar</button>
                                 </div>
                             </div>
                         </article>

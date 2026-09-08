@@ -64,11 +64,11 @@
 
                 <div class="app_form_footer">
                     <button class="btn btn-blue icon-check-square-o">Atualizar</button>
-                    <a href="#" class="remove_link icon-error"
+                    <button type="button"  class="remove_link icon-error"
                        data-post="<?= url("/studio/faq/question/{$channel->id}/{$question->id}"); ?>"
                        data-action="delete"
                        data-confirm="Tem certeza que deseja excluir a perguntas e a respostas?"
-                       data-question_id="<?= $question->id; ?>">Excluir Pergunta</a>
+                       data-question_id="<?= $question->id; ?>">Excluir Pergunta</button>
                 </div>
             </form>
         </div>

@@ -181,11 +181,11 @@
 
                 <div class="app_form_footer">
                     <button class="btn btn-blue icon-check-square-o">Atualizar</button>
-                    <a href="#" class="remove_link icon-warning"
+                    <button type="button"  class="remove_link icon-warning"
                        data-post="<?= url("/studio/associations/association/{$club->id}"); ?>"
                        data-action="delete"
                        data-confirm="ATENÇÃO: Tem certeza que deseja excluir o usuário e todos os dados relacionados a ele? Essa ação não pode ser feita!"
-                       data-user_id="<?= $club->id; ?>">Excluir Usuário</a>
+                       data-user_id="<?= $club->id; ?>">Excluir Usuário</button>
                 </div>
             </form>
         </div>

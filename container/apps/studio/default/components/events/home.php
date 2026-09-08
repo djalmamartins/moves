@@ -27,11 +27,11 @@
                                 <div class="actions">
                                     <a class="icon-pencil btn btn-blue" title=""
                                        href="<?= url("/studio/events/post/{$post->id}"); ?>">Editar</a>
-                                    <a class="icon-trash btn btn-red" title="" href="#"
+                                    <button type="button" class="icon-trash btn btn-red" title=""
                                        data-post="<?= url("/studio/events/post"); ?>"
                                        data-action="delete"
                                        data-confirm="Tem certeza que deseja deletar esse post?"
-                                       data-post_id="<?= $post->id; ?>">Deletar</a>
+                                       data-post_id="<?= $post->id; ?>">Deletar</button>
                                 </div>
 
                                 <h3 class="tittle">

@@ -110,12 +110,10 @@
                         <button class="btn btn-red icon-unlock-alt">Recuperar Senha</button>
                     </form>
                 <?php else: ?>
-                    <a href="#" style="text-decoration: none;"
+                    <button type="button" class="btn btn-green icon-whatsapp"
                        onclick="window.open(
                                'https://api.whatsapp.com/send?text=Perdeu sua senha <?= $user->first_name; ?>?%0AVocê está recebendo está messagem pois foi solicitado a recuperação de senha.%0A➥ <?= url("/recuperar/{$user->forget}-{$user->email}"); ?> %0A● IMPORTANTE:%0ASe não foi você que solicitou ignore o e-mail.%0ASeus dados permanecem seguros.%0AAtenciosamente, equipe CBC.',
-                               '_system', 'location=yes'); return false;">
-                        <button class="btn btn-green icon-whatsapp">Enviar WhatsApp</button>
-                    </a>
+                               '_system', 'location=yes');">Enviar WhatsApp</button>
                 <?php endif; ?>
             <?php endif; ?>
         </header>
@@ -249,11 +247,11 @@
                     <?php if($user->level == 10 ) : ?>
 
                     <?php else : ?>
-                        <a href="#" class="remove_link icon-warning"
+                        <button type="button" class="remove_link icon-warning"
                            data-post="<?= url("/studio/users/user/{$user->id}"); ?>"
                            data-action="delete"
                            data-confirm="ATENÇÃO: Tem certeza que deseja excluir o usuário e todos os dados relacionados a ele? Essa ação não pode ser feita!"
-                           data-user_id="<?= $user->id; ?>">Excluir Usuário</a>
+                           data-user_id="<?= $user->id; ?>">Excluir Usuário</button>
                     <?php endif; ?>
                 </div>
             </form>
