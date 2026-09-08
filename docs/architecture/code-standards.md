@@ -140,8 +140,9 @@ Cada mudança funcional deve cobrir, conforme o risco:
 
 Unitários cobrem regra isolada; integração cobre banco, HTTP e adaptadores;
 end-to-end cobre apenas jornadas críticas. Testes são determinísticos, isolados,
-independentes de ordem, relógio real, rede externa e banco principal. A matriz e
-as metas quantitativas serão detalhadas na Issue #5.
+independentes de ordem, relógio real, rede externa e banco principal. A proposta
+detalhada está em [`test-strategy.md`](test-strategy.md), sujeita à revisão da
+Issue #5.
 
 ## Gates de contribuição
 
