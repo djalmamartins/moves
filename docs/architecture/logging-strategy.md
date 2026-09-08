@@ -137,6 +137,10 @@ versão, severidade ou padrão material pode reabrir. Resolução não apaga evi
 
 ## Erros, exceções e stack traces
 
+A taxonomia, a propagação e a tradução por borda são detalhadas em
+[`error-handling-strategy.md`](error-handling-strategy.md), sujeitas à revisão
+da Issue #11.
+
 Erros esperados de domínio usam códigos estáveis e não geram stack em nível error
 por padrão. Exceções inesperadas registram classe, frame sanitizado e stack apenas
 no sink restrito. Mensagem pública contém incident/correlation ID, nunca o detalhe.
