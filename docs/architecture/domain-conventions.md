@@ -111,6 +111,9 @@ recursos de outro tenant.
 
 ## Segurança, auditoria e multi-tenancy
 
+As ameaças transversais e prioridades iniciais estão registradas no
+[`threat model`](../security/threat-model.md), sujeito à revisão da Issue #7.
+
 - `tenant_id` é obrigatório em entidades tenant-scoped e filtros são aplicados
   no repositório, não apenas no controller.
 - Operações privilegiadas falham fechadas quando a política está ausente.
