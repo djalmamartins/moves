@@ -149,6 +149,10 @@ produção.
 
 ## Segredos e certificados
 
+Classificação, ciclo de vida, rotação e migração dos campos legados são detalhados
+em [`secure-configuration.md`](../security/secure-configuration.md), sujeitos à
+revisão da Issue #9.
+
 - segredos são injetados no runtime, não commitados, exibidos ou persistidos em
   `settings`;
 - acesso segue menor privilégio e separação por ambiente;
