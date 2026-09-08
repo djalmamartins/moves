@@ -154,6 +154,10 @@ somente quando o segredo precisa ser lido, com chave mestra separada dos dados.
 
 ## Logs, erros, métricas e suporte
 
+O envelope, correlação, níveis, sinks e retenção são detalhados na proposta de
+[`logging estruturado`](../architecture/logging-strategy.md), sujeita à revisão
+da Issue #10.
+
 Redaction combina catálogo, nomes e tipos; não depende apenas de regex. Headers,
 cookies, bodies e URLs são minimizados antes do logger. Erros públicos nunca
 incluem configuração, path interno, stack, SQL ou existência de segredo.
