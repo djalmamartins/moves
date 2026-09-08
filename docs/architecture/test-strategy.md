@@ -203,7 +203,8 @@ qual proteção deixou de ser necessária.
 - escolher ferramenta de contrato e automação de acessibilidade;
 - mapear integrações que exigem sandbox periódico;
 - estabelecer retenção dos relatórios e evidências da CI;
-- alinhar testes de migrations à especificação da Issue #6.
+- alinhar testes de migrations à proposta em
+  [`migration-strategy.md`](migration-strategy.md), sujeita à revisão da Issue #6.
 
 ## Gate para sair do Discovery
 
