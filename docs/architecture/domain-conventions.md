@@ -155,7 +155,9 @@ Para cada agregado ou fluxo, a Issue executável deve conter:
   [`identifier-strategy.md`](identifier-strategy.md) após revisão da Issue #2;
 - revisar o contrato proposto em [`api-strategy.md`](api-strategy.md) na
   Issue #3;
-- formalizar eventos e consistência entre contextos nas Issues #13 e #40;
+- revisar a proposta de eventos em
+  [`internal-events-strategy.md`](internal-events-strategy.md) na Issue #13 e
+  detalhar consistência entre contextos na Issue #40;
 - detalhar autenticação/autorização nas Issues #23–#39;
 - catalogar tabelas legadas que ainda misturam contextos.
 
