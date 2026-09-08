@@ -16,7 +16,9 @@ Um erro pode gerar os três, com IDs em comum, mas retenção, acesso e imutabil
 são próprios. Esta proposta depende da
 [configuração segura](../security/secure-configuration.md), do
 [threat model](../security/threat-model.md) e do
-[contrato de ambientes](environment-strategy.md).
+[contrato de ambientes](environment-strategy.md). Métricas, traces, health,
+dashboards e SLOs são definidos na
+[estratégia de observabilidade](observability-strategy.md).
 
 ## Baseline observado
 
