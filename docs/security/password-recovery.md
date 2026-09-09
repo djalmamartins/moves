@@ -4,6 +4,9 @@ Status: proposta de Discovery para revisão. Consolida o baseline existente e
 define o contrato futuro; não altera usuários, tokens, banco, sessões, e-mail,
 MFA ou configuração de produção.
 
+A etapa que recebe o token e confirma a nova credencial possui contrato próprio
+em [redefinição segura de senha](secure-password-reset.md).
+
 ## Objetivo e princípios
 
 Permitir que uma pessoa recupere o acesso sem revelar se a identidade existe,
